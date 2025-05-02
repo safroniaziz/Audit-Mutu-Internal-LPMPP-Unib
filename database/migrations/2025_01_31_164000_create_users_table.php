@@ -18,16 +18,12 @@ return new class extends Migration
             $table->string('username')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->unsignedBigInteger('ketua_auditee')->nullable();
-            $table->unsignedBigInteger('website')->nullable();
-            $table->unsignedBigInteger('no_hp')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
 
             $table->foreign('unit_kerja_id')->references('id')->on('unit_kerjas');
-
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

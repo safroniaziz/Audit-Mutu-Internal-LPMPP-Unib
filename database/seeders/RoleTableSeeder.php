@@ -23,7 +23,6 @@ class RoleTableSeeder extends Seeder
 
         foreach ($roles as $role) {
             DB::table('roles')->insert([
-                'id' => Str::uuid(),
                 'name' => $role,
                 'guard_name' => 'web',
                 'created_at' => now(),

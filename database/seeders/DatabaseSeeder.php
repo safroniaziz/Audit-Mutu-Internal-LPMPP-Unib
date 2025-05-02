@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\IndikatorInstrumen;
+use App\Models\InstrumenProdi;
+use App\Models\SatuanStandar;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,5 +24,11 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call(RoleTableSeeder::class);
         $this->call(UnitKerjaSeeder::class);
+        $this->call(IndikatorInstrumenSeeder::class);
+        $this->call(KriteriaInstrumenSeeder::class);
+        $this->call(InstrumenProdi::class);
+        $this->call(SatuanStandar::class);
+        $this->call(IndikatorKinerjaSeeder::class);
+        $this->call(InstrumenIkssSeeder::class);
     }
 }

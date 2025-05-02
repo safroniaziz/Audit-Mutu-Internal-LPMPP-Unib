@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('indikator_instrumen_kriterias', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('indikator_instrumen_id');
-            $table->string('kode_kriteria');
+            $table->string('kode_kriteria')->nullable();
             $table->string('nama_kriteria');
             $table->softDeletes();
             $table->timestamps();

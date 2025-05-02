@@ -15,9 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('kode_unit_kerja')->unique();
             $table->string('nama_unit_kerja');
-            $table->enum('jenis_unit_kerja',['prodi','fakultas','upt','lembaga']);
-            $table->enum('jenjang',['D2','D3','D4','S1','S2','S3','Profesi'])->nullable();
+            $table->enum('jenis_unit_kerja', ['prodi', 'fakultas', 'upt', 'lembaga']);
+            $table->enum('jenjang', ['D2', 'D3', 'D4', 'S1', 'S2', 'S3', 'Profesi'])->nullable();
             $table->string('fakultas')->nullable();
+            $table->string('nama_ketua')->nullable();
+            $table->string('nip_ketua')->nullable();
+            $table->string('website')->nullable();
+            $table->string('no_hp')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
