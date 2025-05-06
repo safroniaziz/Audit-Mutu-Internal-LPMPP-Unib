@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Kuisioner extends Model
+{
+    use SoftDeletes;
+
+    protected $guarded = [];
+
+    public function opsis(): HasMany
+    {
+        return $this->hasMany(KuisionerOpsi::class,'kuisioner_id','id');
+    }
+
+    /**
+     * Get the jawaban for the kuisioner.
+     */
+    public function jawabans(): HasMany
+    {
+        return $this->hasMany(KuisionerJawaban::class,'kuisioner_id','id');
+    }
+}
