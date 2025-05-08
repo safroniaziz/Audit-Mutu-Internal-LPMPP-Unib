@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('judul');
             $table->text('konten');
-            $table->timestamp('tanggal_publikasi');
-            $table->timestamp('tanggal_berlaku');
+            $table->dateTime('tanggal_publikasi')->nullable();
+            $table->dateTime('tanggal_berlaku')->nullable();
             $table->string('lampiran');
             $table->string('thumbnail');
             $table->softDeletes();

@@ -235,12 +235,48 @@
                         </a>
                     </div>
 
-                    <div class="menu-item {{ Route::is('penugasanAuditor.index') ? 'show' : '' }}">
-                        <a class="menu-link {{ Route::is('penugasanAuditor.index') ? 'active' : '' }}" href="{{ route('penugasanAuditor.index') }}">
+                    <!-- Kuisioner Auditor -->
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('kuisioner.index','opsiKuisioner.index') ? 'show' : '' }}">
+                        <span class="menu-link">
                             <span class="menu-icon">
-                                <i class="fas fa-user-cog fs-4"></i>
+                                <i class="fas fa-clipboard-list fs-4"></i> {{-- lebih cocok untuk kuisioner --}}
                             </span>
-                            <span class="menu-title">Penugasan Auditor</span>
+                            <span class="menu-title">Kuisioner Auditor</span>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ Route::is('kuisioner.index') ? 'active' : '' }}" href="{{ route('kuisioner.index') }}">
+                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                    <span class="menu-title">Data Kuisioner</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ Route::is('opsiKuisioner.index') ? 'active' : '' }}" href="{{ route('opsiKuisioner.index') }}">
+                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                    <span class="menu-title">Opsi Kuisioner</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item {{ Route::is('tujuan.index') ? 'show' : '' }}">
+                        <a class="menu-link {{ Route::is('tujuan.index') ? 'active' : '' }}" href="{{ route('tujuan.index') }}">
+                            <span class="menu-icon">
+                                <i class="fas fa-compass fs-4"></i>
+                            </span>
+                            <span class="menu-title">Tujuan AMI</span>
+                        </a>
+                    </div>
+
+                    <div class="menu-item {{ Route::is('lingkupAudit.index') ? 'show' : '' }}">
+                        <a class="menu-link {{ Route::is('lingkupAudit.index') ? 'active' : '' }}" href="{{ route('lingkupAudit.index') }}">
+                            <span class="menu-icon">
+                                <i class="fas fa-project-diagram fs-4"></i> {{-- Representasi ruang lingkup, struktur kerja --}}
+                            </span>
+                            <span class="menu-title">Lingkup Audit</span>
                         </a>
                     </div>
 

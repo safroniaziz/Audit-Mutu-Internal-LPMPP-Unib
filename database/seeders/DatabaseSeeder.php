@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         $this->call(PeriodeAktifSeeder::class);
         $this->call(TujuanSeeder::class);
-        $this->call(LingkupAudit::class);
+        $this->call(LingkupAuditSeeder::class);
         $this->call(KuisionerSeeder::class);
     }
 }

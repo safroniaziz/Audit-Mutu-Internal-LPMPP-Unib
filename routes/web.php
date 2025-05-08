@@ -11,14 +11,20 @@ use App\Http\Controllers\IndikatorInstrumenController;
 use App\Http\Controllers\IndikatorInstrumenKriteriaController;
 use App\Http\Controllers\InstrumenIkssController;
 use App\Http\Controllers\InstrumenProdiController;
+use App\Http\Controllers\KuisionerController;
+use App\Http\Controllers\KuisionerOpsiController;
+use App\Http\Controllers\LingkupAuditController;
 use App\Http\Controllers\PenugasanAuditorController;
 use App\Http\Controllers\PeriodeAktifController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RsbFakultasController;
 use App\Http\Controllers\RsbProdiController;
 use App\Http\Controllers\SatuanStandarController;
+use App\Http\Controllers\TujuanController;
 use App\Http\Controllers\UnitKerjaController;
 use App\Http\Controllers\UserController;
+use App\Models\KuisionerOpsi;
+use App\Models\LingkupAudit;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -73,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/delete-selected', [InstrumenProdiController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
             Route::put('/auditor/{id}/restore', [InstrumenProdiController::class, 'restore'])->name('restore');
             Route::delete('/{id}/hapus-permanen/', [InstrumenProdiController::class, 'destroyPermanent'])->name('hapus_permanen');
-            Route::get('/indikator/{indikatorId}/kriteria', [InstrumenProdiController::class, 'getKriteriaByIndikator']) ->name('getKriteriaByIndikator');
+            Route::get('/indikator/{indikatorId}/kriteria', [InstrumenProdiController::class, 'getKriteriaByIndikator'])->name('getKriteriaByIndikator');
             Route::get('/instrumen-prodi/{id}', [InstrumenProdiController::class, 'show'])->name('show');
         });
 
@@ -169,6 +175,50 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/save-penugasan-auditor', [PenugasanAuditorController::class, 'savePenugasanAuditor']);
         });
 
+        Route::prefix('data-kuisioner')->name('kuisioner.')->group(function () {
+            Route::get('/', [KuisionerController::class, 'index'])->name('index');
+            Route::post('/', [KuisionerController::class, 'store'])->name('store');
+            Route::get('/{kuisioner}/edit', [KuisionerController::class, 'edit'])->name('edit');
+            Route::put('/{kuisioner}', [KuisionerController::class, 'update'])->name('update');
+            Route::delete('/{kuisioner}', [KuisionerController::class, 'nonaktifkan'])->name('nonaktifkan');
+            Route::post('/delete-selected', [KuisionerController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
+            Route::put('/auditor/{id}/restore', [KuisionerController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/hapus-permanen/', [KuisionerController::class, 'destroyPermanent'])->name('hapus_permanen');
+        });
+
+        Route::prefix('data-kuisioner-opsi')->name('opsiKuisioner.')->group(function () {
+            Route::get('/', [KuisionerOpsiController::class, 'index'])->name('index');
+            Route::post('/', [KuisionerOpsiController::class, 'store'])->name('store');
+            Route::get('/{opsiKuisioner}/edit', [KuisionerOpsiController::class, 'edit'])->name('edit');
+            Route::put('/{opsiKuisioner}', [KuisionerOpsiController::class, 'update'])->name('update');
+            Route::delete('/{opsiKuisioner}', [KuisionerOpsiController::class, 'nonaktifkan'])->name('nonaktifkan');
+            Route::post('/delete-selected', [KuisionerOpsiController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
+            Route::put('/auditor/{id}/restore', [KuisionerOpsiController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/hapus-permanen/', [KuisionerOpsiController::class, 'destroyPermanent'])->name('hapus_permanen');
+        });
+
+        Route::prefix('tujuan-ami')->name('tujuan.')->group(function () {
+            Route::get('/', [TujuanController::class, 'index'])->name('index');
+            Route::post('/', [TujuanController::class, 'store'])->name('store');
+            Route::get('/{tujuan}/edit', [TujuanController::class, 'edit'])->name('edit');
+            Route::put('/{tujuan}', [TujuanController::class, 'update'])->name('update');
+            Route::delete('/{tujuan}', [TujuanController::class, 'nonaktifkan'])->name('nonaktifkan');
+            Route::post('/delete-selected', [TujuanController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
+            Route::put('/auditor/{id}/restore', [TujuanController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/hapus-permanen/', [TujuanController::class, 'destroyPermanent'])->name('hapus_permanen');
+        });
+
+        Route::prefix('lingkup-audit')->name('lingkupAudit.')->group(function () {
+            Route::get('/', [LingkupAuditController::class, 'index'])->name('index');
+            Route::post('/', [LingkupAuditController::class, 'store'])->name('store');
+            Route::get('/{lingkupAudit}/edit', [LingkupAuditController::class, 'edit'])->name('edit');
+            Route::put('/{lingkupAudit}', [LingkupAuditController::class, 'update'])->name('update');
+            Route::delete('/{lingkupAudit}', [LingkupAuditController::class, 'nonaktifkan'])->name('nonaktifkan');
+            Route::post('/delete-selected', [LingkupAuditController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
+            Route::put('/auditor/{id}/restore', [LingkupAuditController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/hapus-permanen/', [LingkupAuditController::class, 'destroyPermanent'])->name('hapus_permanen');
+        });
+
         Route::prefix('auditor')->name('auditor.')->group(function () {
             Route::get('/', [AuditorController::class, 'index'])->name('index');
         });
@@ -219,7 +269,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('/daftar-pertanyaan/{pengajuan}', [AuditorAuditController::class, 'daftarPertanyaan'])->name('daftarPertanyaan');
                     Route::post('/laporan-ami/{pengajuan}', [AuditorAuditController::class, 'laporanAmi'])->name('laporanAmi');
                 });
-
             });
         });
     });
@@ -227,7 +276,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
