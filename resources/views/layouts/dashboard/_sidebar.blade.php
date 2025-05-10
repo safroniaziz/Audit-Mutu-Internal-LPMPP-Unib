@@ -280,6 +280,15 @@
                         </a>
                     </div>
 
+                    <div class="menu-item {{ Route::is('laporan.index') ? 'show' : '' }}">
+                        <a class="menu-link {{ Route::is('laporan.index') ? 'active' : '' }}" href="{{ route('laporan.index') }}">
+                            <span class="menu-icon">
+                                <i class="fas fa-file-alt fs-4"></i>
+                            </span>
+                            <span class="menu-title">Laporan Hasil Audit</span>
+                        </a>
+                    </div>
+
                     <div class="menu-item">
                         <!--begin:Menu link-->
                         <a class="menu-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
