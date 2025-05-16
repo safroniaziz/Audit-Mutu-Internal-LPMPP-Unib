@@ -289,12 +289,12 @@
                         </a>
                     </div>
 
-                    <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
-                        <a class="menu-link {{ Route::is('dokumenAmi.index') ? 'active' : '' }}" href="{{ route('dokumenAmi.index') }}">
+                    <div class="menu-item {{ Route::is('dokumen.index') ? 'show' : '' }}">
+                        <a class="menu-link {{ Route::is('dokumen.index') ? 'active' : '' }}" href="{{ route('dokumen.index') }}">
                             <span class="menu-icon">
                                 <i class="fas fa-file-alt fs-4"></i>
                             </span>
-                            <span class="menu-title">Dokumen Ami</span>
+                            <span class="menu-title">dokumen Hasil Audit</span>
                         </a>
                     </div>
 

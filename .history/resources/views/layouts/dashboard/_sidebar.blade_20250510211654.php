@@ -289,13 +289,23 @@
                         </a>
                     </div>
 
-                    <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
-                        <a class="menu-link {{ Route::is('dokumenAmi.index') ? 'active' : '' }}" href="{{ route('dokumenAmi.index') }}">
+                    <!-- Kuisioner Auditor -->
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('dokumen.index') ? 'show' : '' }}">
+                        <span class="menu-link">
                             <span class="menu-icon">
-                                <i class="fas fa-file-alt fs-4"></i>
+                                <i class="fas fa-clipboard-list fs-4"></i> {{-- lebih cocok untuk dokumen --}}
                             </span>
-                            <span class="menu-title">Dokumen Ami</span>
-                        </a>
+                            <span class="menu-title">Dokumen AMI</span>
+                            <span class="menu-arrow"></span>
+                        </span>
+                        <div class="menu-sub menu-sub-accordion">
+                            <div class="menu-item">
+                                <a class="menu-link {{ Route::is('dokumen.index') ? 'active' : '' }}" href="{{ route('dokumen.index') }}">
+                                    <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                    <span class="menu-title">Data Kuisioner</span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="menu-item">

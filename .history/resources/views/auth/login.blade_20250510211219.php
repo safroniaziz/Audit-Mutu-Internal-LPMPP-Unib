@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SIAMI LPPM UNIB - Login</title>
-    <link rel="shortcut icon" href="{{ asset('assets/src/images/logo_unib.png') }}">
+    <link rel="shortcut icon" href="{{ asset('') }}">
 
     <!-- tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>

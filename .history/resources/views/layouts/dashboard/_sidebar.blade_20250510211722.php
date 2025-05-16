@@ -289,13 +289,20 @@
                         </a>
                     </div>
 
-                    <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
-                        <a class="menu-link {{ Route::is('dokumenAmi.index') ? 'active' : '' }}" href="{{ route('dokumenAmi.index') }}">
+                    <div class="menu-item">
+                        <!--begin:Menu link-->
+                        <a class="menu-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <span class="menu-icon">
-                                <i class="fas fa-file-alt fs-4"></i>
+                                <i class="fa fa-sign-out-alt fs-4 text-danger"></i>
                             </span>
-                            <span class="menu-title">Dokumen Ami</span>
+                            <span class="menu-title">Logout</span>
                         </a>
+                        <!--end:Menu link-->
+
+                        <!-- Form for logout -->
+                        <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                            @csrf
+                        </form>
                     </div>
 
                     <div class="menu-item">

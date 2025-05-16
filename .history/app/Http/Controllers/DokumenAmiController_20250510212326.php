@@ -15,7 +15,7 @@ class DokumenAmiController extends Controller
         $dokumenUmum = DokumenAmi::where('jenis_dokumen','umum')
                                     ->first();
 
-        return view('dokumen_ami.index',[
+        return view('auditee/pengajuan_ami/unggah_siklus',[
             'dokumenAuditor'  =>  $dokumenAuditor,
             'dokumenAuditee'  =>  $dokumenAuditee,
             'dokumenUmum'  =>  $dokumenUmum,

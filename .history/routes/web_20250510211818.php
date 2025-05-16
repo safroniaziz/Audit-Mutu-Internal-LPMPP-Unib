@@ -221,7 +221,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{id}/hapus-permanen/', [LingkupAuditController::class, 'destroyPermanent'])->name('hapus_permanen');
         });
 
-        Route::prefix('dokumen-ami')->name('dokumenAmi.')->group(function () {
+        Route::prefix('lingkup-ami')->name('dokumenAmi.')->group(function () {
             Route::get('/', [DokumenAmiController::class, 'index'])->name('index');
             Route::post('/', [DokumenAmiController::class, 'store'])->name('store');
             Route::get('/{dokumenAmi}/edit', [DokumenAmiController::class, 'edit'])->name('edit');

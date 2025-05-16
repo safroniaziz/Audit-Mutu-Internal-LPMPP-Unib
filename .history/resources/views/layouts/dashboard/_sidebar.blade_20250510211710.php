@@ -289,15 +289,6 @@
                         </a>
                     </div>
 
-                    <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
-                        <a class="menu-link {{ Route::is('dokumenAmi.index') ? 'active' : '' }}" href="{{ route('dokumenAmi.index') }}">
-                            <span class="menu-icon">
-                                <i class="fas fa-file-alt fs-4"></i>
-                            </span>
-                            <span class="menu-title">Dokumen Ami</span>
-                        </a>
-                    </div>
-
                     <div class="menu-item">
                         <!--begin:Menu link-->
                         <a class="menu-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -8,17 +8,14 @@ use Illuminate\Http\Request;
 class DokumenAmiController extends Controller
 {
     public function index(){
-        $dokumenAuditor = DokumenAmi::where('jenis_dokumen','auditor')
-                                    ->first();
-        $dokumenAuditee = DokumenAmi::where('jenis_dokumen','auditee')
-                                    ->first();
-        $dokumenUmum = DokumenAmi::where('jenis_dokumen','umum')
-                                    ->first();
-
-        return view('dokumen_ami.index',[
-            'dokumenAuditor'  =>  $dokumenAuditor,
-            'dokumenAuditee'  =>  $dokumenAuditee,
-            'dokumenUmum'  =>  $dokumenUmum,
+        $dokumenAuditor = DokumenAmi::with(['auditor'])
+                            ->first();
+        $dokumenAuditee = DokumenAmi::with(['auditee'])
+                            ->first();
+        $dokumenUmum = DokumenAmi::with(['umum'])
+                            ->first();
+        return view('auditee/pengajuan_ami/unggah_siklus',[
+            'siklus'  =>  $siklus,
         ]);
     }
 

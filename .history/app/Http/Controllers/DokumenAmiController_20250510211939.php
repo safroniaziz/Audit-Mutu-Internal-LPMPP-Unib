@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DokumenAmi;
 use Illuminate\Http\Request;
 
 class DokumenAmiController extends Controller
 {
-    public function index(){
-        $dokumenAuditor = DokumenAmi::where('jenis_dokumen','auditor')
-                                    ->first();
-        $dokumenAuditee = DokumenAmi::where('jenis_dokumen','auditee')
-                                    ->first();
-        $dokumenUmum = DokumenAmi::where('jenis_dokumen','umum')
-                                    ->first();
-
-        return view('dokumen_ami.index',[
-            'dokumenAuditor'  =>  $dokumenAuditor,
-            'dokumenAuditee'  =>  $dokumenAuditee,
-            'dokumenUmum'  =>  $dokumenUmum,
+    public function unggahSiklus(){
+        $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
+        $siklus = PengajuanAmi::with(['siklus'])->where('auditee_id',Auth::user()->unit_kerja_id)
+                            ->where('periode_id', $periodeAktif->id)
+                            ->first();
+        return view('auditee/pengajuan_ami/unggah_siklus',[
+            'siklus'  =>  $siklus,
         ]);
     }
 
-    public function store(Request $request)
+    public function uploadFiles(Request $request)
     {
         $request->validate([
             'auditee_id' => 'required',
@@ -82,7 +76,7 @@ class DokumenAmiController extends Controller
         ]);
     }
 
-    public function nonaktifkan($id)
+    public function destroy($id)
     {
         try {
             // Ambil data file

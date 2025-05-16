@@ -9,13 +9,13 @@ class DokumenAmiController extends Controller
 {
     public function index(){
         $dokumenAuditor = DokumenAmi::where('jenis_dokumen','auditor')
-                                    ->first();
+                            ->first();
         $dokumenAuditee = DokumenAmi::where('jenis_dokumen','auditee')
-                                    ->first();
+                            ->first();
         $dokumenUmum = DokumenAmi::where('jenis_dokumen','umum')
-                                    ->first();
+                            ->first();
 
-        return view('dokumen_ami.index',[
+        return view('auditee/pengajuan_ami/unggah_siklus',[
             'dokumenAuditor'  =>  $dokumenAuditor,
             'dokumenAuditee'  =>  $dokumenAuditee,
             'dokumenUmum'  =>  $dokumenUmum,

@@ -294,7 +294,7 @@
                             <span class="menu-icon">
                                 <i class="fas fa-file-alt fs-4"></i>
                             </span>
-                            <span class="menu-title">Dokumen Ami</span>
+                            <span class="menu-title">dokumenAmi Hasil Audit</span>
                         </a>
                     </div>
 

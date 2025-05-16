@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('kategori_dokumen',['auditor','auditee','umum']);
             $table->text('deskripsi_dokumen');
             $table->string('file_dokumen');
-            $table->enum('jenis_dokumen',['auditee','auditpr','umum']);
+            $table->string('jenis_dokumen',['auditee','auditpr','umum']);
             $table->dateTime('tanggal_unggah')->nullable();
             $table->dateTime('tanggal_berlaku')->nullable();
             $table->softDeletes();

@@ -6,7 +6,6 @@ use App\Http\Controllers\AuditeeProfilController;
 use App\Http\Controllers\AuditorAuditController;
 use App\Http\Controllers\AuditorController;
 use App\Http\Controllers\AuditorProfilController;
-use App\Http\Controllers\DokumenAmiController;
 use App\Http\Controllers\IkssController;
 use App\Http\Controllers\IndikatorInstrumenController;
 use App\Http\Controllers\IndikatorInstrumenKriteriaController;
@@ -220,18 +219,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/auditor/{id}/restore', [LingkupAuditController::class, 'restore'])->name('restore');
             Route::delete('/{id}/hapus-permanen/', [LingkupAuditController::class, 'destroyPermanent'])->name('hapus_permanen');
         });
-
-        Route::prefix('dokumen-ami')->name('dokumenAmi.')->group(function () {
-            Route::get('/', [DokumenAmiController::class, 'index'])->name('index');
-            Route::post('/', [DokumenAmiController::class, 'store'])->name('store');
-            Route::get('/{dokumenAmi}/edit', [DokumenAmiController::class, 'edit'])->name('edit');
-            Route::put('/{dokumenAmi}', [DokumenAmiController::class, 'update'])->name('update');
-            Route::delete('/{dokumenAmi}', [DokumenAmiController::class, 'nonaktifkan'])->name('nonaktifkan');
-            Route::post('/delete-selected', [DokumenAmiController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
-            Route::put('/auditor/{id}/restore', [DokumenAmiController::class, 'restore'])->name('restore');
-            Route::delete('/{id}/hapus-permanen/', [DokumenAmiController::class, 'destroyPermanent'])->name('hapus_permanen');
-        });
-
         Route::prefix('laporan')->name('laporan.')->group(function () {
             Route::get('/', [LaporanHasilAuditController::class, 'index'])->name('index');
             Route::get('/{id}/detail', [LaporanHasilAuditController::class, 'show'])->name('detail');
