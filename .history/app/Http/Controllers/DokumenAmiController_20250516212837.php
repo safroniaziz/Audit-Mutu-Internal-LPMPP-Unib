@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DokumenAmiController extends Controller
 {
+<<<<<<< HEAD
     public function index(){
         $dokumenAuditor = DokumenAmi::where('jenis_dokumen','auditor')
                                     ->first();
@@ -21,6 +22,13 @@ class DokumenAmiController extends Controller
             'dokumenAuditor'  =>  $dokumenAuditor,
             'dokumenAuditee'  =>  $dokumenAuditee,
             'dokumenUmum'  =>  $dokumenUmum,
+=======
+    public function index()
+    {
+        $dokumenAmis = DokumenAmi::orderBy('created_at', 'desc')->withTrashed()->get();
+        return view('dokumen_ami.index', [
+            'dokumenAmis'    =>  $dokumenAmis,
+>>>>>>> 6ff025fe6206501c3c4391aa810d2d0240dc0f45
         ]);
     }
 

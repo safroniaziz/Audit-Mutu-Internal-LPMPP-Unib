@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+@extends('auditee/dashboard_template')
+=======
 @extends('layouts.dashboard.dashboard')
 @section('menu')
     Data Dokumen AMI
@@ -11,6 +14,7 @@
     </li>
     <li class="breadcrumb-item text-muted">Data Dokumen AMI</li>
 @endsection
+>>>>>>> 6ff025fe6206501c3c4391aa810d2d0240dc0f45
 @push('styles')
     <style>
         /* Add these styles to your CSS file */
