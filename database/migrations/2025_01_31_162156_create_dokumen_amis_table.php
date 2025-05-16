@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('dokumen_amis', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('nama_dokumen');
-            $table->enum('kategori_dokumen',['auditor','auditee','umum']);
+            $table->enum('kategori_dokumen', ['auditor', 'auditee', 'umum']);
             $table->text('deskripsi_dokumen');
             $table->string('file_dokumen');
+            $table->string('size_dokumen');
             $table->dateTime('tanggal_unggah')->nullable();
             $table->dateTime('tanggal_berlaku')->nullable();
             $table->softDeletes();

@@ -64,6 +64,17 @@
                         <!--end:Menu link-->
                     </div>
 
+                    <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
+                        <!--begin:Menu link-->
+                        <a class="menu-link {{ Route::is('dokumenAmi.index') ? 'active' : '' }}" href="{{ route('dokumenAmi.index') }}">
+                            <span class="menu-icon">
+                                <i class="fa fa-file-alt fs-4"></i>
+                            </span>
+                            <span class="menu-title">Dokumen AMI</span>
+                        </a>
+                        <!--end:Menu link-->
+                    </div>
+
                     <div class="menu-item ">
                         <!--begin:Menu content-->
                         <div class="menu-content">
