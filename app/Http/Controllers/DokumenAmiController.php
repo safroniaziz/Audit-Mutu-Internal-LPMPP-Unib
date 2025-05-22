@@ -9,15 +9,16 @@ use Illuminate\Support\Facades\Validator;
 
 class DokumenAmiController extends Controller
 {
-    public function index(){
-        $dokumenAuditor = DokumenAmi::where('jenis_dokumen','auditor')
-                                    ->first();
-        $dokumenAuditee = DokumenAmi::where('jenis_dokumen','auditee')
-                                    ->first();
-        $dokumenUmum = DokumenAmi::where('jenis_dokumen','umum')
-                                    ->first();
+    public function index()
+    {
+        $dokumenAuditor = DokumenAmi::where('jenis_dokumen', 'auditor')
+            ->first();
+        $dokumenAuditee = DokumenAmi::where('jenis_dokumen', 'auditee')
+            ->first();
+        $dokumenUmum = DokumenAmi::where('jenis_dokumen', 'umum')
+            ->first();
 
-        return view('dokumen_ami.index',[
+        return view('dokumen_ami.index', [
             'dokumenAuditor'  =>  $dokumenAuditor,
             'dokumenAuditee'  =>  $dokumenAuditee,
             'dokumenUmum'  =>  $dokumenUmum,

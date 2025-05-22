@@ -6,6 +6,7 @@ use App\Models\UnitKerja;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
@@ -14,18 +15,18 @@ class AuditorController extends Controller
     public function index()
     {
         $jenisUnitKerja = UnitKerja::select('jenis_unit_kerja')
-                        ->distinct()
-                        ->orderBy('jenis_unit_kerja', 'asc')
-                        ->pluck('jenis_unit_kerja');
+            ->distinct()
+            ->orderBy('jenis_unit_kerja', 'asc')
+            ->pluck('jenis_unit_kerja');
         $unitKerjas = UnitKerja::all();
 
         $roleExists = Role::where('name', 'auditor')->where('guard_name', 'web')->exists();
         $auditors = $roleExists
             ? User::role('auditor')
-                ->with(['unitKerja'])
-                ->orderBy('created_at', 'desc')
-                ->withTrashed()
-                ->get()
+            ->with(['unitKerja'])
+            ->orderBy('created_at', 'desc')
+            ->withTrashed()
+            ->get()
             : collect();
 
         return view('auditor.index', [
@@ -41,9 +42,9 @@ class AuditorController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'username' => 'required|string|unique:users,username|max:255',
-            'no_hp' => 'required|numeric',
             'unit_kerja_id' => 'required|exists:unit_kerjas,id',
             'password' => 'required|min:6|confirmed',
+            'foto' => 'required|image|mimes:jpeg,jpg,png|max:2048',
         ], [
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama harus berupa teks.',
@@ -55,15 +56,16 @@ class AuditorController extends Controller
             'username.string' => 'Username harus berupa teks.',
             'username.unique' => 'Username sudah digunakan.',
             'username.max' => 'Username maksimal 255 karakter.',
-            'no_hp.required' => 'Nomor HP wajib diisi.',
-            'no_hp.numeric' => 'Nomor HP harus berupa angka.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
             'unit_kerja_id.required' => 'Unit kerja wajib diisi.',
             'unit_kerja_id.exists' => 'Unit kerja yang dipilih tidak valid.',
+            'foto.required' => 'Foto profil wajib diupload.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
-
 
         if ($validator->fails()) {
             return response()->json([
@@ -71,19 +73,24 @@ class AuditorController extends Controller
             ], 422);
         }
 
+        // Handle upload foto
+        $folder = "foto/auditor";
+        $file = $request->file('foto');
+        $filePath = $file->store($folder, 'public');
+
         $user = User::create([
             'name' => $request->name,
             'unit_kerja_id' => $request->unit_kerja_id,
             'username' => $request->username,
             'email' => $request->email,
-            'no_hp' => $request->no_hp,
             'password' => Hash::make($request->password),
+            'foto' => $filePath, // Simpan path foto
         ]);
 
         $user->assignRole('Auditor');
 
         return response()->json([
-            'message' => 'auditor berhasil ditambahkan!',
+            'message' => 'Auditor berhasil ditambahkan!',
             'data' => $user
         ]);
     }
@@ -94,17 +101,25 @@ class AuditorController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
 
+        $auditor->foto_url = $auditor->foto
+            ? Storage::url($auditor->foto)
+            : null;
+
         return response()->json(['success' => true, 'data' => $auditor]);
     }
 
-    public function update(Request $request, User $auditor)
+
+    public function update(Request $request, $id)
     {
+        $user = User::findOrFail($id);
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $auditor->id,
-            'username' => 'required|string|max:255|unique:users,username,' . $auditor->id,
+            'email' => 'required|email|unique:users,email,' . $id,
+            'username' => 'required|string|unique:users,username,' . $id . '|max:255',
             'unit_kerja_id' => 'required|exists:unit_kerjas,id',
-            'no_hp' => 'required|numeric',
+            'foto' => 'nullable|image|mimes:jpeg,jpg,png|max:2048',
+            'foto_remove' => 'nullable|string',
         ], [
             'name.required' => 'Nama wajib diisi.',
             'name.string' => 'Nama harus berupa teks.',
@@ -114,12 +129,13 @@ class AuditorController extends Controller
             'email.unique' => 'Email sudah digunakan.',
             'username.required' => 'Username wajib diisi.',
             'username.string' => 'Username harus berupa teks.',
-            'username.max' => 'Username maksimal 255 karakter.',
             'username.unique' => 'Username sudah digunakan.',
-            'no_hp.required' => 'Nomor HP wajib diisi.',
-            'no_hp.numeric' => 'Nomor HP harus berupa angka.',
+            'username.max' => 'Username maksimal 255 karakter.',
             'unit_kerja_id.required' => 'Unit kerja wajib diisi.',
             'unit_kerja_id.exists' => 'Unit kerja yang dipilih tidak valid.',
+            'foto.image' => 'File harus berupa gambar.',
+            'foto.mimes' => 'Format foto harus JPG, JPEG, atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -128,17 +144,38 @@ class AuditorController extends Controller
             ], 422);
         }
 
-        $auditor->update([
+        $updateData = [
             'name' => $request->name,
             'unit_kerja_id' => $request->unit_kerja_id,
             'username' => $request->username,
             'email' => $request->email,
-            'no_hp' => $request->no_hp,
-        ]);
+        ];
+
+        // Handle foto upload/remove
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            // Upload foto baru
+            $folder = "foto/auditor";
+            $file = $request->file('foto');
+            $filePath = $file->store($folder, 'public');
+            $updateData['foto'] = $filePath;
+        } elseif ($request->foto_remove == '1') {
+            // Hapus foto jika diminta
+            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+            $updateData['foto'] = null;
+        }
+
+        $user->update($updateData);
 
         return response()->json([
             'message' => 'Auditor berhasil diperbarui!',
-            'data' => $auditor
+            'data' => $user
         ]);
     }
 
