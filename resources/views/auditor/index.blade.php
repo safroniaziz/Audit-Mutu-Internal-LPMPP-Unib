@@ -70,7 +70,7 @@
                                     <th class="min-w-125px">Unit Kerja</th>
                                     <th>Username</th>
                                     <th>Email</th>
-                                    <th>No. Handphone</th>
+                                    <th>Foto</th>
                                     <th class="min-w-100px">Terdaftar Sejak</th>
                                     <th class="min-w-100px text-center">Ubah Password</th>
                                     <th class="min-w-100px text-center">Status</th>
@@ -90,7 +90,13 @@
                                         <td>{{ optional($auditor->unitKerja)->nama_unit_kerja }}</td>
                                         <td>{{ $auditor->username ? $auditor->username : '-' }}</td>
                                         <td>{{ $auditor->email }}</td>
-                                        <td>{{ $auditor->no_hp ? $auditor->no_hp : '-' }}</td>
+                                        <td>
+                                            @if ($auditor->foto)
+                                            <img src="{{ Storage::url($auditor->foto) }}" alt="Foto Auditor" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+                                            @else
+                                                <span>-</span>
+                                            @endif
+                                        </td>
                                         <td>{{ \Carbon\Carbon::parse($auditor->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-primary ubah-password-btn" data-id="{{ $auditor->id }}">
@@ -234,6 +240,7 @@
             $('#methodField').val('POST').trigger('change');
             $('#kt_modal').modal('show');
             $('#kt_modal_form').attr('action', "{{ route('auditor.store') }}");
+            initImageInput();
         });
 
         $('.editAuditorButton').click(function() {
@@ -257,8 +264,24 @@
                     if (response.data.username) {
                         $('[name="username"]').val(response.data.username);
                     }
-                    if (response.data.no_hp) {
-                        $('[name="no_hp"]').val(response.data.no_hp);
+
+                    if (response.data.id) {
+                        $('[name="auditor_id"]').val(response.data.id);
+                    }
+
+                    if (response.data.foto_url) {
+                        const dropZone = document.getElementById('dragDropZone');
+                        dropZone.innerHTML = `
+                            <img src="${response.data.foto_url}" class="preview-img">
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <button type="button" class="btn btn-sm btn-danger btn-icon" onclick="resetUpload()">
+                                    <i class="ki-duotone ki-cross fs-2">
+                                        <span class="path1"></span>
+                                        <span class="path2"></span>
+                                    </i>
+                                </button>
+                            </div>`;
+                        dropZone.classList.add('success-upload');
                     }
 
                     $('#kt_modal').modal('show');

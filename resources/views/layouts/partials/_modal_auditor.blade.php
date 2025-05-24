@@ -1,13 +1,157 @@
+@push('styles')
+    <style>
+        /* Drag & Drop Zone Styling */
+        .drag-drop-zone {
+            width: 250px;
+            height: 200px;
+            border: 3px dashed #E1E5E9;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f4fd 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drag-drop-zone:hover {
+            border-color: #009EF7;
+            background: linear-gradient(135deg, #e8f4fd 0%, #009ef720 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 158, 247, 0.15);
+        }
+
+        .drag-drop-zone.drag-over {
+            border-color: #50CD89;
+            background: linear-gradient(135deg, #e8fff3 0%, #50cd8920 100%);
+            transform: scale(1.02);
+            box-shadow: 0 25px 50px rgba(80, 205, 137, 0.2);
+        }
+
+        .drag-drop-zone .upload-icon {
+            transition: all 0.3s ease;
+        }
+
+        .drag-drop-zone:hover .upload-icon {
+            transform: translateY(-5px);
+        }
+
+        .drag-drop-zone.drag-over .upload-icon {
+            transform: scale(1.1) translateY(-5px);
+        }
+
+        /* Success Animation */
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-upload {
+            animation: bounce-in 0.6s ease-out;
+            border-color: #50CD89 !important;
+            background: linear-gradient(135deg, #e8fff3 0%, #50cd8920 100%) !important;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Preview Image */
+        .preview-img {
+            border-radius: 20px;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Pulse Animation for Upload Icon */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .drag-drop-zone:hover .upload-icon i {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Smooth text transitions */
+        .drag-drop-zone h4, .drag-drop-zone p {
+            transition: all 0.3s ease;
+        }
+
+        .drag-drop-zone:hover h4 {
+            color: #009EF7;
+        }
+
+        .drag-drop-zone.drag-over h4 {
+            color: #50CD89;
+        }
+    </style>
+@endpush
+
 <div class="modal fade" id="kt_modal" tabindex="-1" data-bs-backdrop="static" data-bs-focus="true">
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header px-10">
-                <h2 class="fw-bold">Tambah Auditor</h2>
+                <h2 class="fw-bold" id="modalTitle">Tambah Auditor</h2>
             </div>
             <div class="modal-body d-flex flex-column scroll-y px-10" style="flex-grow: 1;">
-                <form id="kt_modal_form" class="form d-flex flex-column" style="flex-grow: 1;">
+                <form id="kt_modal_form" class="form d-flex flex-column" style="flex-grow: 1;" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="_method" id="methodField" value="POST">
+                    <input type="hidden" name="auditor_id" id="auditorId" value="">
+
+                    <!-- Photo Upload Section -->
+                    <div class="fv-row mb-8">
+                        <label class="fs-5 fw-semibold form-label mb-3">Foto Profil</label>
+                        <div class="d-flex justify-content-center">
+                            <div class="drag-drop-zone" id="dragDropZone">
+                                <input type="file" name="foto" id="fotoInput" accept=".png,.jpg,.jpeg" style="display: none;" />
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="ki-duotone ki-cloud-add fs-3x text-primary mb-3">
+                                            <span class="path1"></span>
+                                            <span class="path2"></span>
+                                        </i>
+                                    </div>
+                                    <h4 class="fw-bold text-gray-800 mb-2">Drop foto di sini</h4>
+                                    <p class="text-muted fs-7 mb-0">atau klik untuk pilih file</p>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="form-text text-muted fs-7 mt-2 text-center">
+                            <i class="ki-duotone ki-information-2 text-primary me-1">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                                <span class="path3"></span>
+                            </i>
+                            Format yang diizinkan: JPG, JPEG, PNG. Ukuran maksimal: 2MB
+                        </div>
+                    </div>
+
                     <div class="fv-row mb-5">
                         <label class="fs-5 fw-semibold form-label mb-2">
                             Nama Lengkap
@@ -34,11 +178,6 @@
                     <div class="fv-row mb-5">
                         <label class="fs-5 fw-semibold form-label mb-2">Nomor Induk Pegawai:</label>
                         <input type="text" name="username" class="form-control" />
-                    </div>
-
-                    <div class="fv-row mb-5">
-                        <label class="fs-5 fw-semibold form-label mb-2">No Handphone:</label>
-                        <input type="text" name="no_hp" class="form-control" />
                     </div>
 
                     <div class="fv-row mb-5">
@@ -71,85 +210,347 @@
         </div>
     </div>
 </div>
+
 @include('layouts.partials._cancel_modal')
+
 @push('scripts')
-    <script>
-        function togglePasswordFields() {
-            let method = $('#methodField').val();
-            if (method === 'PUT') {
-                $('#passwordFields').hide();
-            } else {
-                $('#passwordFields').show();
+<script>
+    let currentFile = null; // Store the selected file globally
+
+    // Image input functionality
+    function initImageInput() {
+        const fileInput = document.getElementById('fotoInput');
+        const dropZone = document.getElementById('dragDropZone');
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFileSelection(file);
+            }
+        });
+    }
+
+    // Handle file selection (from input or drag & drop)
+    function handleFileSelection(file) {
+        // Validasi file
+        if (!file.type.match('image.*')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'File tidak valid!',
+                text: 'Silakan pilih file gambar (JPG, JPEG, PNG)',
+            });
+            return;
+        }
+
+        if (file.size > 2048000) { // 2MB
+            Swal.fire({
+                icon: 'error',
+                title: 'File terlalu besar!',
+                text: 'Ukuran file maksimal 2MB',
+            });
+            return;
+        }
+
+        // Store the file globally
+        currentFile = file;
+        console.log('File selected:', file);
+
+        const dropZone = document.getElementById('dragDropZone');
+
+        // Loading animation
+        dropZone.innerHTML = `
+            <div class="loading-overlay d-flex align-items-center justify-content-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="ms-2 text-primary fw-bold">Memproses foto...</span>
+            </div>`;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            setTimeout(() => {
+                dropZone.innerHTML = `
+                    <img src="${e.target.result}" class="preview-img">
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <button type="button" class="btn btn-sm btn-danger btn-icon" onclick="resetUpload()">
+                            <i class="ki-duotone ki-cross fs-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </button>
+                    </div>`;
+                dropZone.classList.add('success-upload');
+            }, 1000);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Drag & Drop Functionality
+    function initDragDrop() {
+        const dropZone = document.getElementById('dragDropZone');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('drag-over');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', handleDrop, false);
+        dropZone.addEventListener('click', () => {
+            document.getElementById('fotoInput').click();
+        });
+
+        function handleDrop(e) {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelection(files[0]);
+            }
+        }
+    }
+
+    // Reset Upload Function
+    function resetUpload() {
+        const dropZone = document.getElementById('dragDropZone');
+        const fileInput = document.getElementById('fotoInput');
+        const uploadContent = dropZone.querySelector('.upload-content');
+
+        currentFile = null;
+        fileInput.value = '';
+        dropZone.classList.remove('success-upload');
+
+        uploadContent.innerHTML = `
+            <div class="upload-icon">
+                <i class="ki-duotone ki-cloud-add fs-3x text-primary mb-3">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                </i>
+            </div>
+            <h4 class="fw-bold text-gray-800 mb-2">Drop foto di sini</h4>
+            <p class="text-muted fs-7 mb-0">atau klik untuk pilih file</p>`;
+    }
+
+    // Initialize when document is ready
+    $(document).ready(function() {
+        initImageInput();
+        initDragDrop();
+
+        // Reset form when modal is hidden
+        $('#kt_modal').on('hidden.bs.modal', function () {
+            resetCompleteForm();
+        });
+    });
+
+    function togglePasswordFields() {
+        let method = $('#methodField').val();
+        if (method === 'PUT') {
+            $('#passwordFields').hide();
+        } else {
+            $('#passwordFields').show();
+        }
+    }
+
+    // Jalankan pertama kali
+    togglePasswordFields();
+
+    // Pas #methodField berubah, cek lagi password perlu ditampilkan atau tidak
+    $('#methodField').on('change', function() {
+        togglePasswordFields();
+    });
+
+    // Debug password fields sebelum submit
+    $('#kt_modal_form').on('submit', function (e) {
+        e.preventDefault();
+
+        let method = $('#methodField').val();
+        let auditorId = $('#auditorId').val();
+        let url;
+
+        if (method === 'PUT' && auditorId) {
+            url = "{{ route('auditor.update', ':id') }}".replace(':id', auditorId);
+        } else {
+            url = "{{ route('auditor.store') }}";
+        }
+
+        // Create FormData
+        let formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+
+        if (method === 'PUT') {
+            formData.append('_method', 'PUT');
+        }
+
+        // Add regular form fields
+        formData.append('name', $('input[name="name"]').val() || '');
+        formData.append('unit_kerja_id', $('select[name="unit_kerja_id"]').val() || '');
+        formData.append('username', $('input[name="username"]').val() || '');
+        formData.append('email', $('input[name="email"]').val() || '');
+
+        // Add file if exists
+        if (currentFile) {
+            formData.append('foto', currentFile);
+        }
+
+        // PASSWORD DEBUG - Tambahkan ini untuk debug
+        console.log('=== PASSWORD DEBUG ===');
+        console.log('Method:', method);
+        console.log('Password field visible?', $('#passwordFields').is(':visible'));
+        console.log('Password value:', $('input[name="password"]').val());
+        console.log('Password confirmation value:', $('input[name="password_confirmation"]').val());
+        console.log('Password field exists?', $('input[name="password"]').length);
+        console.log('======================');
+
+        // Add password fields - PERBAIKAN DI SINI
+        if (method === 'POST') {
+            const password = $('input[name="password"]').val();
+            const passwordConfirmation = $('input[name="password_confirmation"]').val();
+
+            console.log('Adding password to FormData:', password);
+            console.log('Adding password_confirmation to FormData:', passwordConfirmation);
+
+            // Pastikan password tidak kosong untuk create
+            if (password) {
+                formData.append('password', password);
+            }
+            if (passwordConfirmation) {
+                formData.append('password_confirmation', passwordConfirmation);
             }
         }
 
-        // Jalankan pertama kali
-        togglePasswordFields();
+        // Debug FormData contents
+        console.log('=== FORM DATA DEBUG ===');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ':', value);
+        }
+        console.log('=======================');
 
-        // Pas #methodField berubah, cek lagi password perlu ditampilkan atau tidak
-        $('#methodField').on('change', function() {
-            togglePasswordFields();
-        });
+        // Submit form
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            beforeSend: function() {
+                $('button[type="submit"]').prop('disabled', true).html('<i class="spinner-border spinner-border-sm me-2"></i>Menyimpan...');
+            },
+            success: function (response) {
+                Swal.fire({
+                    title: '✅ Berhasil!',
+                    html: `<div style="font-size: 1.2rem; font-weight: 500;">${response.message}</div>`,
+                    icon: 'success',
+                    showConfirmButton: true,
+                    confirmButtonText: 'OK',
+                    timer: 2500,
+                    timerProgressBar: true,
+                }).then(() => {
+                    $('#kt_modal').modal('hide');
+                    location.reload();
+                });
+            },
+            error: function (xhr) {
+                console.log('=== ERROR DEBUG ===');
+                console.log('Status:', xhr.status);
+                console.log('Response:', xhr.responseJSON);
+                console.log('Response Text:', xhr.responseText);
+                console.log('==================');
 
-        $('#kt_modal_form').on('submit', function (e) {
-            e.preventDefault();
-            let form = $(this);
-            let url = form.attr('action') || "{{ route('auditor.store') }}";
-            let method = $('#methodField').val() === 'PUT' ? 'PUT' : 'POST';
+                let errors = xhr.responseJSON?.errors;
+                if (errors) {
+                    let errorMessages = Object.values(errors).map(errorArray =>
+                        errorArray.map(error => `
+                            <div style="margin: 4px auto; padding-bottom: 4px; color: red; font-weight: 500; text-align: center; border-bottom: 1px solid #ccc; width: 80%;">${error}</div>`
+                        ).join('')
+                    ).join('');
 
-            let formData = new FormData(this);
-            formData.append('_token', '{{ csrf_token() }}');
-
-            if (method === 'PUT') {
-                formData.append('_method', 'PUT');
-
-                // Hapus field password dari formData saat update
-                formData.delete('password');
-                formData.delete('password_confirmation');
-            }
-
-            $.ajax({
-                url: url,
-                type: 'POST', // tetap POST
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
                     Swal.fire({
-                        title: '✅ Berhasil!',
-                        html: `<div style="font-size: 1.2rem; font-weight: 500;">${response.message}</div>`,
-                        icon: 'success',
-                        showConfirmButton: true,
-                        confirmButtonText: 'OK',
-                        timer: 2500,
-                        timerProgressBar: true,
-                    }).then(() => {
-                        location.reload();
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan!',
+                        html: `<div style="font-size: 1rem;">${errorMessages}</div>`,
                     });
-                },
-                error: function (xhr) {
-                    let errors = xhr.responseJSON?.errors;
-                    if (errors) {
-                        let errorMessages = Object.values(errors).map(errorArray =>
-                            errorArray.map(error => `
-                                <div style="margin: 4px auto; padding-bottom: 4px; color: red; font-weight: 500; text-align: center; border-bottom: 1px solid #ccc; width: 80%;">${error}</div>`
-                            ).join('')
-                        ).join('');
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Terjadi Kesalahan!',
-                            html: `<div style="font-size: 1rem;">${errorMessages}</div>`,
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Gagal!',
-                            text: 'Terjadi kesalahan, silakan coba lagi.'
-                        });
-                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: xhr.responseJSON?.message || 'Terjadi kesalahan, silakan coba lagi.'
+                    });
                 }
-            });
+            },
+            complete: function() {
+                $('button[type="submit"]').prop('disabled', false).html('<i class="ki-duotone ki-check fs-5"></i> Simpan');
+            }
         });
-    </script>
+    });
+
+    // Reset form for adding new auditor
+    function resetForm() {
+        $('#methodField').val('POST');
+        $('#auditorId').val('');
+        $('#modalTitle').text('Tambah Auditor');
+        $('#kt_modal_form')[0].reset();
+        resetUpload();
+        togglePasswordFields();
+    }
+
+    // Complete form reset function
+    function resetCompleteForm() {
+        // Reset all form fields
+        $('#kt_modal_form')[0].reset();
+
+        // Reset method and ID
+        $('#methodField').val('POST');
+        $('#auditorId').val('');
+        $('#modalTitle').text('Tambah Auditor');
+
+        // Reset file upload
+        currentFile = null;
+        const fileInput = document.getElementById('fotoInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+
+        // Reset drop zone
+        const dropZone = document.getElementById('dragDropZone');
+        if (dropZone) {
+            dropZone.classList.remove('success-upload');
+            dropZone.innerHTML = `
+                <div class="upload-content">
+                    <div class="upload-icon">
+                        <i class="ki-duotone ki-cloud-add fs-3x text-primary mb-3">
+                            <span class="path1"></span>
+                            <span class="path2"></span>
+                        </i>
+                    </div>
+                    <h4 class="fw-bold text-gray-800 mb-2">Drop foto di sini</h4>
+                    <p class="text-muted fs-7 mb-0">atau klik untuk pilih file</p>
+                </div>`;
+        }
+
+        // Show password fields for new entry
+        togglePasswordFields();
+    }
+
+    // Button cancel handler
+    $('#cancelModal').on('click', function() {
+        $('#kt_modal').modal('hide');
+    });
+</script>
 @endpush
