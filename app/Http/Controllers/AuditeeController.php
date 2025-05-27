@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Spatie\Permission\Models\Role;
 
-class AuditorController extends Controller
+class AuditeeController extends Controller
 {
     public function index()
     {
@@ -20,17 +20,16 @@ class AuditorController extends Controller
             ->pluck('jenis_unit_kerja');
         $unitKerjas = UnitKerja::all();
 
-        $roleExists = Role::where('name', 'auditor')->where('guard_name', 'web')->exists();
-        $auditors = $roleExists
-            ? User::role('auditor')
+        $roleExists = Role::where('name', 'auditee')->where('guard_name', 'web')->exists();
+        $auditees = $roleExists
+            ? User::role('auditee')
             ->with(['unitKerja'])
             ->orderBy('created_at', 'desc')
             ->withTrashed()
             ->get()
             : collect();
-
-        return view('auditor.index', [
-            'auditors' => $auditors,
+        return view('data_auditee.index', [
+            'auditees' => $auditees,
             'unitKerjas' => $unitKerjas,
             'jenisUnitKerja' => $jenisUnitKerja,
         ]);
@@ -52,10 +51,10 @@ class AuditorController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
-            'username.required' => 'NIP wajib diisi.',
-            'username.string' => 'NIP harus berupa teks.',
-            'username.unique' => 'NIP sudah digunakan.',
-            'username.max' => 'NIP maksimal 255 karakter.',
+            'username.required' => 'Username wajib diisi.',
+            'username.string' => 'Username harus berupa teks.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.max' => 'Username maksimal 255 karakter.',
             'password.required' => 'Password wajib diisi.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
@@ -74,7 +73,7 @@ class AuditorController extends Controller
         }
 
         // Handle upload foto
-        $folder = "foto/auditor";
+        $folder = "foto/auditee";
         $file = $request->file('foto');
         $filePath = $file->store($folder, 'public');
 
@@ -84,30 +83,29 @@ class AuditorController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'foto' => $filePath, // Simpan path foto
+            'foto' => $filePath,
         ]);
 
-        $user->assignRole('Auditor');
+        $user->assignRole('Auditee');
 
         return response()->json([
-            'message' => 'Auditor berhasil ditambahkan!',
+            'message' => 'Auditee berhasil ditambahkan!',
             'data' => $user
         ]);
     }
 
-    public function edit(User $auditor)
+    public function edit(User $auditee)
     {
-        if (!$auditor) {
+        if (!$auditee) {
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
 
-        $auditor->foto_url = $auditor->foto
-            ? Storage::url($auditor->foto)
+        $auditee->foto_url = $auditee->foto
+            ? Storage::url($auditee->foto)
             : null;
 
-        return response()->json(['success' => true, 'data' => $auditor]);
+        return response()->json(['success' => true, 'data' => $auditee]);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -127,10 +125,10 @@ class AuditorController extends Controller
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
-            'username.required' => 'NIP wajib diisi.',
-            'username.string' => 'NIP harus berupa teks.',
-            'username.unique' => 'NIP sudah digunakan.',
-            'username.max' => 'NIP maksimal 255 karakter.',
+            'username.required' => 'Username wajib diisi.',
+            'username.string' => 'Username harus berupa teks.',
+            'username.unique' => 'Username sudah digunakan.',
+            'username.max' => 'Username maksimal 255 karakter.',
             'unit_kerja_id.required' => 'Unit kerja wajib diisi.',
             'unit_kerja_id.exists' => 'Unit kerja yang dipilih tidak valid.',
             'foto.image' => 'File harus berupa gambar.',
@@ -159,7 +157,7 @@ class AuditorController extends Controller
             }
 
             // Upload foto baru
-            $folder = "foto/auditor";
+            $folder = "foto/auditee";
             $file = $request->file('foto');
             $filePath = $file->store($folder, 'public');
             $updateData['foto'] = $filePath;
@@ -174,22 +172,22 @@ class AuditorController extends Controller
         $user->update($updateData);
 
         return response()->json([
-            'message' => 'Auditor berhasil diperbarui!',
+            'message' => 'Auditee berhasil diperbarui!',
             'data' => $user
         ]);
     }
 
-    public function destroy(User $auditor)
+    public function destroy(User $auditee)
     {
         try {
-            $auditor->syncRoles([]);
-            $auditor->delete();
+            $auditee->syncRoles([]);
+            $auditee->delete();
             return response()->json([
-                'message' => 'Auditor berhasil dihapus!'
+                'message' => 'Auditee berhasil dihapus!'
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal menghapus Auditor!',
+                'message' => 'Gagal menghapus Auditee!',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -206,11 +204,11 @@ class AuditorController extends Controller
             }
 
             return response()->json([
-                'message' => 'Auditor terpilih berhasil dihapus!'
+                'message' => 'Auditee terpilih berhasil dihapus!'
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal menghapus Auditor terpilih!',
+                'message' => 'Gagal menghapus Auditee terpilih!',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -218,31 +216,31 @@ class AuditorController extends Controller
 
     public function restore($id)
     {
-        $auditor = User::withTrashed()->findOrFail($id);
-        $auditor->restore();  // Mengembalikan data yang terhapus
+        $auditee = User::withTrashed()->findOrFail($id);
+        $auditee->restore();
 
-        return response()->json(['message' => 'Auditor berhasil dipulihkan!']);
+        return response()->json(['message' => 'Auditee berhasil dipulihkan!']);
     }
 
     public function destroyPermanent($id)
     {
         try {
-            $auditor = User::withTrashed()->findOrFail($id);
+            $auditee = User::withTrashed()->findOrFail($id);
 
-            if (!$auditor->trashed()) {
+            if (!$auditee->trashed()) {
                 return response()->json([
-                    'message' => 'Auditor belum dinonaktifkan, tidak bisa dihapus permanen!'
+                    'message' => 'Auditee belum dinonaktifkan, tidak bisa dihapus permanen!'
                 ], 400);
             }
 
-            $auditor->forceDelete();
+            $auditee->forceDelete();
 
             return response()->json([
-                'message' => 'Auditor berhasil dihapus permanen!'
+                'message' => 'Auditee berhasil dihapus permanen!'
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal menghapus Auditor permanen!',
+                'message' => 'Gagal menghapus Auditee permanen!',
                 'error' => $e->getMessage()
             ], 500);
         }

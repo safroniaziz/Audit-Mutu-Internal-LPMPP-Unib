@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AuditeeController;
 use App\Http\Controllers\AuditeePengajuanAmiController;
 use App\Http\Controllers\AuditeeProfilController;
 use App\Http\Controllers\AuditorAuditController;
@@ -143,6 +144,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/auditor/{id}/restore', [AuditorController::class, 'restore'])->name('restore');
             Route::delete('/{id}/hapus-permanen/', [AuditorController::class, 'destroyPermanent'])->name('hapus_permanen');
         });
+
+        Route::prefix('auditee')->name('auditee.')->group(function () {
+            Route::get('/', [AuditeeController::class, 'index'])->name('index');
+            Route::post('/', [AuditeeController::class, 'store'])->name('store');
+            Route::get('/{auditee}/edit', [AuditeeController::class, 'edit'])->name('edit');
+            Route::put('/{auditee}', [AuditeeController::class, 'update'])->name('update');
+            Route::delete('/{auditee}', [AuditeeController::class, 'destroy'])->name('destroy');
+            Route::post('/delete-selected', [AuditeeController::class, 'destroySelected'])->name('destroySelected');
+            Route::put('/auditee/{id}/restore', [AuditeeController::class, 'restore'])->name('restore');
+            Route::delete('/{id}/hapus-permanen/', [AuditeeController::class, 'destroyPermanent'])->name('hapus_permanen');
+        });
+
 
         Route::prefix('rsb-prodi')->name('rsbProdi.')->group(function () {
             Route::get('/', [RsbProdiController::class, 'index'])->name('index');

@@ -115,13 +115,13 @@
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header px-10">
-                <h2 class="fw-bold" id="modalTitle">Tambah Auditor</h2>
+                <h2 class="fw-bold" id="modalTitle">Tambah Auditee</h2>
             </div>
             <div class="modal-body d-flex flex-column scroll-y px-10" style="flex-grow: 1;">
                 <form id="kt_modal_form" class="form d-flex flex-column" style="flex-grow: 1;" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="_method" id="methodField" value="POST">
-                    <input type="hidden" name="auditor_id" id="auditorId" value="">
+                    <input type="hidden" name="auditee_id" id="auditeeId" value="">
 
                     <!-- Photo Upload Section -->
                     <div class="fv-row mb-8">
@@ -363,13 +363,13 @@
         e.preventDefault();
 
         let method = $('#methodField').val();
-        let auditorId = $('#auditorId').val();
+        let auditeeId = $('#auditeeId').val();
         let url;
 
-        if (method === 'PUT' && auditorId) {
-            url = "{{ route('auditor.update', ':id') }}".replace(':id', auditorId);
+        if (method === 'PUT' && auditeeId) {
+            url = "{{ route('auditee.update', ':id') }}".replace(':id', auditeeId);
         } else {
-            url = "{{ route('auditor.store') }}";
+            url = "{{ route('auditee.store') }}";
         }
 
         // Create FormData from the form element directly
@@ -461,11 +461,11 @@
         });
     });
 
-    // Reset form for adding new auditor
+    // Reset form for adding new auditee
     function resetForm() {
         $('#methodField').val('POST');
-        $('#auditorId').val('');
-        $('#modalTitle').text('Tambah Auditor');
+        $('#auditeeId').val('');
+        $('#modalTitle').text('Tambah Auditee');
         $('#kt_modal_form')[0].reset();
         resetUpload();
         togglePasswordFields();
@@ -478,8 +478,8 @@
 
         // Reset method and ID
         $('#methodField').val('POST');
-        $('#auditorId').val('');
-        $('#modalTitle').text('Tambah Auditor');
+        $('#auditeeId').val('');
+        $('#modalTitle').text('Tambah Auditee');
 
         // Reset file upload
         currentFile = null;

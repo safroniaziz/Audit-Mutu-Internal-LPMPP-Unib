@@ -59,64 +59,67 @@
                     <div class="table-responsive">
                         <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_auditor_table">
                             <thead>
-                                <tr class="text-start text-dark fw-bolder fs-7 text-uppercase gs-0 bg-light-primary">
-                                    <th class="w-10px pe-2 ps-4">
-                                        <div class="form-check form-check-sm form-check-custom form-check-solid ms-3 me-3">
-                                            <input class="form-check-input bg-white" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_auditor_table .form-check-input" value="1" />
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                            <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_auditor_table .form-check-input" value="1" />
                                         </div>
                                     </th>
-                                    <th class="min-w-50px ps-3">No</th>
-                                    <th class="min-w-125px">Nama Lengkap</th>
-                                    <th class="min-w-125px">Unit Kerja</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Foto</th>
-                                    <th class="min-w-100px">Terdaftar Sejak</th>
+                                    <th class="min-w-125px">Nama Auditor</th>
+                                    <th class="min-w-125px">Kategori Auditor</th>
+                                    <th class="min-w-125px">Username</th>
+                                    <th class="min-w-125px">Email</th>
+                                    <th class="min-w-125px">Status</th>
                                     <th class="min-w-100px text-center">Ubah Password</th>
-                                    <th class="min-w-100px text-center">Status</th>
                                     <th class="min-w-auto text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-600 fw-semibold">
-                                @forelse ($auditors as $index => $auditor)
+                                @forelse ($auditors as $auditor)
                                     <tr>
-                                        <td class="w-10px pe-2 ps-4">
-                                            <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
+                                        <td>
+                                            <div class="form-check form-check-sm form-check-custom form-check-solid">
                                                 <input class="form-check-input" type="checkbox" value="{{ $auditor->id }}" />
                                             </div>
                                         </td>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>{{ $auditor->name }}</td>
+                                        <td class="d-flex align-items-center">
+                                            <!--begin:: Avatar -->
+                                            <div class="symbol symbol-circle symbol-50px overflow-hidden me-3">
+                                                <a href="#">
+                                                    <div class="symbol-label">
+                                                        @if ($auditor->foto)
+                                                            <img src="{{ Storage::url($auditor->foto) }}" alt="{{ $auditor->name }}" class="w-100" />
+                                                        @else
+                                                            <img src="{{ asset('assets/src/images/profile.png') }}" alt="{{ $auditor->name }}" class="w-100" />
+                                                        @endif
+                                                    </div>
+                                                </a>
+                                            </div>
+                                            <!--end::Avatar-->
+                                            <!--begin::User details-->
+                                            <div class="d-flex flex-column">
+                                                <a href="#" class="text-gray-800 text-hover-primary mb-1">{{ $auditor->name }}</a>
+                                            </div>
+                                            <!--begin::User details-->
+                                        </td>
                                         <td>{{ optional($auditor->unitKerja)->nama_unit_kerja }}</td>
-                                        <td>{{ $auditor->username ? $auditor->username : '-' }}</td>
+                                        <td>{{ $auditor->username }}</td>
                                         <td>{{ $auditor->email }}</td>
                                         <td>
-                                            @if ($auditor->foto)
-                                            <img src="{{ Storage::url($auditor->foto) }}" alt="Foto Auditor" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+                                            @if ($auditor->deleted_at)
+                                                <span class="badge badge-light-danger">Tidak Aktif</span>
                                             @else
-                                                <span>-</span>
+                                                <span class="badge badge-light-success">Aktif</span>
                                             @endif
                                         </td>
-                                        <td>{{ \Carbon\Carbon::parse($auditor->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</td>
                                         <td class="text-center">
                                             <button class="btn btn-sm btn-primary ubah-password-btn" data-id="{{ $auditor->id }}">
                                                 <i class="fas fa-key"></i>
                                             </button>
                                         </td>
                                         <td class="text-center">
-                                            @if ($auditor->deleted_at)
-                                                <span class="badge badge-danger">
-                                                    <i class="fas fa-times-circle fa-sm" style="color: white;"></i>&nbsp;Tidak Aktif
-                                                </span>
-                                            @else
-                                                <span class="badge badge-success">
-                                                    <i class="fas fa-check-circle fa-sm" style="color: white;"></i>&nbsp;Aktif
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td class="text-center">
                                             <div class="button-container">
-                                                <button type="button" class="btn btn-sm btn-light-success editAuditorButton "
+                                                <button type="button" class="btn btn-sm btn-light-success editAuditorButton"
                                                         data-id="{{ $auditor->id }}"
                                                         data-url="{{ route('auditor.edit', $auditor->id) }}"
                                                         data-bs-toggle="modal" data-bs-target="#kt_modal">
@@ -144,7 +147,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Data tidak tersedia</td>
+                                        <td colspan="8" class="text-center">Data tidak tersedia</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -155,7 +158,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-md"> <!-- Ubah dari default ke modal-lg -->
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Ubah Password Administrator</h5>
+                                <h5 class="modal-title">Ubah Password Auditor</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                             </div>
                             <div class="modal-body">
