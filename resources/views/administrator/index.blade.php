@@ -62,86 +62,88 @@
                     </div>
                 </div>
                 <div class="card-body pt-0">
-                    <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_administrator_table">
-                        <thead>
-                            <tr class="text-start text-dark fw-bolder fs-7 text-uppercase gs-0 bg-light-primary">
-                                <th class="w-10px pe-2 ps-4">
-                                    <div class="form-check form-check-sm form-check-custom form-check-solid ms-3 me-3">
-                                        <input class="form-check-input bg-white" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_administrator_table .form-check-input" value="1" />
-                                    </div>
-                                </th>
-                                <th class="min-w-50px ps-3">No</th>
-                                <th class="min-w-125px">Nama Lengkap</th>
-                                <th class="min-w-175px">Email</th>
-                                <th class="min-w-100px">Terdaftar Sejak</th>
-                                <th class="min-w-100px text-center">Ubah Password</th>
-                                <th class="min-w-100px text-center">Status</th>
-                                <th class="min-w-auto text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-gray-600 fw-semibold">
-                            @forelse ($administrators as $index => $administrator)
-                                <tr>
-                                    <td class="w-10px pe-2 ps-4">
-                                        <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
-                                            <input class="form-check-input" type="checkbox" value="{{ $administrator->id }}" />
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5" id="kt_administrator_table">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="w-10px pe-2">
+                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                            <input class="form-check-input" type="checkbox" data-kt-check="true" data-kt-check-target="#kt_administrator_table .form-check-input" value="1" />
                                         </div>
-                                    </td>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $administrator->name }}</td>
-                                    <td>{{ $administrator->email }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($administrator->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-sm btn-primary ubah-password-btn" data-id="{{ $administrator->id }}">
-                                            <i class="fas fa-key"></i>
-                                        </button>
-                                    </td>
-                                    <td class="text-center">
-                                        @if ($administrator->deleted_at)
-                                            <span class="badge badge-danger">
-                                                <i class="fas fa-times-circle fa-sm" style="color: white;"></i>&nbsp;Tidak Aktif
-                                            </span>
-                                        @else
-                                            <span class="badge badge-success">
-                                                <i class="fas fa-check-circle fa-sm" style="color: white;"></i>&nbsp;Aktif
-                                            </span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="button-container">
-                                            <button type="button" class="btn btn-sm btn-light-success editAdministratorButton"
-                                                    data-id="{{ $administrator->id }}"
-                                                    data-url="{{ route('administrator.edit', $administrator->id) }}"
-                                                    data-bs-toggle="modal" data-bs-target="#kt_modal">
-                                                <i class="fas fa-edit fa-sm"></i>&nbsp;Edit
+                                    </th>
+                                    <th class="min-w-50px">No</th>
+                                    <th class="min-w-125px">Nama Lengkap</th>
+                                    <th class="min-w-175px">Email</th>
+                                    <th class="min-w-100px">Terdaftar Sejak</th>
+                                    <th class="min-w-100px text-center">Ubah Password</th>
+                                    <th class="min-w-100px text-center">Status</th>
+                                    <th class="min-w-auto text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse ($administrators as $index => $administrator)
+                                    <tr>
+                                        <td class="w-10px pe-2 ps-4">
+                                            <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
+                                                <input class="form-check-input" type="checkbox" value="{{ $administrator->id }}" />
+                                            </div>
+                                        </td>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $administrator->name }}</td>
+                                        <td>{{ $administrator->email }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($administrator->created_at)->locale('id')->isoFormat('dddd, D MMMM YYYY') }}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-primary ubah-password-btn" data-id="{{ $administrator->id }}">
+                                                <i class="fas fa-key"></i>
                                             </button>
+                                        </td>
+                                        <td class="text-center">
                                             @if ($administrator->deleted_at)
-                                                <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $administrator->id }}">
-                                                    <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan
-                                                </button>
-
-                                                <button type="button" class="btn btn-sm btn-light-danger delete-permanent" data-id="{{ $administrator->id }}">
-                                                    <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
-                                                </button>
+                                                <span class="badge badge-danger">
+                                                    <i class="fas fa-times-circle fa-sm" style="color: white;"></i>&nbsp;Tidak Aktif
+                                                </span>
                                             @else
-                                                <button type="button" class="btn btn-sm btn-light-danger delete-data" data-id="{{ $administrator->id }}">
-                                                    <i class="fas fa-user-slash fa-sm"></i>&nbsp;Nonaktifkan
-                                                </button>
-
-                                                <button type="button" class="btn btn-sm btn-light-danger" disabled>
-                                                    <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
-                                                </button>
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle fa-sm" style="color: white;"></i>&nbsp;Aktif
+                                                </span>
                                             @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">Data tidak tersedia</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="button-container">
+                                                <button type="button" class="btn btn-sm btn-light-success editAdministratorButton"
+                                                        data-id="{{ $administrator->id }}"
+                                                        data-url="{{ route('administrator.edit', $administrator->id) }}"
+                                                        data-bs-toggle="modal" data-bs-target="#kt_modal">
+                                                    <i class="fas fa-edit fa-sm"></i>&nbsp;Edit
+                                                </button>
+                                                @if ($administrator->deleted_at)
+                                                    <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $administrator->id }}">
+                                                        <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-sm btn-light-danger delete-permanent" data-id="{{ $administrator->id }}">
+                                                        <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
+                                                    </button>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-light-danger delete-data" data-id="{{ $administrator->id }}">
+                                                        <i class="fas fa-user-slash fa-sm"></i>&nbsp;Nonaktifkan
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-sm btn-light-danger" disabled>
+                                                        <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">Data tidak tersedia</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal fade" id="ubahPasswordModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-md"> <!-- Ubah dari default ke modal-lg -->

@@ -198,7 +198,7 @@
                         <!--end:Menu content-->
                     </div>
 
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('administrator.index', 'auditor.index') ? 'show' : '' }}">
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('administrator.index', 'auditor.index', 'auditee.index') ? 'show' : '' }}">
                         <!--begin:Menu link-->
                         <span class="menu-link">
                             <span class="menu-icon">
@@ -228,6 +228,16 @@
                                         <span class="bullet bullet-dot"></span>
                                     </span>
                                     <span class="menu-title">Auditor</span>
+                                </a>
+                                <!--end:Menu link-->
+                            </div>
+                            <div class="menu-item">
+                                <!--begin:Menu link-->
+                                <a class="menu-link {{ Route::is('auditee.index') ? 'active' : '' }}" href="{{ route('auditee.index') }}">
+                                    <span class="menu-bullet">
+                                        <span class="bullet bullet-dot"></span>
+                                    </span>
+                                    <span class="menu-title">Auditee</span>
                                 </a>
                                 <!--end:Menu link-->
                             </div>
