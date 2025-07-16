@@ -313,7 +313,7 @@
                                         </i>
                                         <div class="d-flex flex-column">
                                             <h4 class="mb-1 text-{{ $isSSSubmitted ? 'success' : 'warning' }}">Status: {{ $isSSSubmitted ? 'Sudah Diisi' : 'Belum Diisi' }}</h4>
-                                            <span>Satuan Standar: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
+                                            <span>Sasaran Strategis: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -495,7 +495,7 @@
 
                     if (!validateCurrentStep()) {
                         Swal.fire({
-                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Satuan Standar ini!",
+                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Sasaran Strategis ini!",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "OK",
@@ -557,7 +557,7 @@
                                 } else {
                                     // If it's the last step, show completion message
                                     Swal.fire({
-                                        text: "Semua Satuan Standar telah berhasil diisi!",
+                                        text: "Semua Sasaran Strategis telah berhasil diisi!",
                                         icon: "success",
                                         buttonsStyling: false,
                                         confirmButtonText: "OK",

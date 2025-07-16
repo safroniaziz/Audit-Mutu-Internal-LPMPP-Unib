@@ -158,7 +158,7 @@
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot"></span>
                                     </span>
-                                    <span class="menu-title">Satuan Standar</span>
+                                    <span class="menu-title">Sasaran Strategis</span>
                                 </a>
                             </div>
                             <div class="menu-item">

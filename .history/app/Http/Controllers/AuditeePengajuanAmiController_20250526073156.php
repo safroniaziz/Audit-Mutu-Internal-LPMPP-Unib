@@ -193,7 +193,7 @@ class AuditeePengajuanAmiController extends Controller
     }
 
     /**
-     * Save IKSS data for specific Satuan Standar
+     * Save IKSS data for specific Sasaran Strategis
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -255,7 +255,7 @@ class AuditeePengajuanAmiController extends Controller
                 throw new \Exception('Tidak ada data IKSS yang dipilih untuk disimpan.');
             }
 
-            // Get Satuan Standar info for the message
+            // Get Sasaran Strategis info for the message
             $satuanStandar = SatuanStandar::find($satuanStandarId);
 
             DB::commit();

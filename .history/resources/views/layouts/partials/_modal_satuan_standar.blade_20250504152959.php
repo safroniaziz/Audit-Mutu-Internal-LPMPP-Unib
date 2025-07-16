@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered mw-650px">
         <div class="modal-content">
             <div class="modal-header px-10">
-                <h2 class="fw-bold">Tambah Satuan Standar</h2>
+                <h2 class="fw-bold">Tambah Sasaran Strategis</h2>
             </div>
             <div class="modal-body d-flex flex-column scroll-y px-10" style="flex-grow: 1;">
                 <form id="kt_modal_form" class="form d-flex flex-column" style="flex-grow: 1;">

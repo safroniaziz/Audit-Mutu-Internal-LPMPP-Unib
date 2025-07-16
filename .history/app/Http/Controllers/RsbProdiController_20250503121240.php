@@ -55,7 +55,7 @@ class RsbProdiController extends Controller
 
     // InstrumenIkssController.php
 
-    // Ambil indikator berdasarkan satuan standar yang dipilih
+    // Ambil indikator berdasarkan Sasaran Strategis yang dipilih
     public function getIndikatorBySatuan($id)
     {
         $indikators = IndikatorKinerja::where('satuan_standar_id', $id)->get();

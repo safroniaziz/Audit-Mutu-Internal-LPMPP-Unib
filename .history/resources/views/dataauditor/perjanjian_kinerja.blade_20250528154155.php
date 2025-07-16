@@ -216,11 +216,11 @@
                         @endphp
 
                         @foreach($groupedData as $satuanStandardNama => $indikatorGroups)
-                            <!-- Satuan Standar Header -->
+                            <!-- Sasaran Strategis Header -->
                             <div class="satuan-standar-section mb-4">
                                 <h5 class="satuan-standar-title">
                                     <i class="fas fa-layer-group"></i>
-                                    {{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}
+                                    {{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}
                                 </h5>
 
                                 @foreach($indikatorGroups as $indikatorKinerjaNama => $ikssGroup)

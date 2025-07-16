@@ -340,7 +340,7 @@
                                         </i>
                                         <div class="d-flex flex-column">
                                             <h4 class="mb-1 text-{{ $isSSSubmitted ? 'success' : 'warning' }}">Status: {{ $isSSSubmitted ? 'Sudah Diisi' : 'Belum Diisi' }}</h4>
-                                            <span>Satuan Standar: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
+                                            <span>Sasaran Strategis: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
                                             <span class="text-muted mt-1">Progress: {{ $selectedInstruments }}/{{ $totalInstruments }} instrumen dipilih</span>
                                         </div>
                                     </div>

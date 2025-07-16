@@ -65,7 +65,7 @@
                                         </div>
                                     </th>
                                     <th class="ps-3">No</th>
-            <th class="">Satuan Standar</th>
+            <th class="">Sasaran Strategis</th>
             <th class="">Kode Instrumen IKSS</th>
             <th class="">Tujuan</th>
             <th class="">Indikator</th>

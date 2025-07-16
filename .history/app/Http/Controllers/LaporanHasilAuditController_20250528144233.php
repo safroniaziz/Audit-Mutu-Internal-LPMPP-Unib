@@ -50,11 +50,11 @@ class LaporanHasilAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Satuan Standar
+        // Process each Sasaran Strategis
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
 
-            // Check if this Satuan Standar has audit data
+            // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
                 $ikssItems = $groupedBySatuanId[$satuanStandarId];
 
@@ -118,7 +118,7 @@ class LaporanHasilAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Satuan Standar with no data
+                // Add Sasaran Strategis with no data
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -226,11 +226,11 @@ class LaporanHasilAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Satuan Standar
+        // Process each Sasaran Strategis
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
 
-            // Check if this Satuan Standar has audit data
+            // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
                 $ikssItems = $groupedBySatuanId[$satuanStandarId];
 
@@ -294,7 +294,7 @@ class LaporanHasilAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Satuan Standar with no data
+                // Add Sasaran Strategis with no data
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,

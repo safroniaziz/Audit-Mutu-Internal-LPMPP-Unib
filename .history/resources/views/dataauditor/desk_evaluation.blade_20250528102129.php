@@ -1,7 +1,7 @@
 @extends('dataauditor/dashboard_template')
 
 @php
-    // Group IKSS by Satuan Standar and calculate completion
+    // Group IKSS by Sasaran Strategis and calculate completion
     $groupedIkss = [];
     $ssCompletionStatus = [];
     $allCompleted = true;
@@ -639,7 +639,7 @@
                 firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 Swal.fire({
                     title: 'Peringatan',
-                    text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                    text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                     icon: 'warning'
                 });
             }

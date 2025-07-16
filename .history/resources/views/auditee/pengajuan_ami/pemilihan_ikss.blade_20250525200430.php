@@ -403,7 +403,7 @@
                 }
             }
 
-            // Calculate and update progress for specific Satuan Standar
+            // Calculate and update progress for specific Sasaran Strategis
             function updateProgressSS(stepNumber) {
                 const content = document.querySelector(`.wizard-content[data-step="${stepNumber}"]`);
                 if (!content) return;

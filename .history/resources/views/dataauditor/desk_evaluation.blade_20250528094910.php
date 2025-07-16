@@ -1,7 +1,7 @@
 @extends('dataauditor/dashboard_template')
 
 @php
-    // Group IKSS by Satuan Standar and calculate completion
+    // Group IKSS by Sasaran Strategis and calculate completion
     $groupedIkss = [];
     $ssCompletionStatus = [];
     $allCompleted = true;

@@ -517,10 +517,10 @@
                                                     $unitKerjaId = $user->unit_kerja_id;
                                                     $periodeAktif = App\Models\PeriodeAktif::whereNull('deleted_at')->latest()->first();
 
-                                                    // Get all Satuan Standar
+                                                    // Get all Sasaran Strategis
                                                     $allSatuanStandar = App\Models\SatuanStandar::all();
 
-                                                    // Check if each Satuan Standar has been filled
+                                                    // Check if each Sasaran Strategis has been filled
                                                     $allSSFilled = true;
                                                     $debugInfo = [];
 
@@ -614,7 +614,7 @@
 
                                                     <li class="nav-item mt-2">
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
-                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pemilihan IKSS di semua Satuan Standar terlebih dahulu' : '' }}">
+                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pemilihan IKSS di semua Sasaran Strategis terlebih dahulu' : '' }}">
                                                             <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumen') ? 'active' : '' }} {{ !$sudahMengisiIkss ? 'disabled' : '' }}"
                                                                href="{{ !$sudahMengisiIkss ? 'javascript:void(0);' : route('auditee.pengajuanAmi.pengisianInstrumen') }}"
                                                                style="{{ !$sudahMengisiIkss ? 'pointer-events: none; color: grey;' : '' }}">

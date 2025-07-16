@@ -184,7 +184,7 @@ class AuditorAuditController extends Controller
                         ->where('status_target', true)
                         ->get();
 
-        // Group by Satuan Standar first
+        // Group by Sasaran Strategis first
         $groupedIkss = $dataIkss->groupBy(function($item) {
             return $item->instrumen->indikatorKinerja->satuanStandar->id;
         });
@@ -423,11 +423,11 @@ class AuditorAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Satuan Standar
+        // Process each Sasaran Strategis
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
 
-            // Check if this Satuan Standar has audit data
+            // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
                 $ikssItems = $groupedBySatuanId[$satuanStandarId];
 
@@ -491,7 +491,7 @@ class AuditorAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Satuan Standar with no data
+                // Add Sasaran Strategis with no data
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,

@@ -30,8 +30,8 @@ class InstrumenIkssController extends Controller
             'uraian' => 'nullable|string|max:255',
             'penilaian' => 'nullable|string|max:255',
         ], [
-            'indikator_kinerja_id.required' => 'Satuan standar harus dipilih.',
-            'indikator_kinerja_id.exists' => 'Satuan standar tidak ditemukan.',
+            'indikator_kinerja_id.required' => 'Sasaran Strategis harus dipilih.',
+            'indikator_kinerja_id.exists' => 'Sasaran Strategis tidak ditemukan.',
             'kode_ikss.required' => 'Kode indikator harus diisi.',
             'kode_ikss.string' => 'Kode indikator harus berupa teks.',
             'kode_ikss.max' => 'Kode indikator tidak boleh lebih dari 10 karakter.',
@@ -74,8 +74,8 @@ class InstrumenIkssController extends Controller
             'kode_ikss' => 'required|string|max:10',
             'tujuan' => 'required|string|max:255',
         ], [
-            'indikator_kinerja_id.required' => 'Satuan standar harus dipilih.',
-            'indikator_kinerja_id.exists' => 'Satuan standar tidak ditemukan.',
+            'indikator_kinerja_id.required' => 'Sasaran Strategis harus dipilih.',
+            'indikator_kinerja_id.exists' => 'Sasaran Strategis tidak ditemukan.',
             'kode_ikss.required' => 'Kode indikator harus diisi.',
             'kode_ikss.string' => 'Kode indikator harus berupa teks.',
             'kode_ikss.max' => 'Kode indikator tidak boleh lebih dari 10 karakter.',

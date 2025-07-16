@@ -1,7 +1,7 @@
 @extends('auditee/dashboard_template')
 
 @php
-    // Group instrumen by Satuan Standar and calculate completion
+    // Group instrumen by Sasaran Strategis and calculate completion
     $groupedInstrumen = [];
     $ssCompletionStatus = [];
     $allCompleted = true;
@@ -337,7 +337,7 @@
                                         <!--end::Title-->
                                         <!--begin::Content-->
                                         <div class="fs-6">
-                                            <div class="fw-semibold text-gray-700">Satuan Standar: {{ $group['satuan_standar']->kode_satuan }} - {{ $group['satuan_standar']->sasaran }}</div>
+                                            <div class="fw-semibold text-gray-700">Sasaran Strategis: {{ $group['satuan_standar']->kode_satuan }} - {{ $group['satuan_standar']->sasaran }}</div>
                                             <div class="fw-semibold text-gray-700 mt-1">Progress: {{ $completedInstrumen }}/{{ $totalInstrumen }} instrumen diisi lengkap</div>
                                         </div>
                                         <!--end::Content-->

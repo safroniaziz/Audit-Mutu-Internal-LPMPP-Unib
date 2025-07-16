@@ -1,7 +1,7 @@
 @extends('dataauditor/dashboard_template')
 
 @php
-    // Group IKSS by Satuan Standar and calculate completion
+    // Group IKSS by Sasaran Strategis and calculate completion
     $groupedIkss = [];
     $ssCompletionStatus = [];
     $allCompleted = true;
@@ -361,7 +361,7 @@
                                     <div class="d-flex flex-column pe-0 pe-sm-10">
                                         <h5 class="mb-1">Status: {{ $isCompleted ? 'Sudah Dievaluasi Lengkap' : 'Belum Lengkap' }}</h5>
                                         <div class="fs-6">
-                                            <div class="fw-semibold text-gray-700">Satuan Standar: {{ $group['satuan_standar']->kode_satuan }} - {{ $group['satuan_standar']->sasaran }}</div>
+                                            <div class="fw-semibold text-gray-700">Sasaran Strategis: {{ $group['satuan_standar']->kode_satuan }} - {{ $group['satuan_standar']->sasaran }}</div>
                                             <div class="fw-semibold text-gray-700 mt-1">Progress: {{ $status['completed'] }}/{{ $status['total'] }} instrumen dievaluasi lengkap</div>
                                         </div>
                                     </div>
@@ -740,7 +740,7 @@
                 firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                 Swal.fire({
                     title: 'Peringatan',
-                    text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                    text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                     icon: 'warning'
                 });
             }

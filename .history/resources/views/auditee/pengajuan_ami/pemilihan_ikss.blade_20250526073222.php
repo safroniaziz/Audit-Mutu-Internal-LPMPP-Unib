@@ -301,7 +301,7 @@
                                         </i>
                                         <div class="d-flex flex-column">
                                             <h4 class="mb-1 text-{{ $isSSSubmitted ? 'success' : 'warning' }}">Status: {{ $isSSSubmitted ? 'Sudah Diisi' : 'Belum Diisi' }}</h4>
-                                            <span>Satuan Standar: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
+                                            <span>Sasaran Strategis: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -536,7 +536,7 @@
 
                     if (!formValid) {
                         Swal.fire({
-                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Satuan Standar ini!",
+                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Sasaran Strategis ini!",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "OK",
@@ -559,7 +559,7 @@
 
                     // Show confirmation dialog
                     Swal.fire({
-                        text: "Apakah Anda yakin ingin menyimpan pilihan untuk Satuan Standar ini?",
+                        text: "Apakah Anda yakin ingin menyimpan pilihan untuk Sasaran Strategis ini?",
                         icon: "question",
                         showCancelButton: true,
                         buttonsStyling: false,

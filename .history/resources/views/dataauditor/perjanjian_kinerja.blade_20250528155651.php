@@ -123,7 +123,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($groupedData as $satuanStandardNama => $indikatorGroups)
-                                        <!-- Level 1: Satuan Standar -->
+                                        <!-- Level 1: Sasaran Strategis -->
                                         <tr class="level-1">
                                             <td>
                                                 <button class="expand-btn" onclick="toggleRows('satuan-{{ $loop->index }}')">
@@ -132,7 +132,7 @@
                                             </td>
                                             <td>
                                                 <i class="fas fa-layer-group text-primary me-2"></i>
-                                                {{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}
+                                                {{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}
                                             </td>
                                             <td class="text-center">
                                                 <span class="text-muted small">{{ $indikatorGroups->count() }} indikator</span>

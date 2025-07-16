@@ -243,7 +243,7 @@
 
                             <div class="satuan-standar-progress mb-8">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="text-gray-600">Progress Satuan Standar Ini</span>
+                                    <span class="text-gray-600">Progress Sasaran Strategis Ini</span>
                                     <span class="fs-6 fw-bolder text-primary progress-percentage-step">0%</span>
                                 </div>
                                 <div class="h-4px bg-light rounded">

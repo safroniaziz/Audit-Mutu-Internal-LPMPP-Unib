@@ -630,7 +630,7 @@
                     firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     Swal.fire({
                         title: 'Peringatan',
-                        text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                        text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                         icon: 'warning'
                     });
                 }

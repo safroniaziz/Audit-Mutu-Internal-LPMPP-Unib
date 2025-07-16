@@ -10,9 +10,9 @@
                     <input type="hidden" name="_method" id="methodField" value="POST">
 
                     <div class="fv-row mb-5">
-                        <label class="fs-5 fw-semibold form-label mb-2">Satuan Standar:</label>
+                        <label class="fs-5 fw-semibold form-label mb-2">Sasaran Strategis:</label>
                         <select name="indikator_instrumen_id" class="form-control" required>
-                            <option disabled selected>-- pilih satuan standar --</option>
+                            <option disabled selected>-- pilih Sasaran Strategis --</option>
                             @foreach ($satuanStandars as $satuanStandar)
                                 <option value="{{ $satuanStandar->id }}">{{ $satuanStandar->nama_indikator }}</option>
                             @endforeach

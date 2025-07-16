@@ -133,7 +133,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach($groupedData as $satuanStandardNama => $indikatorGroups)
-                                        <!-- Satuan Standar Header -->
+                                        <!-- Sasaran Strategis Header -->
                                         <tr class="level-header">
                                             <td>
                                                 <div class="d-flex align-items-center">
@@ -146,8 +146,8 @@
                                                         </span>
                                                     </div>
                                                     <div class="d-flex flex-column">
-                                                        <span class="fw-bold fs-6">{{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}</span>
-                                                        <span class="text-muted fs-7">Satuan Standar</span>
+                                                        <span class="fw-bold fs-6">{{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}</span>
+                                                        <span class="text-muted fs-7">Sasaran Strategis</span>
                                                     </div>
                                                 </div>
                                             </td>

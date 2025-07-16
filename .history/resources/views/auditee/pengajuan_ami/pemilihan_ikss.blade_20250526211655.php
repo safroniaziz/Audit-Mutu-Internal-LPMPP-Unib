@@ -356,7 +356,7 @@
                                         </i>
                                         <div class="d-flex flex-column">
                                             <h4 class="mb-1 text-{{ $isSSSubmitted ? 'success' : 'warning' }}">Status: {{ $isSSSubmitted ? 'Sudah Diisi' : 'Belum Diisi' }}</h4>
-                                            <span>Satuan Standar: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
+                                            <span>Sasaran Strategis: {{ $satuanStandar->kode_satuan }} - {{ $satuanStandar->sasaran }}</span>
                                             <span class="text-muted mt-1">Progress: {{ $selectedInstruments }}/{{ $totalInstruments }} instrumen dipilih ({{ $selectedYesInstruments }} dipilih YA)</span>
                                         </div>
                                     </div>
@@ -529,7 +529,7 @@
                     } else {
                         // Show warning if trying to access a step without completing previous
                         Swal.fire({
-                            text: "Harap selesaikan dan simpan Satuan Standar sebelumnya terlebih dahulu!",
+                            text: "Harap selesaikan dan simpan Sasaran Strategis sebelumnya terlebih dahulu!",
                             icon: "warning",
                             buttonsStyling: false,
                             confirmButtonText: "OK",
@@ -737,7 +737,7 @@
                     step.style.opacity = isAccessible ? '1' : '0.5';
 
                     if (!isAccessible) {
-                        step.setAttribute('title', 'Selesaikan dan simpan Satuan Standar sebelumnya terlebih dahulu');
+                        step.setAttribute('title', 'Selesaikan dan simpan Sasaran Strategis sebelumnya terlebih dahulu');
                     } else {
                         step.removeAttribute('title');
                     }

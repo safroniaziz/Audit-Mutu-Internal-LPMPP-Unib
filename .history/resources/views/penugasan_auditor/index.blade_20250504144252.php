@@ -1,6 +1,6 @@
 @extends('layouts.dashboard.dashboard')
 @section('menu')
-    Data Satuan Standar
+    Data Sasaran Strategis
 @endsection
 @section('link')
     <li class="breadcrumb-item text-muted">
@@ -9,7 +9,7 @@
     <li class="breadcrumb-item">
         <span class="bullet bg-gray-500 w-5px h-2px"></span>
     </li>
-    <li class="breadcrumb-item text-muted">Data Satuan Standar</li>
+    <li class="breadcrumb-item text-muted">Data Sasaran Strategis</li>
 @endsection
 @section('content')
     <div id="kt_app_content" class="app-content flex-column-fluid">
@@ -27,7 +27,7 @@
 
                             <div class="d-flex flex-column">
                                 <h4 class="mb-1 text-danger">Perhatian!</h4>
-                                <span>Jika Anda ingin menghapus data Satuan Standar, harap pastikan data tersebut telah dinonaktifkan terlebih dahulu.</span>
+                                <span>Jika Anda ingin menghapus data Sasaran Strategis, harap pastikan data tersebut telah dinonaktifkan terlebih dahulu.</span>
                             </div>
                         </div>
                     </div>
@@ -37,13 +37,13 @@
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
-                            <input type="text" data-kt-satuanStandar-table-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Cari Satuan Standar" />
+                            <input type="text" data-kt-satuanStandar-table-filter="search" class="form-control form-control-solid w-250px ps-12" placeholder="Cari Sasaran Strategis" />
                         </div>
                     </div>
                     <div class="card-toolbar">
                         <div class="d-flex justify-content-end" data-kt-satuanStandar-table-toolbar="base">
                             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kt_modal" style="padding-top: .8rem; padding-bottom: .8rem;">
-                                <i class="fas fa-plus fa-sm"></i> Tambah Satuan Standar
+                                <i class="fas fa-plus fa-sm"></i> Tambah Sasaran Strategis
                             </button>
                         </div>
                         <div class="d-flex justify-content-end align-items-center d-none" data-kt-satuanStandar-table-toolbar="selected">
@@ -168,7 +168,7 @@
                         success: function(response) {
                             Swal.fire({
                                 title: 'Dipulihkan!',
-                                text: 'Data Satuan Standar berhasil dipulihkan.',
+                                text: 'Data Sasaran Strategis berhasil dipulihkan.',
                                 icon: 'success'
                             }).then(() => {
                                 location.reload();
@@ -193,10 +193,10 @@
             $('#kt_modal form')[0].reset();
             $('#methodField').val('PUT');
             $('#kt_modal_form').attr('action', "{{ route('satuanStandar.update', '') }}/" + id);
-            $('#kt_modal .modal-title').text('Edit Satuan Standar');
+            $('#kt_modal .modal-title').text('Edit Sasaran Strategis');
             $('#kt_modal button[type=submit]').text('Update Data');
 
-            // Ambil data Satuan Standar berdasarkan ID
+            // Ambil data Sasaran Strategis berdasarkan ID
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -210,7 +210,7 @@
                     }
                 },
                 error: function() {
-                    Swal.fire("Error", "Gagal mengambil data Satuan Standar", "error");
+                    Swal.fire("Error", "Gagal mengambil data Sasaran Strategis", "error");
                 }
             });
         });
@@ -220,7 +220,7 @@
             $('#kt_modal form')[0].reset();
             $('#methodField').val('POST');
             $('#kt_modal_form').attr('action', "{{ route('satuanStandar.store') }}");
-            $('#kt_modal .modal-title').text('Tambah Satuan Standar');
+            $('#kt_modal .modal-title').text('Tambah Sasaran Strategis');
             $('#kt_modal button[type=submit]').text('Simpan');
             $('#jenjang_container').hide();
             $('#fakultas_container').hide();
@@ -251,7 +251,7 @@
                         success: function(response) {
                             Swal.fire({
                                 title: 'Dinonaktifkan!',
-                                text: 'Data Satuan Standar berhasil dinonaktifkan.',
+                                text: 'Data Sasaran Strategis berhasil dinonaktifkan.',
                                 icon: 'success'
                             }).then(() => {
                                 location.reload();

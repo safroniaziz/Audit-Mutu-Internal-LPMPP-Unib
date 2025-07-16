@@ -355,7 +355,7 @@
                                             <h4 class="mb-1 text-{{ $ssStats['is_submitted'] ? 'success' : 'warning' }}">
                                                 Status: {{ $ssStats['is_submitted'] ? 'Sudah Diisi' : 'Belum Diisi' }}
                                             </h4>
-                                            <span>Satuan Standar: {{ $ssStats['kode_satuan'] }} - {{ $ssStats['sasaran'] }}</span>
+                                            <span>Sasaran Strategis: {{ $ssStats['kode_satuan'] }} - {{ $ssStats['sasaran'] }}</span>
                                             <span class="text-muted mt-1">
                                                 Progress: {{ $ssStats['selected'] }}/{{ $ssStats['total'] }} instrumen dipilih ({{ $ssStats['selected_yes'] }} dipilih YA)
                                             </span>
@@ -691,7 +691,7 @@
                     step.style.opacity = isAccessible ? '1' : '0.5';
 
                     if (!isAccessible) {
-                        step.setAttribute('title', 'Selesaikan dan simpan Satuan Standar sebelumnya terlebih dahulu');
+                        step.setAttribute('title', 'Selesaikan dan simpan Sasaran Strategis sebelumnya terlebih dahulu');
                     } else {
                         step.removeAttribute('title');
                     }
@@ -843,7 +843,7 @@
                                             } else {
                                                 // If it's the last step
                                                 Swal.fire({
-                                                    text: "Semua Satuan Standar telah berhasil diisi!",
+                                                    text: "Semua Sasaran Strategis telah berhasil diisi!",
                                                     icon: "success",
                                                     buttonsStyling: false,
                                                     confirmButtonText: "OK",

@@ -8,7 +8,7 @@
             border: 1px solid #e5e7eb;
         }
 
-        /* Level 1 - Satuan Standar */
+        /* Level 1 - Sasaran Strategis */
         .tree-node-1 {
             padding: 16px 20px;
             background: #f8fafc;
@@ -140,12 +140,12 @@
 
                         <div class="tree-container">
                             @foreach($groupedData as $satuanStandardNama => $indikatorGroups)
-                                <!-- Level 1: Satuan Standar -->
+                                <!-- Level 1: Sasaran Strategis -->
                                 <div class="tree-node-1" onclick="toggleNode(this)">
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-chevron-right expand-icon tree-icon"></i>
                                         <i class="fas fa-layer-group text-primary tree-icon"></i>
-                                        <span class="fw-semibold">{{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}</span>
+                                        <span class="fw-semibold">{{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}</span>
                                         <span class="progress-text">({{ $indikatorGroups->count() }} indikator)</span>
                                     </div>
                                 </div>

@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Evaluasi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class EvaluasiAuditeeController extends Controller
+{
+    public function index(){
+        $evaluasis = Evaluasi::where('jenis_evaluasi','auditee')->withTrashed()->get();
+        return view('evaluasi_auditee.index',[
+            'evaluasis'    =>  $evaluasis,
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->merge([
+            'is_nilai' => $request->has('is_nilai') ? 1 : 0
+        ]);
+
+        $validator = Validator::make($request->all(), [
+            'evaluasi' => 'required|string|max:100|unique:evaluasis,evaluasi',
+            'nomor' => 'required|string|max:100|unique:evaluasis,nomor',
+            'is_nilai' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $evaluasi = Evaluasi::create([
+            'nomor' => $request->nomor,
+            'evaluasi' => $request->evaluasi,
+            'jenis_evaluasi' => 'auditee',
+            'is_nilai' => $request->is_nilai,
+        ]);
+
+        return response()->json([
+            'message' => 'Evaluasi berhasil ditambahkan!',
+            'data' => $evaluasi
+        ]);
+    }
+
+    public function edit(Evaluasi $evaluasi)
+    {
+        dd($evaluasi);
+        if (!$evaluasi) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        return response()->json(['success' => true, 'data' => $evaluasi]);
+    }
+
+    public function update(Request $request, Evaluasi $evaluasi)
+    {
+        $request->merge([
+            'is_nilai' => $request->has('is_nilai') ? 1 : 0
+        ]);
+
+        $validator = Validator::make($request->all(), [
+            'evaluasi' => 'required|string|max:100|unique:evaluasis,evaluasi,'.$evaluasi->id,
+            'nomor' => 'required|string|max:100|unique:evaluasis,nomor,'.$evaluasi->id,
+            'is_nilai' => 'required|boolean',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $evaluasi->nomor = $request->nomor;
+        $evaluasi->evaluasi = $request->evaluasi;
+        $evaluasi->jenis_evaluasi = 'auditee';
+        $evaluasi->is_nilai = $request->is_nilai;
+        $evaluasi->save();
+
+        return response()->json([
+            'message' => 'Evaluasi berhasil diperbarui!',
+            'data' => $evaluasi
+        ]);
+    }
+
+    public function nonaktifkan(Evaluasi $evaluasi)
+    {
+        try {
+            $evaluasi->delete();
+            return response()->json([
+                'message' => 'Evaluasi berhasil dinonaktifkan!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus Evaluasi!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function nonaktifkanSelected(Request $request)
+    {
+        try {
+            $ids = $request->ids;
+            Evaluasi::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'message' => 'Evaluasi terpilih berhasil dinonaktifkan!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus Evaluasi terpilih!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        $evaluasi = Evaluasi::withTrashed()->findOrFail($id);
+        $evaluasi->restore();  // Mengembalikan data yang terhapus
+
+        return response()->json(['message' => 'Evaluasi berhasil dipulihkan!']);
+    }
+
+    public function destroyPermanent($id)
+    {
+        try {
+            $evaluasi = Evaluasi::withTrashed()->findOrFail($id);
+
+            if (!$evaluasi->trashed()) {
+                return response()->json([
+                    'message' => 'Evaluasi belum dinonaktifkan, tidak bisa dihapus permanen!'
+                ], 400);
+            }
+
+            $evaluasi->forceDelete();
+
+            return response()->json([
+                'message' => 'Evaluasi berhasil dihapus permanen!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus Evaluasi permanen!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+}

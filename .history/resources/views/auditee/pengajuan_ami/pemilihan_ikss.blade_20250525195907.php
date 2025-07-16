@@ -276,7 +276,7 @@
                                             <!--begin::Progress-->
                                             <div class="d-flex align-items-center w-100 flex-column mt-3">
                                                 <div class="d-flex justify-content-between w-100 mt-auto mb-2">
-                                                    <span class="fw-semibold fs-6 text-gray-600">Progress Satuan Standar Ini</span>
+                                                    <span class="fw-semibold fs-6 text-gray-600">Progress Sasaran Strategis Ini</span>
                                                     <span class="fw-bold fs-6 progress-percentage-step">0%</span>
                                                 </div>
                                                 <div class="h-5px mx-3 w-100 bg-light mb-3">

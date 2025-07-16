@@ -125,7 +125,7 @@
             const labels = [];
             const values = [];
 
-            // Process each Satuan Standar item to populate labels and values
+            // Process each Sasaran Strategis item to populate labels and values
             sortedGrouped.forEach(item => {
                 // Only include items that have data
                 if (item.has_data) {

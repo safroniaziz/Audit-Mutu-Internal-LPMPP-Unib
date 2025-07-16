@@ -543,7 +543,7 @@
 
                     if (!validateCurrentStep()) {
                         Swal.fire({
-                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Satuan Standar ini!",
+                            text: "Mohon pilih Ya atau Tidak untuk setiap instrumen di Sasaran Strategis ini!",
                             icon: "error",
                             buttonsStyling: false,
                             confirmButtonText: "OK",
@@ -605,7 +605,7 @@
                                 } else {
                                     // If it's the last step, show completion message
                                     Swal.fire({
-                                        text: "Semua Satuan Standar telah berhasil diisi!",
+                                        text: "Semua Sasaran Strategis telah berhasil diisi!",
                                         icon: "success",
                                         buttonsStyling: false,
                                         confirmButtonText: "OK",

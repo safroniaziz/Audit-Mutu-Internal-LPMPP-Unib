@@ -581,7 +581,7 @@
 
                                                     <li class="nav-item mt-2">
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
-                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pemilihan IKSS di semua Satuan Standar terlebih dahulu' : '' }}">
+                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pemilihan IKSS di semua Sasaran Strategis terlebih dahulu' : '' }}">
                                                             <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumen') ? 'active' : '' }}"
                                                                href="{{ $sudahMengisiIkss ? route('auditee.pengajuanAmi.pengisianInstrumen') : 'javascript:void(0);' }}"
                                                                style="{{ !$sudahMengisiIkss ? 'pointer-events: none; opacity: 0.6;' : '' }}">

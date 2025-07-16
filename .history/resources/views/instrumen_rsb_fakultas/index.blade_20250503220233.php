@@ -103,11 +103,11 @@
                                 <form id="form-tambah-indikator" class="mb-4">
                                     <input type="hidden" id="unit_kerja_id" name="unit_kerja_id">
 
-                                    <!-- Dropdown untuk Satuan Standar -->
+                                    <!-- Dropdown untuk Sasaran Strategis -->
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <select class="form-select" id="satuan_standar_id" name="satuan_standar_id" required>
-                                                <option value="">Pilih Satuan Standar</option>
+                                                <option value="">Pilih Sasaran Strategis</option>
                                                 @foreach ($satuanStandars as $satuan)
                                                     <option value="{{ $satuan->id }}">{{ $satuan->kode_satuan }} - {{ $satuan->sasaran }}</option>
                                                 @endforeach
@@ -178,7 +178,7 @@
             window.location.reload();
         });
 
-        // Ketika Satuan Standar dipilih
+        // Ketika Sasaran Strategis dipilih
         $('#satuan_standar_id').on('change', function () {
             let satuanId = $(this).val();
             let $indikatorSelect = $('#indikator_ikss_id');

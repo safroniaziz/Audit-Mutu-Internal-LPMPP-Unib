@@ -1,7 +1,7 @@
 @extends('dataauditor/dashboard_template')
 
 @php
-    // Group IKSS by Satuan Standar and calculate completion
+    // Group IKSS by Sasaran Strategis and calculate completion
     $groupedIkss = [];
     $ssCompletionStatus = [];
     $allCompleted = true;
@@ -381,7 +381,7 @@
                                     <div class="card-header {{ $ssCompletionStatus[$ssId]['is_completed'] ? 'bg-success-subtle' : 'bg-light' }}">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <h6 class="text-muted mb-1">Satuan Standar {{ $group['satuan_standar']->kode_satuan }}</h6>
+                                                <h6 class="text-muted mb-1">Sasaran Strategis {{ $group['satuan_standar']->kode_satuan }}</h6>
                                                 <h4 class="mb-0">
                                                     {{ $group['satuan_standar']->sasaran }}
                                                 </h4>
@@ -638,7 +638,7 @@
                 // Show error message
                 Swal.fire({
                     title: 'Peringatan',
-                    text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                    text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                     icon: 'warning'
                 });
             }
@@ -655,7 +655,7 @@
             // Update progress bar if it exists
             if ($('.progress-bar').length) {
                 $('.progress-bar').css('width', `${progressPercentage}%`);
-                $('.progress-status .completed').text(`${completedSteps} dari ${totalSteps} Satuan Standar selesai`);
+                $('.progress-status .completed').text(`${completedSteps} dari ${totalSteps} Sasaran Strategis selesai`);
                 $('.progress-status .current').text(`Langkah ${currentStep} dari ${totalSteps}`);
             }
         }

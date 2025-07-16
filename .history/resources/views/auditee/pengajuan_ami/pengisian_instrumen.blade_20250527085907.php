@@ -227,7 +227,7 @@
 
         <div class="flex-lg-row-fluid ms-lg-15">
             @php
-                // Group instrumen by Satuan Standar
+                // Group instrumen by Sasaran Strategis
                 $groupedInstrumen = collect();
                 foreach ($dataIkssProdi as $unit) {
                     foreach ($unit->indikatorKinerjas as $indikator) {

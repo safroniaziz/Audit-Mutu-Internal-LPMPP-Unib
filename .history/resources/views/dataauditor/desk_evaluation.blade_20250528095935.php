@@ -1,7 +1,7 @@
 @extends('dataauditor/dashboard_template')
 
 @php
-    // Group IKSS by Satuan Standar and calculate completion
+    // Group IKSS by Sasaran Strategis and calculate completion
     $groupedIkss = [];
     $ssCompletionStatus = [];
     $allCompleted = true;
@@ -611,7 +611,7 @@
             // Update progress bar if it exists
             if ($('.progress-bar').length) {
                 $('.progress-bar').css('width', `${progressPercentage}%`);
-                $('.progress-status .completed').text(`${completedSteps} dari ${totalSteps} Satuan Standar selesai`);
+                $('.progress-status .completed').text(`${completedSteps} dari ${totalSteps} Sasaran Strategis selesai`);
                 $('.progress-status .current').text(`Langkah ${currentStep} dari ${totalSteps}`);
             }
         }
@@ -635,7 +635,7 @@
                 e.preventDefault();
                 Swal.fire({
                     title: 'Peringatan',
-                    text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                    text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                     icon: 'warning'
                 });
                 return;

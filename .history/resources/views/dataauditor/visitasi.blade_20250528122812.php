@@ -2,14 +2,14 @@
 
 @section('content')
 @php
-    // Calculate completion status for each Satuan Standar
+    // Calculate completion status for each Sasaran Strategis
     $ikssCompletionStatus = [];
     $allCompleted = true;
     $lastCompletedStep = null;
     $firstIncompleteStep = null;
 
     if ($dataIkss->isNotEmpty()) {
-        // Group by Satuan Standar
+        // Group by Sasaran Strategis
         foreach ($groupedIkss as $satuanStandarId => $ikssGroup) {
             if (!isset($ikssCompletionStatus[$satuanStandarId])) {
                 $ikssCompletionStatus[$satuanStandarId] = [
@@ -21,7 +21,7 @@
                 ];
             }
 
-            // Group by IKSS within each Satuan Standar
+            // Group by IKSS within each Sasaran Strategis
             $groupedByIkss = $ikssGroup->groupBy(function($item) {
                 return $item->instrumen->indikatorKinerja->kode_ikss;
             });
@@ -51,7 +51,7 @@
                 }
             }
 
-            // Check if all IKSS in this Satuan Standar are completed
+            // Check if all IKSS in this Sasaran Strategis are completed
             if ($ikssCompletionStatus[$satuanStandarId]['completed'] == $ikssCompletionStatus[$satuanStandarId]['total']) {
                 $ikssCompletionStatus[$satuanStandarId]['is_completed'] = true;
                 $lastCompletedStep = $satuanStandarId;
@@ -654,7 +654,7 @@
                     firstError[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
                     Swal.fire({
                         title: 'Peringatan',
-                        text: 'Mohon lengkapi semua field yang wajib diisi pada satuan standar ini',
+                        text: 'Mohon lengkapi semua field yang wajib diisi pada Sasaran Strategis ini',
                         icon: 'warning'
                     });
                 }

@@ -33,7 +33,7 @@
                 <div class="col-xl-5">
                     <div class="card card-flush h-xl-100 border-0 bg-white">
                         <div class="card-header pt-5">
-                            <h3 class="card-title fw-bold text-dark">Nilai Satuan Standar</h3>
+                            <h3 class="card-title fw-bold text-dark">Nilai Sasaran Strategis</h3>
                         </div>
                         <div class="card-body pt-0">
                             <div class="d-flex flex-column">
@@ -210,7 +210,7 @@
             const labels = [];
             const values = [];
 
-            // Process each Satuan Standar item to populate labels and values
+            // Process each Sasaran Strategis item to populate labels and values
             sortedGrouped.forEach(item => {
                 // Use the kode_satuan as label (like 'SS 1.1')
                 labels.push(item.kode_satuan);

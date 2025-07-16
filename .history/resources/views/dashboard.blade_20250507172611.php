@@ -130,7 +130,7 @@
                 <div class="col-xl-6">
                     <div class="card card-flush h-xl-100 border-0 bg-white">
                         <div class="card-header pt-5">
-                            <h3 class="card-title fw-bold text-dark">Nilai Satuan Standar</h3>
+                            <h3 class="card-title fw-bold text-dark">Nilai Sasaran Strategis</h3>
                             <div class="card-toolbar">
                                 <button type="button" class="btn btn-sm btn-light-primary">
                                     <i class="fas fa-sync-alt me-2"></i>Refresh

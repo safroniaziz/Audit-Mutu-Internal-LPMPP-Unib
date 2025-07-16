@@ -227,7 +227,7 @@
 
         <div class="flex-lg-row-fluid ms-lg-15">
             @php
-                // Group instrumen by Satuan Standar and calculate completion
+                // Group instrumen by Sasaran Strategis and calculate completion
                 $groupedInstrumen = collect();
                 $ssCompletionStatus = [];
                 $allCompleted = true;

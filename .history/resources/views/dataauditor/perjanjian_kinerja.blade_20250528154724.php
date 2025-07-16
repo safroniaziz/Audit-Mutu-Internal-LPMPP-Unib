@@ -105,13 +105,13 @@
 
                         <div class="tree-container">
                             @foreach($groupedData as $satuanStandardNama => $indikatorGroups)
-                                <!-- Level 1: Satuan Standar -->
+                                <!-- Level 1: Sasaran Strategis -->
                                 <div class="tree-level-1">
                                     <div class="tree-node level-1">
                                         <div class="d-flex align-items-center py-3 px-4 border-bottom bg-light">
                                             <i class="fas fa-layer-group text-info me-3"></i>
                                             <div class="flex-grow-1">
-                                                <h6 class="mb-0 fw-bold text-dark">{{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}</h6>
+                                                <h6 class="mb-0 fw-bold text-dark">{{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}</h6>
                                             </div>
                                             <span class="badge badge-light-info">{{ $indikatorGroups->count() }} Indikator</span>
                                         </div>

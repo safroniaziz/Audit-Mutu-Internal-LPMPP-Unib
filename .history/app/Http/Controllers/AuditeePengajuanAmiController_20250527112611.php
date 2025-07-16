@@ -203,7 +203,7 @@ class AuditeePengajuanAmiController extends Controller
     }
 
     /**
-     * Save IKSS data for specific Satuan Standar
+     * Save IKSS data for specific Sasaran Strategis
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -279,7 +279,7 @@ class AuditeePengajuanAmiController extends Controller
                 throw new \Exception('Tidak ada data IKSS yang dipilih untuk disimpan.');
             }
 
-            // Get Satuan Standar info for the message
+            // Get Sasaran Strategis info for the message
             $satuanStandar = SatuanStandar::find($satuanStandarId);
 
             DB::commit();
@@ -643,7 +643,7 @@ class AuditeePengajuanAmiController extends Controller
         if (empty($instrumenIds)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada instrumen yang perlu diisi untuk Satuan Standar ini.'
+                'message' => 'Tidak ada instrumen yang perlu diisi untuk Sasaran Strategis ini.'
             ], 422);
         }
 
@@ -661,8 +661,8 @@ class AuditeePengajuanAmiController extends Controller
         ], [
             'periode_id.required' => 'Periode harus dipilih.',
             'periode_id.exists' => 'Periode yang dipilih tidak valid.',
-            'ss_id.required' => 'Satuan Standar harus dipilih.',
-            'ss_id.exists' => 'Satuan Standar tidak valid.',
+            'ss_id.required' => 'Sasaran Strategis harus dipilih.',
+            'ss_id.exists' => 'Sasaran Strategis tidak valid.',
             'realisasi.*.required' => 'Realisasi wajib diisi.',
             'akar_penyebab.*.required' => 'Akar penyebab wajib diisi.',
             'rencana_perbaikan.*.required' => 'Rencana perbaikan wajib diisi.',

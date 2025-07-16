@@ -325,7 +325,7 @@
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-layer-group me-3 fs-4"></i>
                                         <div>
-                                            <h6 class="mb-0 fw-bold">{{ $satuanStandardNama ?? 'Satuan Standar Tidak Ditemukan' }}</h6>
+                                            <h6 class="mb-0 fw-bold">{{ $satuanStandardNama ?? 'Sasaran Strategis Tidak Ditemukan' }}</h6>
                                             <small class="opacity-75">{{ $indikatorGroups->count() }} Indikator Kinerja</small>
                                         </div>
                                     </div>
