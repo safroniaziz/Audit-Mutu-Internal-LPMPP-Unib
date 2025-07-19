@@ -1,3 +1,0 @@
-@push('name')
-
-@endpush
