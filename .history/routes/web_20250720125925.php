@@ -41,7 +41,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
-Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('auditee.pengajuanAmi.lengkapiProfil');
+Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('pengajuanAmi.lengkapiProfil');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:Administrator')->group(function () {
