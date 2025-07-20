@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('pengajuan_ami_id')->constrained('pengajuan_amis')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('jenis', ['auditor', 'auditee']); // Untuk membedakan siapa yang mengisi
-            $table->integer('nilai'); // Nilai evaluasi (1-4)
-            $table->unique(['evaluasi_id', 'pengajuan_ami_id', 'user_id', 'jenis']); // Satu evaluasi hanya bisa dinilai sekali per pengajuan per user per jenis
+            $table->integer('nilai'); // Nilai evaluasi (1-4)$table->unique(['evaluasi_id', 'pengajuan_ami_id', 'user_id', 'jenis'], 'evaluasi_sub_unique');
+            $table->unique(['evaluasi_id', 'pengajuan_ami_id', 'user_id', 'jenis'], 'evaluasi_sub_unique');
             $table->softDeletes();
             $table->timestamps();
         });
