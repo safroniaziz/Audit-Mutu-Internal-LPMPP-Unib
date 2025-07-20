@@ -87,18 +87,7 @@ class LoginRequest extends FormRequest
         $periodeAktif = \App\Models\PeriodeAktif::whereNull('deleted_at')->first();
 
         if (!$periodeAktif) {
-            // Jika tidak ada periode aktif, hanya admin yang bisa login
-            $isAdmin = DB::table('model_has_roles')
-                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-                ->where('model_has_roles.model_id', $user->id)
-                ->where('roles.name', 'Administrator')
-                ->exists();
-
-            if ($isAdmin) {
-                return; // Admin tetap bisa login
-            }
-
-            // Logout user non-admin karena tidak ada periode aktif
+            // Logout user karena tidak ada periode aktif
             Auth::logout();
             throw ValidationException::withMessages([
                 'email' => 'Tidak ada periode aktif yang tersedia saat ini.',
