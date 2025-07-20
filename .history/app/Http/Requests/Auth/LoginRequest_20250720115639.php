@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
-use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -66,15 +65,15 @@ class LoginRequest extends FormRequest
      */
     private function validatePeriodeAktif(): void
     {
-                                // Cek apakah user yang sudah login adalah admin
+                        // Cek apakah user yang sudah login adalah admin
         $user = Auth::user();
 
         // Jika user adalah admin, skip validasi periode
         if ($user) {
-            // Cek role admin dengan query sederhana
-            $isAdmin = DB::table('model_has_roles')
+            $isAdmin = \DB::table('model_has_roles')
                 ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
                 ->where('model_has_roles.model_id', $user->id)
+                ->where('model_has_roles.model_type', User::class)
                 ->where('roles.name', 'Administrator')
                 ->exists();
 

@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Models\Role;
-use App\Models\User;
 
 class LoginRequest extends FormRequest
 {
@@ -58,7 +56,7 @@ class LoginRequest extends FormRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-        /**
+    /**
      * Validate if current time is within active period login schedule
      * Admin is exempted from this restriction
      *
@@ -66,29 +64,18 @@ class LoginRequest extends FormRequest
      */
     private function validatePeriodeAktif(): void
     {
-                                // Cek apakah user yang sudah login adalah admin
-        $user = Auth::user();
+        // Cek apakah user yang login adalah admin
+        $user = \App\Models\User::where('email', $this->email)->first();
 
         // Jika user adalah admin, skip validasi periode
-        if ($user) {
-            // Cek role admin dengan query sederhana
-            $isAdmin = DB::table('model_has_roles')
-                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-                ->where('model_has_roles.model_id', $user->id)
-                ->where('roles.name', 'Administrator')
-                ->exists();
-
-            if ($isAdmin) {
-                return;
-            }
+        if ($user && $user->hasRole('Administrator')) {
+            return;
         }
 
         // Get active period (deleted_at is null)
         $periodeAktif = \App\Models\PeriodeAktif::whereNull('deleted_at')->first();
 
         if (!$periodeAktif) {
-            // Logout user karena tidak ada periode aktif
-            Auth::logout();
             throw ValidationException::withMessages([
                 'email' => 'Tidak ada periode aktif yang tersedia saat ini.',
             ]);
@@ -100,8 +87,6 @@ class LoginRequest extends FormRequest
             ->first();
 
         if (!$loginJadwal) {
-            // Logout user karena tidak ada jadwal login
-            Auth::logout();
             throw ValidationException::withMessages([
                 'email' => 'Jadwal login untuk periode ini belum ditentukan.',
             ]);
@@ -115,8 +100,6 @@ class LoginRequest extends FormRequest
             $mulai = $loginJadwal->waktu_mulai->format('d/m/Y H:i');
             $selesai = $loginJadwal->waktu_selesai->format('d/m/Y H:i');
 
-            // Logout user karena di luar jadwal
-            Auth::logout();
             throw ValidationException::withMessages([
                 'email' => "Login hanya tersedia pada periode: {$mulai} - {$selesai}",
             ]);
