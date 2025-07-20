@@ -26,10 +26,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
         ]);
 
-        $middleware->trustProxies(
-            at: '*',
-            headers: Request::HEADER_X_FORWARDED_AWS_ELB
+        $middleware->validateCsrfTokens(
+            except: ['stripe/*']
         );
+
+        $middleware->web(append: [
+            EnsureUserIsSubscribed::class,
+        ])
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (UnauthorizedException $e, Request $request) {

@@ -25,10 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
 
         ]);
-
         $middleware->trustProxies(
-            at: '*',
-            headers: Request::HEADER_X_FORWARDED_AWS_ELB
+            // '*' artinya percaya semua proxy
+            proxies: '*',
+            headers: Request::HEADER_X_FORWARDED_ALL
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {

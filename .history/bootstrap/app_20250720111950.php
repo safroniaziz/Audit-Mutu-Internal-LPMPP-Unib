@@ -25,11 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
 
         ]);
-
-        $middleware->trustProxies(
-            at: '*',
-            headers: Request::HEADER_X_FORWARDED_AWS_ELB
-        );
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (UnauthorizedException $e, Request $request) {
