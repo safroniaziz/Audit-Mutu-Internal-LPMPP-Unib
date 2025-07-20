@@ -6,7 +6,6 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -59,21 +58,7 @@ class LoginRequest extends FormRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-                /**
-     * Check if user is admin
-     */
-    private function isUserAdmin($user): bool
-    {
-        if (!$user) return false;
-
-        return DB::table('model_has_roles')
-            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
-            ->where('model_has_roles.model_id', $user->id)
-            ->where('roles.name', 'Administrator')
-            ->exists();
-    }
-
-    /**
+            /**
      * Validate if current time is within active period login schedule
      * Admin is exempted from this restriction
      *
@@ -84,15 +69,39 @@ class LoginRequest extends FormRequest
         // Cek apakah user yang sudah login adalah admin
         $user = Auth::user();
 
-        // Jika user adalah admin, skip semua validasi
-        if ($this->isUserAdmin($user)) {
-            return;
+        // Jika user adalah admin, skip validasi periode
+        if ($user) {
+            // Cek role admin dengan query sederhana
+            $isAdmin = DB::table('model_has_roles')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('model_has_roles.model_id', $user->id)
+                ->where('roles.name', 'Administrator')
+                ->exists();
+
+            // Log untuk debug
+            \Log::info('User ID: ' . $user->id . ', Is Admin: ' . ($isAdmin ? 'Yes' : 'No'));
+
+            if ($isAdmin) {
+                \Log::info('Admin detected, skipping periode validation');
+                return;
+            }
         }
 
         // Get active period (deleted_at is null)
         $periodeAktif = \App\Models\PeriodeAktif::whereNull('deleted_at')->first();
 
         if (!$periodeAktif) {
+            // Jika tidak ada periode aktif, hanya admin yang bisa login
+            $isAdmin = DB::table('model_has_roles')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('model_has_roles.model_id', $user->id)
+                ->where('roles.name', 'Administrator')
+                ->exists();
+
+            if ($isAdmin) {
+                return; // Admin tetap bisa login
+            }
+
             // Logout user non-admin karena tidak ada periode aktif
             Auth::logout();
             throw ValidationException::withMessages([
@@ -105,7 +114,18 @@ class LoginRequest extends FormRequest
             ->where('jenis', 'login')
             ->first();
 
-        if (!$loginJadwal) {
+                if (!$loginJadwal) {
+            // Jika tidak ada jadwal login, hanya admin yang bisa login
+            $isAdmin = DB::table('model_has_roles')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->where('model_has_roles.model_id', $user->id)
+                ->where('roles.name', 'Administrator')
+                ->exists();
+
+            if ($isAdmin) {
+                return; // Admin tetap bisa login
+            }
+
             // Logout user non-admin karena tidak ada jadwal login
             Auth::logout();
             throw ValidationException::withMessages([
