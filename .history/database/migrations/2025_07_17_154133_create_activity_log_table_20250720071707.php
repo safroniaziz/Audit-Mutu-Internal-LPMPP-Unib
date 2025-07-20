@@ -20,8 +20,9 @@ class CreateActivityLogTable extends Migration
         });
     }
 
+
     public function down()
     {
-        Schema::dropIfExists('activity_log');
+        Schema::connection(config('activitylog.database_connection'))->dropIfExists(config('activitylog.table_name'));
     }
 }
