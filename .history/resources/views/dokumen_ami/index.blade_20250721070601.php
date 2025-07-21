@@ -793,15 +793,6 @@
 
             // Ubah handler untuk drag and drop
             dropzone.addEventListener('drop', function(e) {
-                if (dropEventHandled) return;
-                dropEventHandled = true;
-
-                // Reset flag after 1 second
-                clearTimeout(filePickerTimeout);
-                filePickerTimeout = setTimeout(() => {
-                    dropEventHandled = false;
-                }, 1000);
-
                 const files = e.dataTransfer.files;
 
                 if (files.length > 0) {
@@ -885,15 +876,6 @@
 
             // Handle dropped files
             dropzone.addEventListener('drop', function(e) {
-                if (dropEventHandled) return;
-                dropEventHandled = true;
-
-                // Reset flag after 1 second
-                clearTimeout(filePickerTimeout);
-                filePickerTimeout = setTimeout(() => {
-                    dropEventHandled = false;
-                }, 1000);
-
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     const file = files[0]; // Accept only the first file
@@ -905,7 +887,7 @@
                     }
 
                     if (file.size > MAX_FILE_SIZE) {
-                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 1MB.`);
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
                         return;
                     }
 

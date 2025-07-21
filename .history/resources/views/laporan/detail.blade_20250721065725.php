@@ -562,16 +562,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingEvaluasiAuditee = false;
-                                foreach($evaluasiAuditee as $evaluasi) {
-                                    if($evaluasi->is_nilai && (!isset($evaluasiSubmissionsAuditee[$evaluasi->id]) || $evaluasiSubmissionsAuditee[$evaluasi->id]->nilai <= 0)) {
-                                        $hasMissingEvaluasiAuditee = true;
-                                        break;
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingEvaluasiAuditee)
                             <div class="alert alert-info d-flex align-items-center p-4 mb-4">
                                 <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
                                     <i class="ki-duotone ki-information-5 fs-2 text-info">
@@ -585,7 +575,6 @@
                                     <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan evaluasi belum diisi oleh auditee.</span>
                                 </div>
                             </div>
-                            @endif
                             @if(count($evaluasiAuditee) > 0)
                                 <div class="table-responsive">
                                     <table class="table table-row-dashed table-row-gray-300 align-middle">
@@ -669,18 +658,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingEvaluasiAuditor = false;
-                                foreach($auditorEvaluasiData as $auditorData) {
-                                    foreach($evaluasiAuditor as $evaluasi) {
-                                        if($evaluasi->is_nilai && (!isset($auditorData['evaluasi_submissions'][$evaluasi->id]) || $auditorData['evaluasi_submissions'][$evaluasi->id]->nilai <= 0)) {
-                                            $hasMissingEvaluasiAuditor = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingEvaluasiAuditor)
                             <div class="alert alert-info d-flex align-items-center p-4 mb-4">
                                 <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
                                     <i class="ki-duotone ki-information-5 fs-2 text-info">
@@ -694,7 +671,6 @@
                                     <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan evaluasi belum diisi oleh auditor.</span>
                                 </div>
                             </div>
-                            @endif
                             @if(count($auditorEvaluasiData) > 0)
                                 @foreach($auditorEvaluasiData as $auditorData)
                                     <div class="border-bottom border-gray-300 pb-4 mb-4">
@@ -792,18 +768,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingKuisioner = false;
-                                foreach($auditorKuisionerData as $auditorData) {
-                                    foreach($kuisioners as $kuisioner) {
-                                        if(!isset($auditorData['kuisioner_jawaban'][$kuisioner->id]) || !$auditorData['kuisioner_jawaban'][$kuisioner->id]->opsi->opsi) {
-                                            $hasMissingKuisioner = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingKuisioner)
                             <div class="alert alert-info d-flex align-items-center p-4 mb-4">
                                 <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
                                     <i class="ki-duotone ki-information-5 fs-2 text-info">
@@ -817,7 +781,6 @@
                                     <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan kuisioner belum diisi oleh auditor.</span>
                                 </div>
                             </div>
-                            @endif
                             @if(isset($auditorKuisionerData) && count($auditorKuisionerData) > 0)
                                 @foreach($auditorKuisionerData as $auditorData)
                                     <div class="border-bottom border-gray-300 pb-4 mb-4">

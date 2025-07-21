@@ -224,7 +224,92 @@ var KTauditeesList = function () {
         }
     }
 
+    // Handle password change
+    const handlePasswordChange = () => {
+        // Handle ubah password button click
+        $(document).on('click', '.ubah-password-btn', function() {
+            const auditeeId = $(this).data('id');
+            $('#passwordAuditeeId').val(auditeeId);
+            $('#ubahPasswordModal').modal('show');
+        });
 
+        // Handle password form submission
+        $('#ubahPasswordForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const auditeeId = $('#passwordAuditeeId').val();
+            const password = $('#newPassword').val();
+            const confirmPassword = $('#confirmPassword').val();
+
+            // Basic validation
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Konfirmasi password tidak cocok!',
+                    confirmButtonColor: '#d33'
+                });
+                return;
+            }
+
+            if (password.length < 8) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Password harus minimal 8 karakter!',
+                    confirmButtonColor: '#d33'
+                });
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = $('#buttonsubmit');
+            const originalText = submitBtn.text();
+            submitBtn.prop('disabled', true).text('Menyimpan...');
+
+            // AJAX request
+            $.ajax({
+                url: `/auditee/${auditeeId}/ubah-password`,
+                type: 'PUT',
+                data: {
+                    password: password,
+                    password_confirmation: confirmPassword,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: response.message,
+                        confirmButtonColor: '#3085d6'
+                    }).then(() => {
+                        $('#ubahPasswordModal').modal('hide');
+                        $('#ubahPasswordForm')[0].reset();
+                    });
+                },
+                error: function(xhr) {
+                    let errorMessage = 'Terjadi kesalahan saat mengubah password.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        const errors = xhr.responseJSON.errors;
+                        errorMessage = Object.values(errors).flat().join('\n');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: errorMessage,
+                        confirmButtonColor: '#d33'
+                    });
+                },
+                complete: function() {
+                    submitBtn.prop('disabled', false).text(originalText);
+                }
+            });
+        });
+    };
 
     return {
         // Public functions
@@ -240,6 +325,7 @@ var KTauditeesList = function () {
             handleSearch();
             handleRowDeletion();
             handleFilter();
+            handlePasswordChange();
         }
     }
 }();

@@ -240,6 +240,7 @@ var KTauditeesList = function () {
             handleSearch();
             handleRowDeletion();
             handleFilter();
+            handlePasswordChange();
         }
     }
 }();

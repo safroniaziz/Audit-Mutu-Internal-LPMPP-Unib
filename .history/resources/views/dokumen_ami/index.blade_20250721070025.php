@@ -448,7 +448,7 @@
                                 </button>
                                 <input type="file" name="file_dokumen[]" id="fileInput" style="display: none;" required multiple>
                                 <p class="text-gray-500 mt-3 mb-0">
-                                    <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 1MB)</small>
+                                    <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 10MB)</small>
                                 </p>
                             </div>
                             <div id="filePreviewContainer" class="mb-3">
@@ -528,7 +528,7 @@
                                 </button>
                                 <input type="file" name="file_dokumen" id="edit_fileInput" style="display: none;">
                                 <p class="text-gray-500 mt-3 mb-0">
-                                    <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 1MB)</small>
+                                    <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 10MB)</small>
                                 </p>
                             </div>
                             <div id="edit_filePreview" class="mt-3" style="display: none;">
@@ -567,17 +567,8 @@
 
 @push('scripts')
     <script>
-        $(document).ready(function() {
-            const dropzone = document.getElementById('dropzone');
-
-            // Clean up any existing event listeners
-            const newDropzone = dropzone.cloneNode(true);
-            dropzone.parentNode.replaceChild(newDropzone, dropzone);
-            const cleanDropzone = document.getElementById('dropzone');
-
-            // Flag to prevent duplicate event listeners
-            let dropEventHandled = false;
-            let filePickerTimeout;
+        $(document).ready(function() {$(document).ready(function() {
+            const dropzone = document.getElementById('dropzone'); // Tambahkan ini
 
             // File size validation (1MB - 1KB = 1023KB)
             const MAX_FILE_SIZE = 1023 * 1024;
@@ -660,15 +651,6 @@
 
             // Browse files button
             $('#browseFilesBtn').on('click', function() {
-                if (dropEventHandled) return;
-                dropEventHandled = true;
-
-                // Reset flag after 1 second
-                clearTimeout(filePickerTimeout);
-                filePickerTimeout = setTimeout(() => {
-                    dropEventHandled = false;
-                }, 1000);
-
                 $('#fileInput').click();
             });
 
@@ -693,7 +675,7 @@
 
                         // Validasi file size
                         if (file.size > MAX_FILE_SIZE) {
-                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 1MB.`);
+                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
                             continue;
                         }
 
@@ -793,15 +775,6 @@
 
             // Ubah handler untuk drag and drop
             dropzone.addEventListener('drop', function(e) {
-                if (dropEventHandled) return;
-                dropEventHandled = true;
-
-                // Reset flag after 1 second
-                clearTimeout(filePickerTimeout);
-                filePickerTimeout = setTimeout(() => {
-                    dropEventHandled = false;
-                }, 1000);
-
                 const files = e.dataTransfer.files;
 
                 if (files.length > 0) {
@@ -824,7 +797,7 @@
                         }
 
                         if (file.size > MAX_FILE_SIZE) {
-                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 1MB.`);
+                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
                             continue;
                         }
 
@@ -885,15 +858,6 @@
 
             // Handle dropped files
             dropzone.addEventListener('drop', function(e) {
-                if (dropEventHandled) return;
-                dropEventHandled = true;
-
-                // Reset flag after 1 second
-                clearTimeout(filePickerTimeout);
-                filePickerTimeout = setTimeout(() => {
-                    dropEventHandled = false;
-                }, 1000);
-
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     const file = files[0]; // Accept only the first file
@@ -905,7 +869,7 @@
                     }
 
                     if (file.size > MAX_FILE_SIZE) {
-                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 1MB.`);
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
                         return;
                     }
 
@@ -1021,7 +985,580 @@
                     }
 
                     if (file.size > MAX_FILE_SIZE) {
-                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 1MB.`);
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
+                        this.value = '';
+                        return;
+                    }
+
+                    // Show file preview
+                    $('#edit_fileName').text(file.name);
+                    $('#edit_fileSize').text(formatFileSize(file.size));
+                    $('#edit_filePreview').show();
+                }
+            });
+
+            $('#edit_removeFile').on('click', function() {
+                $('#edit_fileInput').val('');
+                $('#edit_filePreview').hide();
+            });
+
+            // Edit form submission
+            $('#formEditDokumen').on('submit', function(e) {
+                e.preventDefault();
+
+                // Button loading state
+                const submitBtn = $(this).find('#btnEditSubmit');
+                submitBtn.attr('data-kt-indicator', 'on');
+                submitBtn.prop('disabled', true);
+
+                // FormData for AJAX
+                const formData = new FormData(this);
+
+                // AJAX submission
+                $.ajax({
+                    url: '/dokumen-ami/' + $('#edit_id').val()+'/update',
+                    method: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Show success message
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Dokumen AMI berhasil diperbarui.',
+                            icon: 'success',
+                            buttonsStyling: false,
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        }).then(function() {
+                            // Reload page after successful update
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        // Show error message
+                        let errorMessage = 'Terjadi kesalahan saat memperbarui dokumen.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            buttonsStyling: false,
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    },
+                    complete: function() {
+                        // Reset loading state
+                        submitBtn.attr('data-kt-indicator', 'off');
+                        submitBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Delete document functionality
+            $('.btn-delete-dokumen').on('click', function() {
+                const id = $(this).data('id');
+
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    text: 'Apakah Anda yakin ingin menghapus dokumen ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Hapus',
+                    cancelButtonText: 'Batal',
+                    buttonsStyling: false,
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary me-3'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // AJAX delete request
+                        $.ajax({
+                            url: '/dokumen/' + id,
+                            method: 'DELETE',
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: 'Dokumen AMI berhasil dihapus.',
+                                    icon: 'success',
+                                    buttonsStyling: false,
+                                    confirmButtonText: 'OK',
+                                    customClass: {
+                                        confirmButton: 'btn btn-primary'
+                                    }
+                                }).then(function() {
+                                    // Reload page after successful deletion
+                                    location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                // Show error message
+                                let errorMessage = 'Terjadi kesalahan saat menghapus dokumen.';
+
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMessage = xhr.responseJSON.message;
+                                }
+
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: errorMessage,
+                                    icon: 'error',
+                                    buttonsStyling: false,
+                                    customClass: {
+                                        confirmButton: 'btn btn-primary'
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Add hover effects to document items
+            $('.dokumen-item').hover(
+                function() {
+                    $(this).addClass('bg-light-primary');
+                    $(this).find('.btn').addClass('btn-active');
+                },
+                function() {
+                    $(this).removeClass('bg-light-primary');
+                    $(this).find('.btn').removeClass('btn-active');
+                }
+            );
+
+            // Add tooltips to action buttons
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+            const dropzone = document.getElementById('dropzone'); // Tambahkan ini
+
+            // File size validation (10MB)
+            const MAX_FILE_SIZE = 10 * 1024 * 1024;
+            // Allowed file types
+            const ALLOWED_TYPES = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'image/jpeg',
+                'image/png'
+            ];
+
+            // Initialize toastr notifications
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toastr-top-right",
+                "preventDuplicates": false,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            // Tab switching animation
+            function activateTabFromHash() {
+                let hash = window.location.hash;
+                if (hash) {
+                    // Mencari tab yang sesuai dengan hash dan menampilkannya
+                    $('.dokumen-tabs .nav-link[href="' + hash + '"]').tab('show');
+
+                    // Menambahkan class untuk menampilkan tab
+                    $('.tab-pane').removeClass('show active');
+                    $(hash).addClass('show active');
+                }
+            }
+
+            // Menangani klik pada tab
+            $('.dokumen-tabs .nav-link').on('click', function() {
+                const target = $(this).attr('href');
+
+                // Animasi fade pada tab
+                $('.tab-pane').removeClass('show active');
+                setTimeout(function() {
+                    $(target).addClass('show active');
+                }, 150);
+
+                // Memperbarui URL dengan hash - perubahan penting di sini
+                window.history.pushState(null, null, window.location.pathname + target);
+            });
+
+            // Mengaktifkan tab yang benar saat halaman pertama kali dimuat
+            activateTabFromHash();
+
+            // Menangani navigasi tombol kembali/maju pada browser
+            window.addEventListener('popstate', function() {
+                activateTabFromHash();
+            });
+
+            // Add Document Modal Functionality
+            $('#modalAddDokumen').on('shown.bs.modal', function(e) {
+                // Check if the button has a category data attribute
+                const button = $(e.relatedTarget);
+                if (button.data('kategori')) {
+                    $('#kategori_dokumen').val(button.data('kategori'));
+                }
+
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                $('#tanggal_berlaku').val(today);
+            });
+
+            // Browse files button
+            $('#browseFilesBtn').on('click', function() {
+                $('#fileInput').click();
+            });
+
+            // Handle file selection change
+            $('#fileInput').on('change', function() {
+                const files = this.files;
+
+                if (files.length > 0) {
+                    // Reset preview area
+                    $('#filePreviewContainer').empty();
+                    $('#removeAllFiles').removeClass('d-none');
+
+                    // Loop melalui semua file yang dipilih
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+
+                        // Validasi file type
+                        if (!ALLOWED_TYPES.includes(file.type)) {
+                            toastr.error(`File "${file.name}" tidak didukung. Hanya file PDF, DOC, DOCX, XLS, XLSX, JPG, dan PNG yang diizinkan.`);
+                            continue;
+                        }
+
+                        // Validasi file size
+                        if (file.size > MAX_FILE_SIZE) {
+                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
+                            continue;
+                        }
+
+                        // Tambahkan file ke preview
+                        addFilePreview(file, i);
+                    }
+                } else {
+                    $('#filePreviewContainer').empty();
+                    $('#removeAllFiles').addClass('d-none');
+                }
+            });
+
+            // Fungsi untuk menambahkan preview file
+            function addFilePreview(file, index) {
+                // Get file extension
+                const extension = file.name.split('.').pop().toLowerCase();
+                let iconClass = 'bi-file-earmark-text';
+
+                // Set icon based on file type
+                if (file.type.includes('pdf')) {
+                    iconClass = 'bi-file-earmark-pdf text-danger';
+                } else if (file.type.includes('word')) {
+                    iconClass = 'bi-file-earmark-word text-primary';
+                } else if (file.type.includes('excel')) {
+                    iconClass = 'bi-file-earmark-excel text-success';
+                } else if (file.type.includes('image')) {
+                    iconClass = 'bi-file-earmark-image text-warning';
+                }
+
+                // Create file preview element
+                const previewElement = `
+                <div class="file-preview-item mb-3" data-index="${index}">
+                    <div class="d-flex align-items-center border border-dashed border-gray-300 rounded p-3">
+                        <div class="me-3">
+                            <i class="bi ${iconClass} fs-2"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <span class="fw-bold d-block fs-6">${file.name}</span>
+                            <span class="text-muted fs-7">${formatFileSize(file.size)}</span>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-icon btn-light-danger remove-file" data-index="${index}">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+                // Append to preview container
+                $('#filePreviewContainer').append(previewElement);
+            }
+
+            $(document).on('click', '.remove-file', function() {
+                const index = parseInt($(this).data('index'));
+
+                // Hapus dari UI
+                $(`.file-preview-item[data-index="${index}"]`).remove();
+
+                // Hapus dari FileList
+                const dt = new DataTransfer();
+                const input = document.getElementById('fileInput');
+                const { files } = input;
+
+                for (let i = 0; i < files.length; i++) {
+                    // Tambahkan semua file kecuali yang dihapus
+                    if (i !== index) {
+                        dt.items.add(files[i]);
+                    }
+                }
+
+                // Tetapkan kembali file yang tersisa ke input
+                input.files = dt.files;
+
+                // Update data-index pada item yang tersisa
+                updateFileIndexes();
+
+                // Jika tidak ada file yang tersisa, sembunyikan tombol hapus semua
+                if (dt.files.length === 0) {
+                    $('#removeAllFiles').addClass('d-none');
+                }
+            });
+
+            // Fungsi untuk memperbarui indeks file setelah penghapusan
+            function updateFileIndexes() {
+                $('.file-preview-item').each(function(newIndex) {
+                    $(this).attr('data-index', newIndex);
+                    $(this).find('.remove-file').attr('data-index', newIndex);
+                });
+            }
+
+            // Tombol Hapus Semua File
+            $('#removeAllFiles').on('click', function() {
+                $('#fileInput').val('');
+                $('#filePreviewContainer').empty();
+                $(this).addClass('d-none');
+            });
+
+            // Ubah handler untuk drag and drop
+            dropzone.addEventListener('drop', function(e) {
+                const files = e.dataTransfer.files;
+
+                if (files.length > 0) {
+                    // Reset preview area for clarity
+                    $('#filePreviewContainer').empty();
+                    $('#removeAllFiles').removeClass('d-none');
+
+                    // Create a DataTransfer object to store valid files
+                    const dt = new DataTransfer();
+                    let validFilesCount = 0;
+
+                    // Loop through dropped files
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+
+                        // Validate file
+                        if (!ALLOWED_TYPES.includes(file.type)) {
+                            toastr.error(`File "${file.name}" tidak didukung. Hanya file PDF, DOC, DOCX, XLS, XLSX, JPG, dan PNG yang diizinkan.`);
+                            continue;
+                        }
+
+                        if (file.size > MAX_FILE_SIZE) {
+                            toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
+                            continue;
+                        }
+
+                        // Add valid file to DataTransfer object
+                        dt.items.add(file);
+
+                        // Add to preview with the correct index
+                        addFilePreview(file, validFilesCount);
+                        validFilesCount++;
+                    }
+
+                    // Set files to input if there are valid files
+                    if (validFilesCount > 0) {
+                        document.querySelector('#fileInput').files = dt.files;
+                    } else {
+                        $('#removeAllFiles').addClass('d-none');
+                    }
+                }
+            }, false);
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Prevent defaults for drag events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Highlight dropzone on drag
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                dropzone.classList.add('border-primary');
+                dropzone.classList.add('bg-light-primary');
+            }
+
+            function unhighlight() {
+                dropzone.classList.remove('border-primary');
+                dropzone.classList.remove('bg-light-primary');
+            }
+
+            // Handle dropped files
+            dropzone.addEventListener('drop', function(e) {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0]; // Accept only the first file
+
+                    // Validate file
+                    if (!ALLOWED_TYPES.includes(file.type)) {
+                        toastr.error(`File "${file.name}" tidak didukung. Hanya file PDF, DOC, DOCX, XLS, XLSX, JPG, dan PNG yang diizinkan.`);
+                        return;
+                    }
+
+                    if (file.size > MAX_FILE_SIZE) {
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
+                        return;
+                    }
+
+                    // Set file to input
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.querySelector('#fileInput').files = dataTransfer.files;
+
+                    // Show preview
+                    showFilePreview(file);
+                }
+            }, false);
+
+            // Form add document validation and submission
+            $('#formAddDokumen').on('submit', function(e) {
+                e.preventDefault();
+
+                // Button loading state
+                const submitBtn = $(this).find('#btnSubmit');
+                submitBtn.attr('data-kt-indicator', 'on');
+                submitBtn.prop('disabled', true);
+
+                // FormData for AJAX
+                const formData = new FormData(this);
+
+                // AJAX submission
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Show success message
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Dokumen AMI berhasil ditambahkan.',
+                            icon: 'success',
+                            buttonsStyling: false,
+                            confirmButtonText: 'OK',
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        }).then(function() {
+                            // Reload page after successful addition
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        // Show error message
+                        let errorMessage = 'Terjadi kesalahan saat menambahkan dokumen.';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+
+                        Swal.fire({
+                            title: 'Error!',
+                            text: errorMessage,
+                            icon: 'error',
+                            buttonsStyling: false,
+                            confirmClass: {
+                                confirmButton: 'btn btn-primary'
+                            }
+                        });
+                    },
+                    complete: function() {
+                        // Reset loading state
+                        submitBtn.attr('data-kt-indicator', 'off');
+                        submitBtn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Edit document functionality
+            $(document).on('click', '.btn-edit-dokumen', function (e) {
+                e.preventDefault(); // <<== Tambahkan ini!
+                const id = $(this).data('id');
+                const nama = $(this).data('nama');
+                const kategori = $(this).data('kategori');
+                const deskripsi = $(this).data('deskripsi');
+                const tanggal = $(this).data('tanggal');
+
+                // Set values in form
+                $('#edit_id').val(id);
+                $('#edit_nama_dokumen').val(nama);
+                $('#edit_kategori_dokumen').val(kategori);
+                $('#edit_deskripsi_dokumen').val(deskripsi);
+                $('#edit_tanggal_berlaku').val(tanggal_berlaku);
+
+                // Reset file input and preview
+                $('#edit_fileInput').val('');
+                $('#edit_filePreview').hide();
+
+                // Show modal
+                $('#modalEditDokumen').modal('show');
+            });
+
+            // Edit document file functionality
+            $('#edit_browseFilesBtn').on('click', function() {
+                $('#edit_fileInput').click();
+            });
+
+            $('#edit_fileInput').on('change', function() {
+                const file = this.files[0];
+
+                if (file) {
+                    // Validate file
+                    if (!ALLOWED_TYPES.includes(file.type)) {
+                        toastr.error(`File "${file.name}" tidak didukung. Hanya file PDF, DOC, DOCX, XLS, XLSX, JPG, dan PNG yang diizinkan.`);
+                        this.value = '';
+                        return;
+                    }
+
+                    if (file.size > MAX_FILE_SIZE) {
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
                         this.value = '';
                         return;
                     }

@@ -108,7 +108,7 @@ class DokumenAmiController extends Controller
             'kategori_dokumen' => 'required|in:auditor,auditee,umum',
             'deskripsi_dokumen' => 'required',
             'tanggal_berlaku' => 'required|date',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:1023',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
         ], $messages);
 
         if ($validator->fails()) {

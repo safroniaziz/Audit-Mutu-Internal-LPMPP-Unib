@@ -1487,9 +1487,6 @@
         // Hide progress section
         $('.mb-8').first().hide();
 
-        // Hide the regular approve button when showing completion page
-        $('#approve-penilaian-btn').hide();
-
         // Create and show completion message
         const completionHtml = `
             <div class="text-center py-10">

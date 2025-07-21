@@ -322,30 +322,6 @@
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingValues = false;
-                                foreach($sortedGrouped as $group) {
-                                    if($group['has_data'] && ($group['total_nilai_ketua'] <= 0 || $group['total_nilai_anggota'] <= 0)) {
-                                        $hasMissingValues = true;
-                                        break;
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingValues)
-                            <div class="alert alert-info d-flex align-items-center p-4 mb-4">
-                                <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
-                                    <i class="ki-duotone ki-information-5 fs-2 text-info">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </span>
-                                <div class="d-flex flex-column">
-                                    <h5 class="mb-1 text-info">Informasi Nilai</h5>
-                                    <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan nilai belum diisi oleh auditor.</span>
-                                </div>
-                            </div>
-                            @endif
                             <div class="table-responsive">
                                 <table class="table table-row-dashed table-row-gray-300 align-middle" id="detailTable">
                                 <thead>
@@ -455,30 +431,6 @@
                             </div>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingValuesProdi = false;
-                                foreach($kriteriaScores as $kriteria) {
-                                    if($kriteria['total_nilai_ketua'] <= 0 || $kriteria['total_nilai_anggota'] <= 0) {
-                                        $hasMissingValuesProdi = true;
-                                        break;
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingValuesProdi)
-                            <div class="alert alert-info d-flex align-items-center p-4 mb-4">
-                                <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
-                                    <i class="ki-duotone ki-information-5 fs-2 text-info">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </span>
-                                <div class="d-flex flex-column">
-                                    <h5 class="mb-1 text-info">Informasi Nilai</h5>
-                                    <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan nilai belum diisi oleh auditor.</span>
-                                </div>
-                            </div>
-                            @endif
                             <div class="table-responsive">
                                 <table class="table table-row-dashed table-row-gray-300 align-middle" id="prodiTable">
                                     <thead>
@@ -562,30 +514,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingEvaluasiAuditee = false;
-                                foreach($evaluasiAuditee as $evaluasi) {
-                                    if($evaluasi->is_nilai && (!isset($evaluasiSubmissionsAuditee[$evaluasi->id]) || $evaluasiSubmissionsAuditee[$evaluasi->id]->nilai <= 0)) {
-                                        $hasMissingEvaluasiAuditee = true;
-                                        break;
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingEvaluasiAuditee)
-                            <div class="alert alert-info d-flex align-items-center p-4 mb-4">
-                                <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
-                                    <i class="ki-duotone ki-information-5 fs-2 text-info">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </span>
-                                <div class="d-flex flex-column">
-                                    <h5 class="mb-1 text-info">Informasi Evaluasi</h5>
-                                    <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan evaluasi belum diisi oleh auditee.</span>
-                                </div>
-                            </div>
-                            @endif
                             @if(count($evaluasiAuditee) > 0)
                                 <div class="table-responsive">
                                     <table class="table table-row-dashed table-row-gray-300 align-middle">
@@ -607,10 +535,10 @@
                                                             <span class="text-dark fw-semibold">{{ $evaluasi->evaluasi }}</span>
                                                         </td>
                                                         <td class="text-center">
-                                                            @if(isset($evaluasiSubmissionsAuditee[$evaluasi->id]) && $evaluasiSubmissionsAuditee[$evaluasi->id]->nilai > 0)
+                                                            @if(isset($evaluasiSubmissionsAuditee[$evaluasi->id]))
                                                                 <span class="badge badge-light-success fw-bold">{{ $evaluasiSubmissionsAuditee[$evaluasi->id]->nilai }}</span>
                                                             @else
-                                                                <span class="badge badge-light-danger fw-bold text-danger">-</span>
+                                                                <span class="badge badge-light-secondary fw-bold">-</span>
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -669,32 +597,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingEvaluasiAuditor = false;
-                                foreach($auditorEvaluasiData as $auditorData) {
-                                    foreach($evaluasiAuditor as $evaluasi) {
-                                        if($evaluasi->is_nilai && (!isset($auditorData['evaluasi_submissions'][$evaluasi->id]) || $auditorData['evaluasi_submissions'][$evaluasi->id]->nilai <= 0)) {
-                                            $hasMissingEvaluasiAuditor = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingEvaluasiAuditor)
-                            <div class="alert alert-info d-flex align-items-center p-4 mb-4">
-                                <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
-                                    <i class="ki-duotone ki-information-5 fs-2 text-info">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </span>
-                                <div class="d-flex flex-column">
-                                    <h5 class="mb-1 text-info">Informasi Evaluasi</h5>
-                                    <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan evaluasi belum diisi oleh auditor.</span>
-                                </div>
-                            </div>
-                            @endif
                             @if(count($auditorEvaluasiData) > 0)
                                 @foreach($auditorEvaluasiData as $auditorData)
                                     <div class="border-bottom border-gray-300 pb-4 mb-4">
@@ -724,11 +626,11 @@
                                                                 <td>
                                                                     <span class="text-dark fw-semibold fs-8">{{ $evaluasi->evaluasi }}</span>
                                                                 </td>
-                                                                <td class="text-center"></td>
-                                                                    @if(isset($auditorData['evaluasi_submissions'][$evaluasi->id]) && $auditorData['evaluasi_submissions'][$evaluasi->id]->nilai > 0)
+                                                                <td class="text-center">
+                                                                    @if(isset($auditorData['evaluasi_submissions'][$evaluasi->id]))
                                                                         <span class="badge badge-light-success fw-bold">{{ $auditorData['evaluasi_submissions'][$evaluasi->id]->nilai }}</span>
                                                                     @else
-                                                                        <span class="badge badge-light-danger fw-bold text-danger">-</span>
+                                                                        <span class="badge badge-light-secondary fw-bold">-</span>
                                                                     @endif
                                                                 </td>
                                                             </tr>
@@ -792,32 +694,6 @@
                             </h3>
                         </div>
                         <div class="card-body pt-0">
-                            @php
-                                $hasMissingKuisioner = false;
-                                foreach($auditorKuisionerData as $auditorData) {
-                                    foreach($kuisioners as $kuisioner) {
-                                        if(!isset($auditorData['kuisioner_jawaban'][$kuisioner->id]) || !$auditorData['kuisioner_jawaban'][$kuisioner->id]->opsi->opsi) {
-                                            $hasMissingKuisioner = true;
-                                            break 2;
-                                        }
-                                    }
-                                }
-                            @endphp
-                            @if($hasMissingKuisioner)
-                            <div class="alert alert-info d-flex align-items-center p-4 mb-4">
-                                <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
-                                    <i class="ki-duotone ki-information-5 fs-2 text-info">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                        <span class="path3"></span>
-                                    </i>
-                                </span>
-                                <div class="d-flex flex-column">
-                                    <h5 class="mb-1 text-info">Informasi Kuisioner</h5>
-                                    <span>Tanda <span class="badge badge-light-danger fw-bold text-danger">-</span> menandakan kuisioner belum diisi oleh auditor.</span>
-                                </div>
-                            </div>
-                            @endif
                             @if(isset($auditorKuisionerData) && count($auditorKuisionerData) > 0)
                                 @foreach($auditorKuisionerData as $auditorData)
                                     <div class="border-bottom border-gray-300 pb-4 mb-4">
@@ -853,12 +729,12 @@
                                                                 <span class="text-dark fw-semibold fs-8">{{ $kuisioner->pertanyaan }}</span>
                                                             </td>
                                                             <td class="text-center">
-                                                                @if(isset($auditorData['kuisioner_jawaban'][$kuisioner->id]) && $auditorData['kuisioner_jawaban'][$kuisioner->id]->opsi->opsi)
+                                                                @if(isset($auditorData['kuisioner_jawaban'][$kuisioner->id]))
                                                                     <span class="badge badge-light-success fw-bold">
-                                                                        {{ $auditorData['kuisioner_jawaban'][$kuisioner->id]->opsi->opsi }}
+                                                                        {{ $auditorData['kuisioner_jawaban'][$kuisioner->id]->opsi->opsi ?? '-' }}
                                                                     </span>
                                                                 @else
-                                                                    <span class="badge badge-light-danger fw-bold text-danger">-</span>
+                                                                    <span class="badge badge-light-secondary fw-bold">-</span>
                                                                 @endif
                                                             </td>
                                                         </tr>

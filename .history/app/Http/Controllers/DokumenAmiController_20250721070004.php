@@ -100,7 +100,7 @@ class DokumenAmiController extends Controller
             'tanggal_berlaku.date' => 'Tanggal berlaku harus berupa tanggal yang valid.',
             'file_dokumen.file' => 'File dokumen harus berupa file.',
             'file_dokumen.mimes' => 'File harus berformat: pdf, doc, docx, xls, xlsx, jpg, jpeg, png.',
-            'file_dokumen.max' => 'Ukuran file maksimal 1MB.',
+            'file_dokumen.max' => 'Ukuran file maksimal 10MB.',
         ];
 
         $validator = Validator::make($request->all(), [
@@ -108,7 +108,7 @@ class DokumenAmiController extends Controller
             'kategori_dokumen' => 'required|in:auditor,auditee,umum',
             'deskripsi_dokumen' => 'required',
             'tanggal_berlaku' => 'required|date',
-            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:1023',
+            'file_dokumen' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
         ], $messages);
 
         if ($validator->fails()) {

@@ -173,34 +173,6 @@
 </div>
 
 @include('layouts.partials._modal_auditee')
-
-<!-- Modal Ubah Password -->
-<div class="modal fade" id="ubahPasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Ubah Password Auditee</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body">
-                <form id="ubahPasswordForm">
-                    <input type="hidden" name="auditee_id" id="passwordAuditeeId">
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">Password Baru</label>
-                        <input type="password" class="form-control" name="password" id="newPassword" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Konfirmasi Password</label>
-                        <input type="password" class="form-control" name="password_confirmation" id="confirmPassword" required>
-                    </div>
-                    <div class="text-end">
-                        <button type="submit" id="buttonsubmit" class="btn btn-primary">Simpan Perubahan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
