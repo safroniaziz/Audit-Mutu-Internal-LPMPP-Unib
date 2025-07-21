@@ -61,7 +61,6 @@ class AuditeePengajuanAmiController extends Controller
             'jenjang.required' => 'Jenjang wajib dipilih.',
             'jenjang.in' => 'Jenjang yang dipilih tidak valid.',
             'website.required' => 'Website wajib diisi.',
-            'website.url' => 'Format website tidak valid.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'no_hp.required' => 'No HP wajib diisi.',

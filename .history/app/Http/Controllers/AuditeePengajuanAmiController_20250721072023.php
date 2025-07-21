@@ -50,7 +50,7 @@ class AuditeePengajuanAmiController extends Controller
             'nama_ketua' => 'required|string|max:255',
             'nip_ketua' => 'required|string|max:255',
             'jenjang' => 'required|in:D2,D3,D4,S1,S2,S3,Profesi',
-            'website' => 'required|url|max:255',
+            'website' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'no_hp' => 'required|string|max:20',
         ], [
@@ -61,7 +61,6 @@ class AuditeePengajuanAmiController extends Controller
             'jenjang.required' => 'Jenjang wajib dipilih.',
             'jenjang.in' => 'Jenjang yang dipilih tidak valid.',
             'website.required' => 'Website wajib diisi.',
-            'website.url' => 'Format website tidak valid.',
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'no_hp.required' => 'No HP wajib diisi.',
