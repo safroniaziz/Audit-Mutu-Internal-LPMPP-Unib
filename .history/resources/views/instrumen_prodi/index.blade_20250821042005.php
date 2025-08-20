@@ -99,22 +99,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="button-container">
-                                                @if (!$instrumen->deleted_at)
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-light-info detail-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalDetailInstrumen">
-                                                        <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
-                                                        data-bs-toggle="modal" data-bs-target="#kt_modal">
-                                                        <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
-                                                    </button>
-                                                @endif
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light-info detail-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetailInstrumen">
+                                                    <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
+                                                    data-bs-toggle="modal" data-bs-target="#kt_modal">
+                                                    <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
+                                                </button>
                                                 @if ($instrumen->deleted_at)
                                                     <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $instrumen->id }}">
                                                         <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan
@@ -257,6 +255,9 @@
             let id = $(this).data('id');
             let url = $(this).data('url');
 
+            console.log('Edit button clicked - ID:', id);
+            console.log('Edit button clicked - URL:', url);
+
             $('#kt_modal form')[0].reset();
             $('#methodField').val('PUT');
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.update', '') }}/" + id);
@@ -268,11 +269,14 @@
                 url: url,
                 type: 'GET',
                 success: function(response) {
+                    console.log('Success response:', response);
                     if (response.success) {
                         let data = response.data;
+                        console.log("Data dari server:", data);
 
                         // Simpan ID kriteria ke variabel global
                         savedKriteriaId = data.indikator_instrumen_kriteria_id;
+                        console.log("Saved kriteria ID:", savedKriteriaId);
 
                         // Isi form dalam modal dengan data dari server
                         $('#kt_modal select[name="indikator_instrumen_id"]').val(data.indikator_instrumen_id).trigger('change');
@@ -303,6 +307,12 @@
                     }
                 },
                 error: function(xhr, status, error) {
+                    console.error('AJAX Error Details:');
+                    console.error('Status:', xhr.status);
+                    console.error('Status Text:', xhr.statusText);
+                    console.error('Response Text:', xhr.responseText);
+                    console.error('Error:', error);
+                    
                     if (xhr.status === 404) {
                         Swal.fire("Error", "Route tidak ditemukan. Silakan refresh halaman.", "error");
                     } else if (xhr.status === 401 || xhr.status === 403) {

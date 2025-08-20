@@ -99,22 +99,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="button-container">
-                                                @if (!$instrumen->deleted_at)
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-light-info detail-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalDetailInstrumen">
-                                                        <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
-                                                        data-bs-toggle="modal" data-bs-target="#kt_modal">
-                                                        <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
-                                                    </button>
-                                                @endif
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light-info detail-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetailInstrumen">
+                                                    <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
+                                                    data-bs-toggle="modal" data-bs-target="#kt_modal">
+                                                    <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
+                                                </button>
                                                 @if ($instrumen->deleted_at)
                                                     <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $instrumen->id }}">
                                                         <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan
@@ -270,9 +268,11 @@
                 success: function(response) {
                     if (response.success) {
                         let data = response.data;
+                        console.log("Data dari server:", data);
 
                         // Simpan ID kriteria ke variabel global
                         savedKriteriaId = data.indikator_instrumen_kriteria_id;
+                        console.log("Saved kriteria ID:", savedKriteriaId);
 
                         // Isi form dalam modal dengan data dari server
                         $('#kt_modal select[name="indikator_instrumen_id"]').val(data.indikator_instrumen_id).trigger('change');
@@ -283,33 +283,24 @@
                         $('#kt_modal input[name="target"]').val(data.target);
                         $('#kt_modal input[name="realisasi"]').val(data.realisasi);
                         $('#kt_modal input[name="standar_digunakan"]').val(data.standar_digunakan);
-
+                        
                         // Populate CKEditor fields using setData
-                        // Add a small delay to ensure CKEditor instances are ready
-                        setTimeout(() => {
-                            if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_uraian']) {
-                                window.editorInstances['kt_docs_ckeditor_uraian'].setData(data.uraian || '');
-                            }
-                            if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penyebab']) {
-                                window.editorInstances['kt_docs_ckeditor_penyebab'].setData(data.penyebab_tidak_tercapai || '');
-                            }
-                            if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_rencana']) {
-                                window.editorInstances['kt_docs_ckeditor_rencana'].setData(data.rencana_perbaikan || '');
-                            }
-                            if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
-                                window.editorInstances['kt_docs_ckeditor_penilaian'].setData(data.indikator_penilaian || '');
-                            }
-                        }, 100);
+                        if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_uraian']) {
+                            window.editorInstances['kt_docs_ckeditor_uraian'].setData(data.uraian || '');
+                        }
+                        if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penyebab']) {
+                            window.editorInstances['kt_docs_ckeditor_penyebab'].setData(data.penyebab_tidak_tercapai || '');
+                        }
+                        if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_rencana']) {
+                            window.editorInstances['kt_docs_ckeditor_rencana'].setData(data.rencana_perbaikan || '');
+                        }
+                        if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
+                            window.editorInstances['kt_docs_ckeditor_penilaian'].setData(data.indikator_penilaian || '');
+                        }
                     }
                 },
-                error: function(xhr, status, error) {
-                    if (xhr.status === 404) {
-                        Swal.fire("Error", "Route tidak ditemukan. Silakan refresh halaman.", "error");
-                    } else if (xhr.status === 401 || xhr.status === 403) {
-                        Swal.fire("Error", "Anda tidak memiliki izin untuk mengakses data ini.", "error");
-                    } else {
-                        Swal.fire("Error", "Gagal mengambil data Instrumen Prodi: " + error, "error");
-                    }
+                error: function() {
+                    Swal.fire("Error", "Gagal mengambil data Instrumen Prodi", "error");
                 }
             });
         });
@@ -327,10 +318,14 @@
 
             // Reset semua dropdown
             $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
+            
             // Reset CKEditor fields
-            if (window.resetCKEditorFields) {
-                window.resetCKEditorFields();
+            if (window.editorInstances) {
+                Object.values(window.editorInstances).forEach(editor => {
+                    if (editor && typeof editor.setData === 'function') {
+                        editor.setData('');
+                    }
+                });
             }
         });
 
@@ -341,11 +336,6 @@
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
             $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
             $('#kt_modal button[type=submit]').text('Simpan');
-
-            // Reset CKEditor fields
-            if (window.resetCKEditorFields) {
-                window.resetCKEditorFields();
-            }
         });
 
         // Script untuk delete

@@ -99,22 +99,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="button-container">
-                                                @if (!$instrumen->deleted_at)
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-light-info detail-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#modalDetailInstrumen">
-                                                        <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
-                                                        data-id="{{ $instrumen->id }}"
-                                                        data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
-                                                        data-bs-toggle="modal" data-bs-target="#kt_modal">
-                                                        <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
-                                                    </button>
-                                                @endif
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light-info detail-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.show', $instrumen->id) }}"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetailInstrumen">
+                                                    <i class="fas fa-info-circle fa-sm"></i>&nbsp;Detail
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-light-success edit-instrumenProdi"
+                                                    data-id="{{ $instrumen->id }}"
+                                                    data-url="{{ route('instrumenProdi.edit', $instrumen->id) }}"
+                                                    data-bs-toggle="modal" data-bs-target="#kt_modal">
+                                                    <i class="fas fa-edit fa-sm"></i>&nbsp;</i> Edit
+                                                </button>
                                                 @if ($instrumen->deleted_at)
                                                     <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $instrumen->id }}">
                                                         <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan

@@ -96,8 +96,7 @@ class InstrumenProdiController extends Controller
 
     public function edit(InstrumenProdi $instrumen)
     {
-        // Debug: cek apakah model ditemukan
-        if (!$instrumen || !$instrumen->exists) {
+        if (!$instrumen) {
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
 

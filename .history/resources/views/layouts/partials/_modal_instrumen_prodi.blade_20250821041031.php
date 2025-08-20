@@ -100,6 +100,9 @@
     <script>
         const editorInstances = {};
 
+        // Make editorInstances globally accessible
+        window.editorInstances = editorInstances;
+
         // Definisikan field CKEditor
         const editorFields = [
             'kt_docs_ckeditor_uraian',
@@ -160,8 +163,39 @@
             }
         });
 
+        // Function to sync CKEditor content with hidden textareas
+        function syncCKEditorContent() {
+            Object.keys(editorInstances).forEach(editorId => {
+                const editor = editorInstances[editorId];
+                const textarea = document.querySelector(`#${editorId}`);
+                if (editor && textarea) {
+                    textarea.value = editor.getData();
+                }
+            });
+        }
+
+        // Function to reset CKEditor fields
+        function resetCKEditorFields() {
+            Object.values(editorInstances).forEach(editor => {
+                if (editor && typeof editor.setData === 'function') {
+                    editor.setData('');
+                }
+            });
+        }
+
+        // Make functions globally accessible
+        window.syncCKEditorContent = syncCKEditorContent;
+        window.resetCKEditorFields = resetCKEditorFields;
+
         dKriteriaId = null;
         $(document).ready(function () {
+            // Reset CKEditor fields when modal is hidden
+            $('#kt_modal').on('hidden.bs.modal', function () {
+                if (window.resetCKEditorFields) {
+                    window.resetCKEditorFields();
+                }
+            });
+
             $('select[name="indikator_instrumen_id"]').on('change', function () {
                 let indikatorId = $(this).val();
 
@@ -218,6 +252,58 @@
                 let form = $(this);
                 let url = form.attr('action') || "{{ route('kriteriaInstrumen.store') }}";
                 let method = $('#methodField').val() === 'PUT' ? 'PUT' : 'POST';
+
+                // Validate required fields including CKEditor content
+                let isValid = true;
+                let errorMessages = [];
+
+                // Check if uraian field has content (required field)
+                const uraianEditor = editorInstances['kt_docs_ckeditor_uraian'];
+                if (uraianEditor) {
+                    const uraianContent = uraianEditor.getData().trim();
+                    if (!uraianContent) {
+                        isValid = false;
+                        errorMessages.push('Uraian harus diisi');
+                        // Focus on the uraian editor
+                        uraianEditor.focus();
+                    }
+                }
+
+                // Check other required fields
+                const requiredFields = [
+                    'indikator_instrumen_id',
+                    'indikator_instrumen_kriteria_id',
+                    'elemen',
+                    'indikator',
+                    'sumber_data',
+                    'metode_perhitungan',
+                    'target',
+                    'realisasi',
+                    'standar_digunakan'
+                ];
+
+                requiredFields.forEach(fieldName => {
+                    const field = form.find(`[name="${fieldName}"]`);
+                    if (field.length && !field.val()) {
+                        isValid = false;
+                        errorMessages.push(`${fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} harus diisi`);
+                        if (!field.is(':focus')) {
+                            field.focus();
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Validasi Gagal',
+                        html: `<div style="font-size: 1rem;">${errorMessages.join('<br>')}</div>`,
+                    });
+                    return;
+                }
+
+                // Sync CKEditor content with hidden textareas before submission
+                syncCKEditorContent();
 
                 // Siapkan data form
                 let formData = new FormData(this);

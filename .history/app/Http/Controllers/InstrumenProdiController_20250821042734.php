@@ -96,8 +96,10 @@ class InstrumenProdiController extends Controller
 
     public function edit(InstrumenProdi $instrumen)
     {
-        // Debug: cek apakah model ditemukan
-        if (!$instrumen || !$instrumen->exists) {
+        Log::info('Edit method called with ID: ' . $instrumen->id);
+        Log::info('Instrumen data: ' . json_encode($instrumen->toArray()));
+
+        if (!$instrumen) {
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
 
