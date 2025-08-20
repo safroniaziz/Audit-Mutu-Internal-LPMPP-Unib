@@ -160,16 +160,7 @@
             }
         });
 
-        // Fungsi untuk reset CKEditor fields
-        window.resetCKEditorFields = function() {
-            editorFields.forEach(id => {
-                if (window.editorInstances[id]) {
-                    window.editorInstances[id].setData('');
-                }
-            });
-        };
-
-        var savedKriteriaId = null;
+        dKriteriaId = null;
         $(document).ready(function () {
             $('select[name="indikator_instrumen_id"]').on('change', function () {
                 let indikatorId = $(this).val();

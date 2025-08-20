@@ -98,7 +98,7 @@
 @push('scripts')
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <script>
-        window.editorInstances = {};
+        const editorInstances = {};
 
         // Definisikan field CKEditor
         const editorFields = [
@@ -133,7 +133,7 @@
                     })
                     .then(editor => {
                         // Simpan instance editor dalam objek global
-                        window.editorInstances[id] = editor;
+                        editorInstances[id] = editor;
 
                         const editable = editor.ui.view.editable.element;
 
@@ -160,16 +160,7 @@
             }
         });
 
-        // Fungsi untuk reset CKEditor fields
-        window.resetCKEditorFields = function() {
-            editorFields.forEach(id => {
-                if (window.editorInstances[id]) {
-                    window.editorInstances[id].setData('');
-                }
-            });
-        };
-
-        var savedKriteriaId = null;
+        dKriteriaId = null;
         $(document).ready(function () {
             $('select[name="indikator_instrumen_id"]').on('change', function () {
                 let indikatorId = $(this).val();
