@@ -491,7 +491,7 @@
 
         $.ajax({
             url: `/auditee/${id}/ubah-password`,
-            method: 'POST',
+            method: 'PUT',
             data: formData,
             success: function (response) {
                 Swal.fire({
