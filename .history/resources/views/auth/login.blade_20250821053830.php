@@ -486,9 +486,7 @@
                                 class="form-input pl-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-gray-700 focus:border-blue-500 focus:outline-none"
                                 placeholder="••••••••" />
                         </div>
-                        @error('password')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+
                     </div>
 
                     <div class="flex items-center justify-between">

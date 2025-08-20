@@ -58,29 +58,12 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // Coba login dengan username atau email
-        $loginField = $this->input('login');
-        $password = $this->input('password');
+        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
 
-        // Cek apakah input adalah email atau username
-        $isEmail = filter_var($loginField, FILTER_VALIDATE_EMAIL);
-
-        if ($isEmail) {
-            // Jika email, gunakan email untuk login
-            if (!Auth::attempt(['email' => $loginField, 'password' => $password], $this->boolean('remember'))) {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'login' => trans('auth.failed'),
-                ]);
-            }
-        } else {
-            // Jika bukan email, coba dengan username
-            if (!Auth::attempt(['username' => $loginField, 'password' => $password], $this->boolean('remember'))) {
-                RateLimiter::hit($this->throttleKey());
-                throw ValidationException::withMessages([
-                    'login' => trans('auth.failed'),
-                ]);
-            }
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
         }
 
         // Validasi periode aktif setelah login berhasil (kecuali admin)
@@ -187,21 +170,13 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
     }
 
     public function getRedirectRoute()
     {
-        // Cari user berdasarkan login (username atau email) yang diinput
-        $loginField = $this->input('login');
-        $isEmail = filter_var($loginField, FILTER_VALIDATE_EMAIL);
-
-        if ($isEmail) {
-            $user = \App\Models\User::where('email', $loginField)->first();
-        } else {
-            $user = \App\Models\User::where('username', $loginField)->first();
-        }
-
+        // Cari user berdasarkan email yang diinput
+        $user = \App\Models\User::where('email', $this->email)->first();
         if (!$user) {
             return 'dashboard';
         }

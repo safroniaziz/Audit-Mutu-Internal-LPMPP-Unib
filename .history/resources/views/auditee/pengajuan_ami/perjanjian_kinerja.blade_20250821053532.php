@@ -302,9 +302,7 @@
 
         // Handle file selection change
         fileInput.on('change', function(e) {
-            if (!$(this).prop('disabled')) {
-                handleFiles(e.target.files);
-            }
+            handleFiles(e.target.files);
         });
 
         // Drag and drop functionality
@@ -318,34 +316,22 @@
         }
 
         // Handle drag and drop events
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropzone[0].addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropzone[0].addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight(e) {
-            if (!submitBtn.prop('disabled')) {
-                dropzone.addClass('highlight');
+        dropzone.on('dragenter dragover', function() {
+            if (!$(this).closest('.upload-disabled').length) {
+                $(this).addClass('border-primary');
             }
-        }
+        });
 
-        function unhighlight(e) {
-            dropzone.removeClass('highlight');
-        }
+        dropzone.on('dragleave drop', function() {
+            $(this).removeClass('border-primary');
+        });
 
-        // Handle drop event
-        dropzone[0].addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            if (!submitBtn.prop('disabled')) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
+        dropzone.on('drop', function(e) {
+            if (!$(this).closest('.upload-disabled').length) {
+                const files = e.originalEvent.dataTransfer.files;
                 handleFiles(files);
             }
-        }
+        });
 
         function handleFiles(files) {
             if (files.length > 0) {

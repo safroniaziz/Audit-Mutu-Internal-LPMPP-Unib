@@ -64,7 +64,7 @@ class LoginRequest extends FormRequest
 
         // Cek apakah input adalah email atau username
         $isEmail = filter_var($loginField, FILTER_VALIDATE_EMAIL);
-
+        
         if ($isEmail) {
             // Jika email, gunakan email untuk login
             if (!Auth::attempt(['email' => $loginField, 'password' => $password], $this->boolean('remember'))) {
@@ -195,13 +195,13 @@ class LoginRequest extends FormRequest
         // Cari user berdasarkan login (username atau email) yang diinput
         $loginField = $this->input('login');
         $isEmail = filter_var($loginField, FILTER_VALIDATE_EMAIL);
-
+        
         if ($isEmail) {
             $user = \App\Models\User::where('email', $loginField)->first();
         } else {
             $user = \App\Models\User::where('username', $loginField)->first();
         }
-
+        
         if (!$user) {
             return 'dashboard';
         }

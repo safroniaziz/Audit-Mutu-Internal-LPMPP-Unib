@@ -211,7 +211,7 @@
                                             ->first();
                                         $canDelete = !$pengajuanAmi;
                                     @endphp
-
+                                    
                                     @if($canDelete)
                                         <button type="button" class="btn btn-sm btn-danger" id="deleteFileBtn">
                                             <i class="bi bi-trash me-2"></i>Hapus Dokumen
@@ -235,14 +235,14 @@
                                 ->first();
                             $canUpload = !$pengajuanAmi;
                         @endphp
-
+                        
                         @if(!$canUpload)
                             <div class="alert alert-warning mb-5">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 <strong>Perhatian:</strong> Form upload telah dinonaktifkan karena sudah ada pengajuan AMI di entitas dan periode yang sama.
                             </div>
                         @endif
-
+                        
                         <div class="mb-5" {{ !$canUpload ? 'style=opacity:0.5;pointer-events:none;' : '' }}>
                             <div class="file-upload-wrapper">
                                 <div class="custom-file-upload" id="dropzone">

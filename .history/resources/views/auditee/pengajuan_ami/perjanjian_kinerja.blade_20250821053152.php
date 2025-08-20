@@ -193,7 +193,7 @@
                 <div class="col-12">
                     @if($perjanjianKinerja && $perjanjianKinerja->file_path)
                         <div class="uploaded-file-info mb-8">
-                            <i class="bi bi-file-earmark-pdf text-danger icon"></i>
+                            <i class="bi bi-file-earmark-check icon"></i>
                             <h3 class="fs-2 fw-bold mb-3">Dokumen Telah Diunggah</h3>
                             <p class="text-gray-600 mb-5">
                                 Nama File: {{ $perjanjianKinerja->nama_file }}<br>
@@ -204,23 +204,9 @@
                                     <i class="bi bi-eye me-2"></i>Lihat Dokumen
                                 </a>
                                 @if($perjanjianKinerja)
-                                    @php
-                                        // Cek apakah sudah ada pengajuan AMI
-                                        $pengajuanAmi = \App\Models\PengajuanAmi::where('auditee_id', auth()->user()->unit_kerja_id)
-                                            ->where('periode_id', $periodeAktif->id)
-                                            ->first();
-                                        $canDelete = !$pengajuanAmi;
-                                    @endphp
-
-                                    @if($canDelete)
-                                        <button type="button" class="btn btn-sm btn-danger" id="deleteFileBtn">
-                                            <i class="bi bi-trash me-2"></i>Hapus Dokumen
-                                        </button>
-                                    @else
-                                        <button type="button" class="btn btn-sm btn-secondary" disabled title="Tidak dapat dihapus karena sudah ada pengajuan AMI">
-                                            <i class="bi bi-lock me-2"></i>Tidak Dapat Dihapus
-                                        </button>
-                                    @endif
+                                <button type="button" class="btn btn-sm btn-danger" id="deleteFileBtn">
+                                    <i class="bi bi-trash me-2"></i>Hapus Dokumen
+                                </button>
                                 @endif
                             </div>
                         </div>
@@ -228,31 +214,16 @@
 
                     <form id="uploadForm" class="form" action="{{ route('auditee.pengajuanAmi.uploadPerjanjianKinerja') }}" method="POST" enctype="multipart/form-data" {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'style=display:none' : '' }}>
                         @csrf
-                        @php
-                            // Cek apakah sudah ada pengajuan AMI
-                            $pengajuanAmi = \App\Models\PengajuanAmi::where('auditee_id', auth()->user()->unit_kerja_id)
-                                ->where('periode_id', $periodeAktif->id)
-                                ->first();
-                            $canUpload = !$pengajuanAmi;
-                        @endphp
-
-                        @if(!$canUpload)
-                            <div class="alert alert-warning mb-5">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Perhatian:</strong> Form upload telah dinonaktifkan karena sudah ada pengajuan AMI di entitas dan periode yang sama.
-                            </div>
-                        @endif
-
-                        <div class="mb-5" {{ !$canUpload ? 'style=opacity:0.5;pointer-events:none;' : '' }}>
+                        <div class="mb-5">
                             <div class="file-upload-wrapper">
                                 <div class="custom-file-upload" id="dropzone">
                                     <i class="bi bi-cloud-arrow-up fs-3x text-primary mb-3"></i>
                                     <h3 class="fs-4 fw-bold mb-2">Tarik dan Lepas File di Sini</h3>
                                     <p class="text-gray-600 mb-3">atau</p>
-                                    <button type="button" id="browseFilesBtn" class="btn btn-sm btn-primary" {{ !$canUpload ? 'disabled' : '' }}>
+                                    <button type="button" id="browseFilesBtn" class="btn btn-sm btn-primary">
                                         <i class="bi bi-folder2-open me-2"></i>Pilih File
                                     </button>
-                                    <input type="file" name="file_perjanjian" id="fileInput" style="display: none;" accept=".pdf" {{ !$canUpload ? 'disabled' : '' }}>
+                                    <input type="file" name="file_perjanjian" id="fileInput" style="display: none;" accept=".pdf">
                                     <p class="text-gray-500 mt-3 mb-0">
                                         <small>Format yang didukung: PDF saja (Maks. 10MB)</small>
                                     </p>
@@ -263,7 +234,7 @@
                             </div>
                         </div>
                         <div class="text-end">
-                            <button type="submit" id="submitBtn" class="btn btn-primary btn-sm" disabled {{ !$canUpload ? 'disabled' : '' }}>
+                            <button type="submit" id="submitBtn" class="btn btn-primary btn-sm" disabled>
                                 <span class="indicator-label">
                                     <i class="bi bi-cloud-upload me-2"></i>Unggah Dokumen
                                 </span>
@@ -302,9 +273,7 @@
 
         // Handle file selection change
         fileInput.on('change', function(e) {
-            if (!$(this).prop('disabled')) {
-                handleFiles(e.target.files);
-            }
+            handleFiles(e.target.files);
         });
 
         // Drag and drop functionality
@@ -318,34 +287,22 @@
         }
 
         // Handle drag and drop events
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropzone[0].addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropzone[0].addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight(e) {
-            if (!submitBtn.prop('disabled')) {
-                dropzone.addClass('highlight');
+        dropzone.on('dragenter dragover', function() {
+            if (!$(this).closest('.upload-disabled').length) {
+                $(this).addClass('border-primary');
             }
-        }
+        });
 
-        function unhighlight(e) {
-            dropzone.removeClass('highlight');
-        }
+        dropzone.on('dragleave drop', function() {
+            $(this).removeClass('border-primary');
+        });
 
-        // Handle drop event
-        dropzone[0].addEventListener('drop', handleDrop, false);
-
-        function handleDrop(e) {
-            if (!submitBtn.prop('disabled')) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
+        dropzone.on('drop', function(e) {
+            if (!$(this).closest('.upload-disabled').length) {
+                const files = e.originalEvent.dataTransfer.files;
                 handleFiles(files);
             }
-        }
+        });
 
         function handleFiles(files) {
             if (files.length > 0) {
@@ -386,7 +343,7 @@
                 const fileItem = $(`
                     <div class="file-item">
                         <div class="file-name">
-                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                            <i class="bi bi-file-earmark-text text-primary me-2"></i>
                             <span class="fw-bold">${file.name}</span>
                             <span class="text-muted ms-2">(${formatFileSize(file.size)})</span>
                         </div>
@@ -530,7 +487,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: @if($perjanjianKinerja) "{{ route('auditee.pengajuanAmi.deletePerjanjianKinerja', $perjanjianKinerja->id) }}" @else "#" @endif,
+                        url: @if($perjanjianKinerja) "{{ route('auditee.perjanjian-kinerja.destroy', ['perjanjianKinerja' => $perjanjianKinerja->id]) }}" @else "#" @endif,
                         type: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
