@@ -80,6 +80,31 @@
 
 @push('styles')
 <style>
+    /* Form validation styles */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
+    .form-control.is-valid {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+    
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+    
+    .valid-feedback {
+        display: block !important;
+        color: #198754;
+        font-size: 0.875em;
+        margin-top: 0.25rem;
+    }
+
     /* Wizard navigation styles */
     .wizard-nav {
         display: flex;
@@ -486,7 +511,7 @@
                                     <form class="kriteria-form" data-kriteria-id="{{ $kriteriaId }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         @foreach($kriteriaData['instrumens'] as $instrumenProdi)
-                                            <div class="card card-bordered shadow-sm mb-10">
+                                            <div class="card card-bordered shadow-sm mb-10" data-instrumen-id="{{ $instrumenProdi->id }}">
                                                 <div class="card-header bg-light">
                                                     <div class="card-title">
                                                         <h3 class="card-label text-gray-800 fw-bold">
@@ -537,7 +562,7 @@
                                                                     <td>{{ $instrumenProdi->target }}</td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="fw-semibold bg-light">Realisasi</td>
+                                                                    <td class="fw-semibold bg-light">Realisasi <span class="text-danger">*</span></td>
                                                                     <td>
                                                                         <input type="number"
                                                                             class="form-control"
@@ -545,6 +570,7 @@
                                                                             min="0"
                                                                             max="100"
                                                                             value="{{ $instrumenProdi->submission ? $instrumenProdi->submission->realisasi : '' }}"
+                                                                            required
                                                                             >
                                                                         <div class="form-text text-muted italic text-xs">Masukkan realisasi dalam bentuk angka</div>
                                                                     </td>
@@ -554,9 +580,9 @@
                                                                     <td>{{ $instrumenProdi->uraian }}</td>
                                                                 </tr>
                                                                 <tr>
-                                                                    <td class="fw-semibold bg-light">Akar Penyebab</td>
+                                                                    <td class="fw-semibold bg-light">Akar Penyebab <span class="text-danger">*</span></td>
                                                                     <td>
-                                                                        <textarea class="form-control" name="akar_penyebab[{{ $instrumenProdi->id }}]" rows="3">{{ $instrumenProdi->submission ? $instrumenProdi->submission->akar_penyebab : '' }}</textarea>
+                                                                        <textarea class="form-control" name="akar_penyebab[{{ $instrumenProdi->id }}]" rows="3" required>{{ $instrumenProdi->submission ? $instrumenProdi->submission->akar_penyebab : '' }}</textarea>
                                                                         <div class="form-text text-muted italic text-xs">Masukkan akar penyebab jika ada</div>
                                                                     </td>
                                                                 </tr>
@@ -629,6 +655,116 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Function to validate form fields
+    function validateForm(form) {
+        const errors = [];
+        const formData = new FormData(form[0]);
+        
+        // Get all instrumen IDs from the form
+        const instrumenIds = formData.getAll('instrumen_ids[]');
+        
+        instrumenIds.forEach(instrumenId => {
+            const realisasi = formData.get(`realisasi[${instrumenId}]`);
+            const akarPenyebab = formData.get(`akar_penyebab[${instrumenId}]`);
+            const rencanaPerbaikan = formData.get(`rencana_perbaikan[${instrumenId}]`);
+            
+            if (!realisasi || realisasi.trim() === '') {
+                errors.push({
+                    field: `realisasi[${instrumenId}]`,
+                    message: 'Realisasi harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+            
+            if (!akarPenyebab || akarPenyebab.trim() === '') {
+                errors.push({
+                    field: `akar_penyebab[${instrumenId}]`,
+                    message: 'Akar penyebab harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+            
+            if (!rencanaPerbaikan || rencanaPerbaikan.trim() === '') {
+                errors.push({
+                    field: `rencana_perbaikan[${instrumenId}]`,
+                    message: 'Rencana perbaikan harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+        });
+        
+        return {
+            isValid: errors.length === 0,
+            errors: errors
+        };
+    }
+
+    // Function to show validation errors
+    function showValidationErrors(errors, form) {
+        // Clear previous error highlights
+        form.find('.form-control').removeClass('is-invalid');
+        form.find('.invalid-feedback').remove();
+        
+        // Group errors by instrumen
+        const errorsByInstrumen = {};
+        errors.forEach(error => {
+            if (!errorsByInstrumen[error.instrumenId]) {
+                errorsByInstrumen[error.instrumenId] = [];
+            }
+            errorsByInstrumen[error.instrumenId].push(error);
+        });
+        
+        // Highlight fields with errors and show error messages
+        errors.forEach(error => {
+            const field = form.find(`[name="${error.field}"]`);
+            if (field.length) {
+                field.addClass('is-invalid');
+                
+                // Add error message below the field
+                const errorDiv = $(`<div class="invalid-feedback d-block">${error.message}</div>`);
+                field.after(errorDiv);
+            }
+        });
+        
+        // Show error summary
+        let errorMessage = '<div class="text-start">';
+        errorMessage += '<h6 class="fw-bold text-danger mb-3">Form berikut belum diisi lengkap:</h6>';
+        
+        Object.keys(errorsByInstrumen).forEach(instrumenId => {
+            const instrumenErrors = errorsByInstrumen[instrumenId];
+            const instrumenCard = form.find(`[data-instrumen-id="${instrumenId}"]`);
+            const instrumenTitle = instrumenCard.find('.card-title h3').text() || `Instrumen ${instrumenId}`;
+            
+            errorMessage += `<div class="mb-2">`;
+            errorMessage += `<strong class="text-danger">• ${instrumenTitle}</strong><br>`;
+            instrumenErrors.forEach(error => {
+                errorMessage += `<span class="text-muted">  - ${error.message}</span><br>`;
+            });
+            errorMessage += `</div>`;
+        });
+        
+        errorMessage += '</div>';
+        
+        Swal.fire({
+            title: 'Form Belum Lengkap',
+            html: errorMessage,
+            icon: 'warning',
+            confirmButtonText: 'OK, Saya Akan Lengkapi',
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn btn-warning fw-semibold'
+            }
+        }).then(() => {
+            // Scroll to first error field
+            const firstErrorField = form.find('.is-invalid').first();
+            if (firstErrorField.length) {
+                $('html, body').animate({
+                    scrollTop: firstErrorField.offset().top - 100
+                }, 500);
+            }
+        });
+    }
+
     // Function to find the first incomplete step
     function findFirstIncompleteStep() {
         let firstIncompleteId = null;
@@ -692,33 +828,10 @@ $(document).ready(function() {
         const formData = new FormData(this);
         const isLastStep = form.find('button[type="submit"]').text().includes('Selesai');
 
-        // Validasi field wajib
-        const requiredFields = form.find('input[name*="realisasi"], textarea[name*="akar_penyebab"], textarea[name*="rencana_perbaikan"]');
-        let emptyField = null;
-
-        requiredFields.each(function() {
-            if (!$(this).val() || $(this).val().trim() === '') {
-                emptyField = $(this);
-                return false; // break loop
-            }
-        });
-
-        if (emptyField) {
-            // Scroll ke field yang kosong
-            $('html, body').animate({
-                scrollTop: emptyField.offset().top - 100
-            }, 500);
-
-            // Focus ke field
-            emptyField.focus();
-
-            // Tampilkan alert sederhana
-            Swal.fire({
-                title: 'Form Belum Lengkap',
-                text: 'Mohon lengkapi semua field yang wajib diisi (Realisasi, Akar Penyebab, Rencana Perbaikan)',
-                icon: 'warning',
-                confirmButtonText: 'OK'
-            });
+        // Validate form before submission
+        const validationResult = validateForm(form);
+        if (!validationResult.isValid) {
+            showValidationErrors(validationResult.errors, form);
             return;
         }
 
@@ -872,6 +985,29 @@ $(document).ready(function() {
             scrollTop: $(`#instrumen-group-${kriteriaId}`).offset().top - 100
         }, 500);
     }
+
+    // Real-time validation
+    $('.kriteria-form').on('input', 'input, textarea', function() {
+        const field = $(this);
+        const value = field.val().trim();
+        
+        if (value === '') {
+            field.removeClass('is-valid').addClass('is-invalid');
+            // Remove existing error message if any
+            field.siblings('.invalid-feedback').remove();
+            field.after(`<div class="invalid-feedback d-block">Field ini wajib diisi</div>`);
+        } else {
+            field.removeClass('is-invalid').addClass('is-valid');
+            // Remove error message
+            field.siblings('.invalid-feedback').remove();
+        }
+    });
+
+    // Clear validation state when switching between kriteria
+    $('.wizard-step').click(function() {
+        $('.form-control').removeClass('is-invalid is-valid');
+        $('.invalid-feedback').remove();
+    });
 
     window.showKriteriaContent = showKriteriaContent;
 });

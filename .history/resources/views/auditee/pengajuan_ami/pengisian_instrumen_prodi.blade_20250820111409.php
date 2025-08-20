@@ -336,7 +336,10 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission !== null) {
+                                        if ($instrumenProdi->submission &&
+                                            !empty($instrumenProdi->submission->realisasi) &&
+                                            !empty($instrumenProdi->submission->akar_penyebab) &&
+                                            !empty($instrumenProdi->submission->rencana_perbaikan)) {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -439,7 +442,10 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission !== null) {
+                                        if ($instrumenProdi->submission &&
+                                            !empty($instrumenProdi->submission->realisasi) &&
+                                            !empty($instrumenProdi->submission->akar_penyebab) &&
+                                            !empty($instrumenProdi->submission->rencana_perbaikan)) {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -480,7 +486,7 @@
                                     <form class="kriteria-form" data-kriteria-id="{{ $kriteriaId }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         @foreach($kriteriaData['instrumens'] as $instrumenProdi)
-                                            <div class="card card-bordered shadow-sm mb-10">
+                                            <div class="card card-bordered shadow-sm mb-10" data-instrumen-id="{{ $instrumenProdi->id }}">
                                                 <div class="card-header bg-light">
                                                     <div class="card-title">
                                                         <h3 class="card-label text-gray-800 fw-bold">
@@ -623,6 +629,116 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Function to validate form fields
+    function validateForm(form) {
+        const errors = [];
+        const formData = new FormData(form[0]);
+        
+        // Get all instrumen IDs from the form
+        const instrumenIds = formData.getAll('instrumen_ids[]');
+        
+        instrumenIds.forEach(instrumenId => {
+            const realisasi = formData.get(`realisasi[${instrumenId}]`);
+            const akarPenyebab = formData.get(`akar_penyebab[${instrumenId}]`);
+            const rencanaPerbaikan = formData.get(`rencana_perbaikan[${instrumenId}]`);
+            
+            if (!realisasi || realisasi.trim() === '') {
+                errors.push({
+                    field: `realisasi[${instrumenId}]`,
+                    message: 'Realisasi harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+            
+            if (!akarPenyebab || akarPenyebab.trim() === '') {
+                errors.push({
+                    field: `akar_penyebab[${instrumenId}]`,
+                    message: 'Akar penyebab harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+            
+            if (!rencanaPerbaikan || rencanaPerbaikan.trim() === '') {
+                errors.push({
+                    field: `rencana_perbaikan[${instrumenId}]`,
+                    message: 'Rencana perbaikan harus diisi',
+                    instrumenId: instrumenId
+                });
+            }
+        });
+        
+        return {
+            isValid: errors.length === 0,
+            errors: errors
+        };
+    }
+
+    // Function to show validation errors
+    function showValidationErrors(errors, form) {
+        // Clear previous error highlights
+        form.find('.form-control').removeClass('is-invalid');
+        form.find('.invalid-feedback').remove();
+        
+        // Group errors by instrumen
+        const errorsByInstrumen = {};
+        errors.forEach(error => {
+            if (!errorsByInstrumen[error.instrumenId]) {
+                errorsByInstrumen[error.instrumenId] = [];
+            }
+            errorsByInstrumen[error.instrumenId].push(error);
+        });
+        
+        // Highlight fields with errors and show error messages
+        errors.forEach(error => {
+            const field = form.find(`[name="${error.field}"]`);
+            if (field.length) {
+                field.addClass('is-invalid');
+                
+                // Add error message below the field
+                const errorDiv = $(`<div class="invalid-feedback d-block">${error.message}</div>`);
+                field.after(errorDiv);
+            }
+        });
+        
+        // Show error summary
+        let errorMessage = '<div class="text-start">';
+        errorMessage += '<h6 class="fw-bold text-danger mb-3">Form berikut belum diisi lengkap:</h6>';
+        
+        Object.keys(errorsByInstrumen).forEach(instrumenId => {
+            const instrumenErrors = errorsByInstrumen[instrumenId];
+            const instrumenCard = form.find(`[data-instrumen-id="${instrumenId}"]`);
+            const instrumenTitle = instrumenCard.find('.card-title h3').text() || `Instrumen ${instrumenId}`;
+            
+            errorMessage += `<div class="mb-2">`;
+            errorMessage += `<strong class="text-danger">• ${instrumenTitle}</strong><br>`;
+            instrumenErrors.forEach(error => {
+                errorMessage += `<span class="text-muted">  - ${error.message}</span><br>`;
+            });
+            errorMessage += `</div>`;
+        });
+        
+        errorMessage += '</div>';
+        
+        Swal.fire({
+            title: 'Form Belum Lengkap',
+            html: errorMessage,
+            icon: 'warning',
+            confirmButtonText: 'OK, Saya Akan Lengkapi',
+            buttonsStyling: false,
+            customClass: {
+                confirmButton: 'btn btn-warning fw-semibold'
+            }
+        }).then(() => {
+            // Scroll to first error field
+            const firstErrorField = form.find('.is-invalid').first();
+            if (firstErrorField.length) {
+                $('html, body').animate({
+                    scrollTop: firstErrorField.offset().top - 100
+                }, 500);
+            }
+        });
+    }
+
     // Function to find the first incomplete step
     function findFirstIncompleteStep() {
         let firstIncompleteId = null;
@@ -685,6 +801,13 @@ $(document).ready(function() {
         const form = $(this);
         const formData = new FormData(this);
         const isLastStep = form.find('button[type="submit"]').text().includes('Selesai');
+
+        // Validate form before submission
+        const validationResult = validateForm(form);
+        if (!validationResult.isValid) {
+            showValidationErrors(validationResult.errors, form);
+            return;
+        }
 
         // Find next kriteria step
         const currentStep = $(`.wizard-step[data-kriteria-id="${kriteriaId}"]`);
@@ -836,6 +959,29 @@ $(document).ready(function() {
             scrollTop: $(`#instrumen-group-${kriteriaId}`).offset().top - 100
         }, 500);
     }
+
+    // Real-time validation
+    $('.kriteria-form').on('input', 'input, textarea', function() {
+        const field = $(this);
+        const value = field.val().trim();
+        
+        if (value === '') {
+            field.removeClass('is-valid').addClass('is-invalid');
+            // Remove existing error message if any
+            field.siblings('.invalid-feedback').remove();
+            field.after(`<div class="invalid-feedback d-block">Field ini wajib diisi</div>`);
+        } else {
+            field.removeClass('is-invalid').addClass('is-valid');
+            // Remove error message
+            field.siblings('.invalid-feedback').remove();
+        }
+    });
+
+    // Clear validation state when switching between kriteria
+    $('.wizard-step').click(function() {
+        $('.form-control').removeClass('is-invalid is-valid');
+        $('.invalid-feedback').remove();
+    });
 
     window.showKriteriaContent = showKriteriaContent;
 });

@@ -336,7 +336,10 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission !== null) {
+                                        if ($instrumenProdi->submission &&
+                                            !empty($instrumenProdi->submission->realisasi) &&
+                                            !empty($instrumenProdi->submission->akar_penyebab) &&
+                                            !empty($instrumenProdi->submission->rencana_perbaikan)) {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -439,7 +442,10 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission !== null) {
+                                        if ($instrumenProdi->submission &&
+                                            !empty($instrumenProdi->submission->realisasi) &&
+                                            !empty($instrumenProdi->submission->akar_penyebab) &&
+                                            !empty($instrumenProdi->submission->rencana_perbaikan)) {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -685,6 +691,13 @@ $(document).ready(function() {
         const form = $(this);
         const formData = new FormData(this);
         const isLastStep = form.find('button[type="submit"]').text().includes('Selesai');
+
+        // Validate form before submission
+        const validationResult = validateForm(form);
+        if (!validationResult.isValid) {
+            showValidationErrors(validationResult.errors, form);
+            return;
+        }
 
         // Find next kriteria step
         const currentStep = $(`.wizard-step[data-kriteria-id="${kriteriaId}"]`);

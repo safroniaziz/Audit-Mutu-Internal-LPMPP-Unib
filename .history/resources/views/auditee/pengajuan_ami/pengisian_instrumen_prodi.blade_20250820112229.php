@@ -695,23 +695,23 @@ $(document).ready(function() {
         // Validasi field wajib
         const requiredFields = form.find('input[name*="realisasi"], textarea[name*="akar_penyebab"], textarea[name*="rencana_perbaikan"]');
         let emptyField = null;
-
+        
         requiredFields.each(function() {
             if (!$(this).val() || $(this).val().trim() === '') {
                 emptyField = $(this);
                 return false; // break loop
             }
         });
-
+        
         if (emptyField) {
             // Scroll ke field yang kosong
             $('html, body').animate({
                 scrollTop: emptyField.offset().top - 100
             }, 500);
-
+            
             // Focus ke field
             emptyField.focus();
-
+            
             // Tampilkan alert sederhana
             Swal.fire({
                 title: 'Form Belum Lengkap',
