@@ -47,11 +47,11 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="viewer-content">
-                <iframe src="https://docs.google.com/viewer?url={{ urlencode($fileUrl) }}&embedded=true"
-                        width="100%"
-                        height="600px"
+                <iframe src="https://docs.google.com/viewer?url={{ urlencode($fileUrl) }}&embedded=true" 
+                        width="100%" 
+                        height="600px" 
                         frameborder="0"
                         style="border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa;">
                     <div class="text-center p-5">
