@@ -44,8 +44,8 @@
 						<!--end::Sidebar mobile toggle-->
 						<!--begin::Mobile logo-->
 						<div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
-							<a href="index.html" class="d-lg-none">
-								<img alt="Logo" src="{{ asset('assets/assets/media/logos/default-small.svg') }}" class="h-30px" />
+							<a href="{{ route('dashboard') }}" class="d-lg-none">
+								<img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-30px" />
 							</a>
 						</div>
 						<!--end::Mobile logo-->
@@ -86,15 +86,8 @@
 								<!--end::Toolbar container-->
 							</div>
 							<!--end::Toolbar-->
-							<!--begin::Content-->
-							<div id="kt_app_content" class="app-content flex-column-fluid">
-								<div id="kt_app_content_container" class="app-container container-xxl">
-									<!-- Modern Alert System -->
-									<x-alert-system />
-
-									@yield('content')
-								</div>
-							</div>
+														<!--begin::Content-->
+							@yield('content')
 							<!--end::Content-->
 						</div>
 						<!--end::Content wrapper-->
@@ -115,10 +108,6 @@
         @include('layouts.dashboard._activity')
 
 		<!--end::Activities drawer-->
-		<!--begin::Chat drawer-->
-        @include('layouts.dashboard._chat')
-
-		<!--end::Chat drawer-->
 
 		<!--end::Drawers-->
 		<!--begin::Scrolltop-->
