@@ -216,8 +216,8 @@
                                                 <td>{{ \Carbon\Carbon::parse($dokumenUmum->tanggal_berlaku)->format('d M Y') }}</td>
                                                 <td>{{ formatSizeUnits($dokumenUmum->size_dokumen) }}</td>
                                                 <td class="text-center">
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-icon btn-primary me-2"
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-icon btn-primary me-2" 
                                                             title="Lihat"
                                                             onclick="openFileViewer('{{ asset('storage/' . $dokumenUmum->file_dokumen) }}', '{{ $dokumenUmum->nama_dokumen }}')">
                                                         <i class="bi bi-eye-fill fs-4"></i>
@@ -575,7 +575,7 @@
             window.openFileViewer = function(fileUrl, fileName) {
                 const modal = document.getElementById('fileViewerModal');
                 const content = modal.querySelector('#fileViewerContent');
-
+                
                 // Tampilkan loading
                 content.innerHTML = `
                     <div class="text-center p-5">
@@ -585,11 +585,11 @@
                         <p class="mt-3 text-muted">Memuat file...</p>
                     </div>
                 `;
-
+                
                 // Buka modal
                 const bsModal = new bootstrap.Modal(modal);
                 bsModal.show();
-
+                
                 // Load file viewer component via AJAX
                 fetch(`/file-viewer?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}`)
                     .then(response => response.text())

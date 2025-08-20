@@ -46,11 +46,11 @@ Route::get('/', function () {
 Route::get('/file-viewer', function (Request $request) {
     $url = $request->get('url');
     $name = $request->get('name');
-
+    
     if (!$url || !$name) {
         return response('Parameter tidak lengkap', 400);
     }
-
+    
     return view('components.file-viewer', [
         'fileUrl' => $url,
         'fileName' => $name

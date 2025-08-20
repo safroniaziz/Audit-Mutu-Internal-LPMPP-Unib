@@ -216,8 +216,8 @@
                                                 <td>{{ \Carbon\Carbon::parse($dokumenUmum->tanggal_berlaku)->format('d M Y') }}</td>
                                                 <td>{{ formatSizeUnits($dokumenUmum->size_dokumen) }}</td>
                                                 <td class="text-center">
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-icon btn-primary me-2"
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-icon btn-primary me-2" 
                                                             title="Lihat"
                                                             onclick="openFileViewer('{{ asset('storage/' . $dokumenUmum->file_dokumen) }}', '{{ $dokumenUmum->nama_dokumen }}')">
                                                         <i class="bi bi-eye-fill fs-4"></i>
@@ -575,7 +575,7 @@
             window.openFileViewer = function(fileUrl, fileName) {
                 const modal = document.getElementById('fileViewerModal');
                 const content = modal.querySelector('#fileViewerContent');
-
+                
                 // Tampilkan loading
                 content.innerHTML = `
                     <div class="text-center p-5">
@@ -585,11 +585,11 @@
                         <p class="mt-3 text-muted">Memuat file...</p>
                     </div>
                 `;
-
+                
                 // Buka modal
                 const bsModal = new bootstrap.Modal(modal);
                 bsModal.show();
-
+                
                 // Load file viewer component via AJAX
                 fetch(`/file-viewer?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}`)
                     .then(response => response.text())
@@ -609,31 +609,6 @@
                         `;
                     });
             };
-
-            // Initialize dropzone and file handling
-            const dropzone = document.getElementById('dropzone');
-
-            // Clean up any existing event listeners
-            const newDropzone = dropzone.cloneNode(true);
-            dropzone.parentNode.replaceChild(newDropzone, dropzone);
-            const cleanDropzone = document.getElementById('dropzone');
-
-            // Flag to prevent duplicate event listeners
-            let dropEventHandled = false;
-            let filePickerTimeout;
-
-            // File size validation (1MB - 1KB = 1023KB)
-            const MAX_FILE_SIZE = 1023 * 1024;
-            // Allowed file types
-            const ALLOWED_TYPES = [
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'image/jpeg',
-                'image/png'
-            ];
 
             // Toastr configuration
             toastr.options = {

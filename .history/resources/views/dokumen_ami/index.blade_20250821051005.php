@@ -216,8 +216,8 @@
                                                 <td>{{ \Carbon\Carbon::parse($dokumenUmum->tanggal_berlaku)->format('d M Y') }}</td>
                                                 <td>{{ formatSizeUnits($dokumenUmum->size_dokumen) }}</td>
                                                 <td class="text-center">
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-icon btn-primary me-2"
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-icon btn-primary me-2" 
                                                             title="Lihat"
                                                             onclick="openFileViewer('{{ asset('storage/' . $dokumenUmum->file_dokumen) }}', '{{ $dokumenUmum->nama_dokumen }}')">
                                                         <i class="bi bi-eye-fill fs-4"></i>
@@ -571,46 +571,6 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // File viewer function
-            window.openFileViewer = function(fileUrl, fileName) {
-                const modal = document.getElementById('fileViewerModal');
-                const content = modal.querySelector('#fileViewerContent');
-
-                // Tampilkan loading
-                content.innerHTML = `
-                    <div class="text-center p-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <p class="mt-3 text-muted">Memuat file...</p>
-                    </div>
-                `;
-
-                // Buka modal
-                const bsModal = new bootstrap.Modal(modal);
-                bsModal.show();
-
-                // Load file viewer component via AJAX
-                fetch(`/file-viewer?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(fileName)}`)
-                    .then(response => response.text())
-                    .then(html => {
-                        content.innerHTML = html;
-                    })
-                    .catch(error => {
-                        content.innerHTML = `
-                            <div class="text-center p-5">
-                                <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-                                <h6 class="text-warning">Gagal memuat file</h6>
-                                <p class="text-muted mb-3">Terjadi kesalahan saat memuat preview file.</p>
-                                <a href="${fileUrl}" download="${fileName}" class="btn btn-primary">
-                                    <i class="fas fa-download me-1"></i> Download File
-                                </a>
-                            </div>
-                        `;
-                    });
-            };
-
-            // Initialize dropzone and file handling
             const dropzone = document.getElementById('dropzone');
 
             // Clean up any existing event listeners
@@ -635,7 +595,7 @@
                 'image/png'
             ];
 
-            // Toastr configuration
+            // Initialize toastr notifications
             toastr.options = {
                 "closeButton": true,
                 "debug": false,

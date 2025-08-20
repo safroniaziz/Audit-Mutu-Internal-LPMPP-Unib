@@ -610,31 +610,6 @@
                     });
             };
 
-            // Initialize dropzone and file handling
-            const dropzone = document.getElementById('dropzone');
-
-            // Clean up any existing event listeners
-            const newDropzone = dropzone.cloneNode(true);
-            dropzone.parentNode.replaceChild(newDropzone, dropzone);
-            const cleanDropzone = document.getElementById('dropzone');
-
-            // Flag to prevent duplicate event listeners
-            let dropEventHandled = false;
-            let filePickerTimeout;
-
-            // File size validation (1MB - 1KB = 1023KB)
-            const MAX_FILE_SIZE = 1023 * 1024;
-            // Allowed file types
-            const ALLOWED_TYPES = [
-                'application/pdf',
-                'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'application/vnd.ms-excel',
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'image/jpeg',
-                'image/png'
-            ];
-
             // Toastr configuration
             toastr.options = {
                 "closeButton": true,
