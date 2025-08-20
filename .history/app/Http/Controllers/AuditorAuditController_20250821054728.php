@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Evaluasi;
+use App\Models\IndikatorInstrumen;
+use App\Models\IndikatorInstrumenKriteria;
 use App\Models\IkssAuditee;
 use App\Models\IkssAuditeeNilai;
 use App\Models\IkssAuditeeVisitasi;
@@ -22,11 +24,13 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\Models\EvaluasiSubmission;
 use App\Models\EvaluasiMasukan;
+use App\Models\InstrumenProdiNilai;
+use Exception;
 
 class AuditorAuditController extends Controller
 {
     public function daftarAuditee(){
-        $auditess = PengajuanAmi::with(['auditors', 'auditee'])
+        $auditess = PengajuanAmi::with(['auditors.auditor', 'auditee', 'periodeAktif'])
                     ->whereHas('auditors', function ($query) {
                         $query->where('user_id', Auth::user()->id);
                     })
@@ -35,11 +39,19 @@ class AuditorAuditController extends Controller
                     ->map(function ($pengajuan) {
                         // Add audit status indicators
                         $pengajuan->audit_status = $this->getAuditStatus($pengajuan);
+                        $pengajuan->overall_audit_status = $this->getOverallAuditStatus($pengajuan);
+                        // Add audit period validation
+                        $pengajuan->audit_period_status = $this->isAuditPeriodActive($pengajuan);
+                        $pengajuan->is_audit_period_active = ($pengajuan->audit_period_status === 'active');
                         return $pengajuan;
                     });
 
+        // Get active period info
+        $activePeriod = PeriodeAktif::whereNull('deleted_at')->first();
+
         return view('dataauditor.daftar_auditee',[
-            'auditess'  =>  $auditess
+            'auditess'  =>  $auditess,
+            'activePeriod' => $activePeriod
         ]);
     }
 
@@ -122,37 +134,6 @@ class AuditorAuditController extends Controller
                     ];
                 }
             }
-        } elseif ($deskEvaluationCount > 0 && $deskEvaluationCount >= $totalIkss) {
-            // Check if visitasi time is valid
-            $visitasiTimeValidation = $this->checkVisitasiTimeValidation($pengajuan);
-
-            if ($visitasiTimeValidation['is_valid']) {
-                return [
-                    'status' => 'visitasi_ready',
-                    'label' => 'Siap Visitasi',
-                    'color' => 'success',
-                    'icon' => 'fas fa-clipboard-list',
-                    'description' => 'Desk evaluation selesai, siap untuk visitasi'
-                ];
-            } else {
-                if ($visitasiTimeValidation['type'] === 'too_early') {
-                    return [
-                        'status' => 'visitasi_waiting',
-                        'label' => 'Menunggu Jadwal Visitasi',
-                        'color' => 'warning',
-                        'icon' => 'fas fa-clock',
-                        'description' => 'Visitasi akan dimulai pada ' . $visitasiTimeValidation['scheduled_time']
-                    ];
-                } else {
-                    return [
-                        'status' => 'visitasi_expired',
-                        'label' => 'Jadwal Visitasi Berakhir',
-                        'color' => 'danger',
-                        'icon' => 'fas fa-exclamation-triangle',
-                        'description' => 'Hubungi admin untuk memperpanjang jadwal'
-                    ];
-                }
-            }
         } elseif ($deskEvaluationCount > 0) {
             return [
                 'status' => 'desk_in_progress',
@@ -186,33 +167,32 @@ class AuditorAuditController extends Controller
         $scheduledTime = \Carbon\Carbon::parse($pengajuan->waktu);
         $currentTime = \Carbon\Carbon::now();
 
-        // Define time window (±2 hours before and after scheduled time)
-        $timeWindow = 2; // hours
-        $startTime = $scheduledTime->copy()->subHours($timeWindow);
-        $endTime = $scheduledTime->copy()->addHours($timeWindow);
+        // Define time window (same day, from scheduled time to end of day)
+        $startTime = $scheduledTime; // Use the actual scheduled time
+        $endTime = $scheduledTime->copy()->endOfDay(); // 23:59:59
 
         if ($currentTime->lt($startTime)) {
-            // Too early
+            // Too early (before scheduled time)
             return [
                 'is_valid' => false,
-                'message' => 'Visitasi belum dapat dilakukan. Jadwal visitasi akan dimulai pada ' . $scheduledTime->format('d/m/Y H:i'),
+                'message' => 'Visitasi belum dapat dilakukan. Visitasi dapat dilakukan mulai ' . $scheduledTime->format('d/m/Y H:i') . '.',
                 'scheduled_time' => $scheduledTime->format('d/m/Y H:i'),
                 'start_time' => $startTime->format('d/m/Y H:i'),
                 'end_time' => $endTime->format('d/m/Y H:i'),
                 'type' => 'too_early'
             ];
         } elseif ($currentTime->gt($endTime)) {
-            // Too late
+            // Too late (after end of day)
             return [
                 'is_valid' => false,
-                'message' => 'Waktu visitasi telah berakhir. Silakan hubungi admin untuk memperpanjang jadwal visitasi.',
+                'message' => 'Waktu visitasi telah berakhir. Visitasi hanya dapat dilakukan hingga akhir hari.',
                 'scheduled_time' => $scheduledTime->format('d/m/Y H:i'),
                 'start_time' => $startTime->format('d/m/Y H:i'),
                 'end_time' => $endTime->format('d/m/Y H:i'),
                 'type' => 'too_late'
             ];
         } else {
-            // Within time window
+            // Within time window (scheduled time - end of day)
             return [
                 'is_valid' => true,
                 'message' => 'Visitasi dapat dilakukan pada waktu ini.',
@@ -225,13 +205,27 @@ class AuditorAuditController extends Controller
     }
 
     public function perjanjianKinerja(PengajuanAmi $pengajuan){
+        // Check if audit period is active
+        if (!$this->isAuditPeriodActive($pengajuan)) {
+            return redirect()->route('auditor.audit.daftarAuditee')
+                ->with('error', 'Jadwal audit sudah berakhir. Silakan hubungi administrator untuk memperpanjang jadwal audit.');
+        }
+
         $auditess = PengajuanAmi::with([
             'ikssAuditee.instrumen.indikatorKinerja.satuanStandar',
-            'auditee',
-            'perjanjianKinerja'
+            'auditee'
         ])
         ->where('id', $pengajuan->id)
         ->first();
+
+        // Get perjanjian kinerja berdasarkan auditee_id dan periode_id
+        if ($auditess) {
+            $perjanjianKinerja = \App\Models\PerjanjianKinerja::where('auditee_id', $auditess->auditee_id)
+                ->where('periode_id', $auditess->periode_id)
+                ->first();
+            
+            $auditess->perjanjianKinerja = $perjanjianKinerja;
+        }
 
         // Add audit status for the current auditor
         $auditess->audit_status = $this->getAuditStatus($pengajuan);
@@ -379,13 +373,6 @@ class AuditorAuditController extends Controller
         // Check visitasi time validation
         $visitasiTimeValidation = $this->checkVisitasiTimeValidation($pengajuan);
 
-        if (!$visitasiTimeValidation['is_valid']) {
-            return view('dataauditor.visitasi_time_error', [
-                'pengajuan' => $pengajuan,
-                'error' => $visitasiTimeValidation
-            ]);
-        }
-
         // Load IKSS data with all necessary relationships
         $dataIkss = IkssAuditee::with(['instrumen.indikatorKinerja.satuanStandar'])
                         ->where('auditee_id', $pengajuan->auditee_id)
@@ -479,9 +466,17 @@ class AuditorAuditController extends Controller
         $visitasiTimeValidation = $this->checkVisitasiTimeValidation($pengajuan);
 
         if (!$visitasiTimeValidation['is_valid']) {
+            $errorMessage = $visitasiTimeValidation['message'];
+            if ($visitasiTimeValidation['type'] === 'too_late') {
+                $errorMessage .= ' Silakan hubungi administrator untuk memperpanjang jadwal visitasi.';
+            } elseif ($visitasiTimeValidation['type'] === 'too_early') {
+                $errorMessage .= ' Silakan tunggu hingga waktu yang dijadwalkan.';
+            }
+
             return response()->json([
                 'status' => 'error',
-                'message' => $visitasiTimeValidation['message']
+                'message' => $errorMessage,
+                'type' => $visitasiTimeValidation['type']
             ], 403);
         }
 
@@ -549,10 +544,172 @@ class AuditorAuditController extends Controller
         return redirect()->back()->with('success', 'Desk Evaluation berhasil disetujui.');
     }
 
+    public function penilaianInstrumenProdi(PengajuanAmi $pengajuan)
+    {
+        $unitKerjaId = $pengajuan->auditee_id;
+
+        // Get IndikatorInstrumen for this Prodi with proper eager loading
+        $indikatorInstrumens = IndikatorInstrumen::with([
+            'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $pengajuan) {
+                $query->with(['kriteriaInstrumen.indikatorInstrumen',
+                    'submission' => function($subQuery) use ($unitKerjaId) {
+                        $subQuery->where('unit_kerja_id', $unitKerjaId);
+                    },
+                    'nilaiAuditor' => function($nilaiQuery) use ($pengajuan) {
+                        $nilaiQuery->where('pengajuan_ami_id', $pengajuan->id)
+                                  ->where('auditor_id', Auth::id());
+                    }
+                ]);
+            }
+        ])
+            ->whereHas('prodis', function($query) use ($unitKerjaId) {
+                $query->where('unit_kerja_id', $unitKerjaId);
+            })
+            ->get();
+
+        return view('dataauditor.penilaian_instrumen_prodi', [
+            'indikatorInstrumens' => $indikatorInstrumens,
+            'unitKerjaId' => $unitKerjaId,
+            'pengajuan' => $pengajuan
+        ]);
+    }
+
+    public function submitPenilaianInstrumenProdi(Request $request, PengajuanAmi $pengajuan)
+    {
+        // Debug: Log the incoming request data
+        Log::info('Penilaian Instrumen Prodi Request Data:', [
+            'all_data' => $request->all(),
+            'nilai_data' => $request->nilai,
+            'catatan_data' => $request->catatan
+        ]);
+
+        $validator = Validator::make($request->all(), [
+            'nilai' => 'required|array',
+            'nilai.*' => 'required|integer|min:1|max:4',
+            'catatan' => 'nullable|array',
+            'catatan.*' => 'nullable|string|max:1000',
+        ], [
+            'nilai.required' => 'Nilai penilaian harus diisi',
+            'nilai.array' => 'Format nilai tidak valid',
+            'nilai.*.required' => 'Setiap instrumen harus diberi nilai',
+            'nilai.*.integer' => 'Nilai harus berupa angka',
+            'nilai.*.min' => 'Nilai minimal adalah 1',
+            'nilai.*.max' => 'Nilai maksimal adalah 4',
+            'catatan.*.string' => 'Catatan harus berupa teks',
+            'catatan.*.max' => 'Catatan maksimal 1000 karakter',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->nilai as $instrumenProdiId => $nilai) {
+                // Debug: Log each nilai being saved
+                Log::info('Saving nilai:', [
+                    'instrumen_prodi_id' => $instrumenProdiId,
+                    'nilai' => $nilai,
+                    'nilai_type' => gettype($nilai),
+                    'catatan' => $request->catatan[$instrumenProdiId] ?? null
+                ]);
+
+                InstrumenProdiNilai::updateOrCreate(
+                    [
+                        'instrumen_prodi_id' => $instrumenProdiId,
+                        'pengajuan_ami_id' => $pengajuan->id,
+                        'auditor_id' => Auth::id(),
+                    ],
+                    [
+                        'nilai' => $nilai,
+                        'catatan' => $request->catatan[$instrumenProdiId] ?? null,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Penilaian instrumen prodi berhasil disimpan'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function approvePenilaianProdi(PengajuanAmi $pengajuan)
+    {
+        try {
+            // Check if auditor is assigned to this pengajuan
+            $penugasan = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if (!$penugasan) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki akses untuk menyetujui penilaian ini.'
+                ], 403);
+            }
+
+            // Check if auditor has submitted scores
+            $hasScores = InstrumenProdiNilai::where('pengajuan_ami_id', $pengajuan->id)
+                ->where('auditor_id', Auth::id())
+                ->exists();
+
+            if (!$hasScores) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda harus menyelesaikan penilaian terlebih dahulu sebelum menyetujui.'
+                ], 400);
+            }
+
+            // Update penugasan auditor to mark indikator prodi as approved
+            $penugasan->update([
+                'is_setuju_indikator_prodi' => true
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Penilaian instrumen prodi berhasil disetujui!'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error approving penilaian prodi: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyetujui penilaian.'
+            ], 500);
+        }
+    }
+
     public function unduhDokumen(PengajuanAmi $pengajuan){
-        $jawabanKuisioner = KuisionerJawaban::with(['kuisioner', 'opsi'])
-                        ->where('pengajuan_id', $pengajuan->id)
-                        ->get();
+        // Ambil penugasan auditor ketua yang bertugas mengaudit pengajuan_ami ini
+        $activePenugasan = \App\Models\PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+            ->where('role', 'ketua')
+            ->whereNull('deleted_at')
+            ->first();
+
+        if ($activePenugasan) {
+            $jawabanKuisioner = KuisionerJawaban::with(['kuisioner', 'opsi'])
+                ->where('pengajuan_id', $pengajuan->id)
+                ->where('penugasan_auditor_id', $activePenugasan->id)
+                ->get();
+        } else {
+            $jawabanKuisioner = collect();
+        }
+
         $kuisioners = Kuisioner::with(['opsis'])->get();
 
         // Get master evaluasi data
@@ -580,10 +737,76 @@ class AuditorAuditController extends Controller
 
     public function beritaAcara(Request $request, PengajuanAmi $pengajuan)
     {
-        // $data = [];
-        // $pdf = PDF::loadView('pdf.berita-acara', $data);
-        // return $pdf->download('Berita_Acara_Audit.pdf');
-        $pdf = Pdf::loadView('dataauditor.pdf.berita_acara');
+        // Debug logging
+        \Illuminate\Support\Facades\Log::info('BeritaAcara method called', [
+            'pengajuan_id' => $pengajuan->id,
+            'request_data' => $request->all(),
+            'user_id' => Auth::id()
+        ]);
+
+        // Validate request
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'catatan_visitasi' => 'required|string|min:10',
+        ], [
+            'catatan_visitasi.required' => 'Catatan visitasi harus diisi',
+            'catatan_visitasi.string' => 'Catatan visitasi harus berupa teks',
+            'catatan_visitasi.min' => 'Catatan visitasi minimal 10 karakter',
+        ]);
+
+        if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::error('Validation failed in beritaAcara', [
+                'pengajuan_id' => $pengajuan->id,
+                'errors' => $validator->errors()->toArray(),
+                'input' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        try {
+            // Save catatan visitasi to database
+            $pengajuan->update([
+                'catatan_visitasi' => $request->catatan_visitasi
+            ]);
+
+            \Illuminate\Support\Facades\Log::info('Catatan visitasi saved successfully', [
+                'pengajuan_id' => $pengajuan->id,
+                'catatan_visitasi' => $request->catatan_visitasi
+            ]);
+
+            // Return JSON response for AJAX
+            return response()->json([
+                'success' => true,
+                'message' => 'Catatan visitasi berhasil disimpan!'
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in beritaAcara method', [
+                'pengajuan_id' => $pengajuan->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function viewBeritaAcara(PengajuanAmi $pengajuan)
+    {
+        // Generate PDF with existing catatan visitasi
+        $data = [
+            'pengajuan' => $pengajuan,
+            'catatan_visitasi' => $pengajuan->catatan_visitasi
+        ];
+
+        $pdf = Pdf::loadView('dataauditor.pdf.berita_acara', $data);
         return $pdf->stream('Berita_Acara_Audit.pdf');
     }
 
@@ -747,7 +970,10 @@ class AuditorAuditController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        // Get only SatuanStandar that belong to this prodi's indikator kinerja
+        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })->orderBy('kode_satuan')->get();
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -763,6 +989,60 @@ class AuditorAuditController extends Controller
                             'auditee',
                             'auditors.auditor.unitKerja',
                         ])->where('id', $pengajuan->id)->first();
+
+        // Get Instrumen Prodi data - calculate per kriteria with specified columns
+        // Only get kriteria from instrumen that belong to this prodi
+        $kriterias = IndikatorInstrumenKriteria::with([
+            'instrumenProdi.nilaiAuditor' => function ($query) use ($pengajuan) {
+                $query->where('pengajuan_ami_id', $pengajuan->id);
+            }
+        ])
+        ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })
+        ->get();
+
+        // Calculate scores per kriteria
+        $kriteriaScores = [];
+        foreach ($kriterias as $kriteria) {
+            $ketuaScores = collect();
+            $anggotaScores = collect();
+
+            foreach ($kriteria->instrumenProdi as $instrumenProdi) {
+                foreach ($instrumenProdi->nilaiAuditor as $nilai) {
+                    if ($nilai->nilai) {
+                        // Get auditor role from penugasan
+                        $penugasan = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                            ->where('user_id', $nilai->auditor_id)
+                            ->first();
+
+                        if ($penugasan) {
+                            if ($penugasan->role == 'ketua') {
+                                $ketuaScores->push((float)$nilai->nilai);
+                            } elseif ($penugasan->role == 'pendamping') {
+                                $anggotaScores->push((float)$nilai->nilai);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $totalNilaiKetua = $ketuaScores->sum();
+            $totalNilaiAnggota = $anggotaScores->sum();
+            $totalNilai = $totalNilaiKetua + $totalNilaiAnggota;
+            $jumlahPenilaian = $ketuaScores->count() + $anggotaScores->count();
+            $rataRata = $jumlahPenilaian > 0 ? $totalNilai / $jumlahPenilaian : 0;
+
+            $kriteriaScores[] = [
+                'kode_kriteria' => $kriteria->kode_kriteria,
+                'nama_kriteria' => $kriteria->nama_kriteria,
+                'total_nilai_ketua' => $totalNilaiKetua,
+                'total_nilai_anggota' => $totalNilaiAnggota,
+                'total_nilai' => $totalNilai,
+                'jumlah_penilaian' => $jumlahPenilaian,
+                'rata_rata' => $rataRata
+            ];
+        }
 
         $ikssAuditeeCollection = collect($pengajuanAmis->ikssAuditee);
         $groupedBySatuanId = $ikssAuditeeCollection->groupBy(function ($ikssAuditee) {
@@ -886,8 +1166,126 @@ class AuditorAuditController extends Controller
             'pengajuanAmis'   =>  $pengajuanAmis,
             'sortedGrouped'   =>  $sortedGrouped,
             'jawabanKuisioner'   =>  $jawabanKuisioner,
+            'kriteriaScores' => $kriteriaScores,
         ];
         $pdf = PDF::loadView('dataauditor.pdf.laporan_ami', $data);
         return $pdf->stream('Laporan_AMI.pdf');
+    }
+
+    public function saveActiveKriteria(Request $request, PengajuanAmi $pengajuan)
+    {
+        $request->validate([
+            'kriteria_id' => 'required|integer'
+        ]);
+
+        // Save active kriteria to session
+        session(['active_kriteria_' . $pengajuan->id => $request->kriteria_id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Active kriteria saved successfully'
+        ]);
+    }
+
+    private function getOverallAuditStatus($pengajuan)
+    {
+        // Get current logged-in auditor for this pengajuan
+        $currentAuditor = $pengajuan->auditors->where('user_id', Auth::user()->id)->first();
+
+        if (!$currentAuditor) {
+            return 'new'; // If auditor not found, treat as new
+        }
+
+        // Check if current auditor has completed all stages
+        $auditorCompleted = (bool)$currentAuditor->is_setuju && (bool)$currentAuditor->is_setuju_visitasi && (bool)$currentAuditor->is_setuju_indikator_prodi;
+        $auditorStarted = (bool)$currentAuditor->is_setuju || (bool)$currentAuditor->is_setuju_visitasi || (bool)$currentAuditor->is_setuju_indikator_prodi;
+
+        if ($auditorCompleted) {
+            return 'completed';
+        } elseif ($auditorStarted) {
+            return 'in_progress';
+        } else {
+            return 'new';
+        }
+    }
+
+    public function saveKuisioner(Request $request, PengajuanAmi $pengajuan)
+    {
+        $request->validate([
+            'jawaban' => 'required|array',
+            'jawaban.*' => 'required|exists:kuisioner_opsis,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $penugasanAuditor = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                ->where('user_id', Auth::user()->id)
+                ->first();
+
+            if (!$penugasanAuditor) {
+                throw new Exception('Penugasan auditor tidak ditemukan');
+            }
+
+            foreach ($request->jawaban as $kuisionerId => $opsiId) {
+                KuisionerJawaban::updateOrCreate(
+                    [
+                        'pengajuan_id' => $pengajuan->id,
+                        'kuisioner_id' => $kuisionerId,
+                        'penugasan_auditor_id' => $penugasanAuditor->id,
+                    ],
+                    [
+                        'kuisioner_opsi_id' => $opsiId,
+                    ]
+                );
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data kuisioner berhasil disimpan'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function isAuditPeriodActive($pengajuan)
+    {
+        // Get audit period schedule from periode_aktif_jadwals
+        $auditSchedule = \App\Models\PeriodeAktifJadwal::where('periode_aktif_id', $pengajuan->periode_id)
+            ->where('jenis', 'audit')
+            ->first();
+
+        if (!$auditSchedule) {
+            return 'no_schedule'; // No schedule found
+        }
+
+        $currentTime = \Carbon\Carbon::now();
+        $startTime = $auditSchedule->waktu_mulai ? \Carbon\Carbon::parse($auditSchedule->waktu_mulai) : null;
+        $endTime = $auditSchedule->waktu_selesai ? \Carbon\Carbon::parse($auditSchedule->waktu_selesai) : null;
+
+        // If no start time, audit period is not active
+        if (!$startTime) {
+            return 'no_start_time';
+        }
+
+        // If current time is before start time, audit period hasn't started
+        if ($currentTime->lt($startTime)) {
+            return 'not_started';
+        }
+
+        // If end time is set and current time is after end time, audit period has ended
+        if ($endTime && $currentTime->gt($endTime)) {
+            return 'ended';
+        }
+
+        return 'active';
     }
 }

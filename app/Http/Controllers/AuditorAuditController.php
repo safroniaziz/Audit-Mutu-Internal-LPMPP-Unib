@@ -213,11 +213,19 @@ class AuditorAuditController extends Controller
 
         $auditess = PengajuanAmi::with([
             'ikssAuditee.instrumen.indikatorKinerja.satuanStandar',
-            'auditee',
-            'perjanjianKinerja'
+            'auditee'
         ])
         ->where('id', $pengajuan->id)
         ->first();
+
+        // Get perjanjian kinerja berdasarkan auditee_id dan periode_id
+        if ($auditess) {
+            $perjanjianKinerja = \App\Models\PerjanjianKinerja::where('auditee_id', $auditess->auditee_id)
+                ->where('periode_id', $auditess->periode_id)
+                ->first();
+            
+            $auditess->perjanjianKinerja = $perjanjianKinerja;
+        }
 
         // Add audit status for the current auditor
         $auditess->audit_status = $this->getAuditStatus($pengajuan);
