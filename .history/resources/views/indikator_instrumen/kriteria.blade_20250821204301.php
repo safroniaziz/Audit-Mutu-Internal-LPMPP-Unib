@@ -57,6 +57,54 @@
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
         }
+        /* CKEditor styling */
+        .ck-editor__editable_inline {
+            min-height: 100px;
+        }
+        .ck.ck-editor__main > .ck-editor__editable:not(.ck-focused) {
+            border-color: #ced4da;
+        }
+        /* Ensure textarea is accessible for form validation but hidden */
+        .ck-editor textarea {
+            position: absolute !important;
+            left: -9999px !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            /* Ensure it's still focusable for validation */
+            tabindex: -1 !important;
+        }
+        /* Validation styling */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        .ck.ck-editor__main > .ck-editor__editable.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        /* Disabled field styling */
+        .form-select:disabled {
+            background-color: #f8f9fa !important;
+            opacity: 1 !important;
+            cursor: not-allowed !important;
+            color: #495057 !important;
+        }
+        /* Ensure disabled select shows the selected text */
+        .form-select:disabled option:checked {
+            color: #495057 !important;
+            background-color: #f8f9fa !important;
+        }
+        /* Force display of selected option text in disabled select */
+        .form-select:disabled {
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+        }
+        .form-select:disabled option {
+            color: #495057 !important;
+        }
     </style>
 @endpush
 
@@ -65,6 +113,7 @@
         <div id="kt_app_content_container" class="app-container container-xxl">
             <div class="card">
                 <div class="card-header border-0 pt-6">
+
                     <div class="w-100 mb-2">
                         <div class="alert alert-info d-flex align-items-center p-5">
                             <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
@@ -251,6 +300,7 @@
                                     <option value="{{ $kriteria->id }}">{{ $kriteria->nama_kriteria }}</option>
                                 @endforeach
                             </select>
+                            <input type="hidden" id="hidden_kriteria_id" name="indikator_instrumen_kriteria_id">
                         </div>
                         <input type="hidden" name="indikator_instrumen_id" value="{{ $indikator->id }}">
                         <div class="mb-3">
@@ -267,7 +317,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="metode_perhitungan" class="form-label">Metode Perhitungan</label>
-                            <input type="text" class="form-control" id="metode_perhitungan" name="metode_perhitungan" required>
+                            <textarea class="form-control" id="metode_perhitungan" name="metode_perhitungan" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="target" class="form-label">Target</label>
@@ -283,19 +333,19 @@
                         </div>
                         <div class="mb-3">
                             <label for="uraian" class="form-label">Uraian</label>
-                            <textarea class="form-control" id="uraian" name="uraian"></textarea>
+                            <textarea class="form-control" id="uraian" name="uraian" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="penyebab_tidak_tercapai" class="form-label">Penyebab Tidak Tercapai</label>
-                            <textarea class="form-control" id="penyebab_tidak_tercapai" name="penyebab_tidak_tercapai"></textarea>
+                            <textarea class="form-control" id="penyebab_tidak_tercapai" name="penyebab_tidak_tercapai" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="rencana_perbaikan" class="form-label">Rencana Perbaikan</label>
-                            <textarea class="form-control" id="rencana_perbaikan" name="rencana_perbaikan"></textarea>
+                            <textarea class="form-control" id="rencana_perbaikan" name="rencana_perbaikan" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="indikator_penilaian" class="form-label">Indikator Penilaian</label>
-                            <textarea class="form-control" id="indikator_penilaian" name="indikator_penilaian"></textarea>
+                            <textarea class="form-control" id="indikator_penilaian" name="indikator_penilaian" tabindex="-1"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -361,15 +411,7 @@
                 <form id="formEditElemen">
                     <div class="modal-body">
                         <input type="hidden" id="edit_elemen_id" name="elemen_id">
-                        <div class="mb-3">
-                            <label for="edit_kriteria_id" class="form-label">Kriteria</label>
-                            <select class="form-select" id="edit_kriteria_id" name="indikator_instrumen_kriteria_id" required>
-                                <option value="">Pilih Kriteria</option>
-                                @foreach($kriterias as $kriteria)
-                                    <option value="{{ $kriteria->id }}">{{ $kriteria->nama_kriteria }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <input type="hidden" id="edit_hidden_kriteria_id" name="indikator_instrumen_kriteria_id">
                         <input type="hidden" name="indikator_instrumen_id" value="{{ $indikator->id }}">
                         <div class="mb-3">
                             <label for="edit_elemen" class="form-label">Elemen</label>
@@ -385,7 +427,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_metode_perhitungan" class="form-label">Metode Perhitungan</label>
-                            <input type="text" class="form-control" id="edit_metode_perhitungan" name="metode_perhitungan" required>
+                            <textarea class="form-control" id="edit_metode_perhitungan" name="metode_perhitungan" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="edit_target" class="form-label">Target</label>
@@ -401,19 +443,19 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_uraian" class="form-label">Uraian</label>
-                            <textarea class="form-control" id="edit_uraian" name="uraian"></textarea>
+                            <textarea class="form-control" id="edit_uraian" name="uraian" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="edit_penyebab_tidak_tercapai" class="form-label">Penyebab Tidak Tercapai</label>
-                            <textarea class="form-control" id="edit_penyebab_tidak_tercapai" name="penyebab_tidak_tercapai"></textarea>
+                            <textarea class="form-control" id="edit_penyebab_tidak_tercapai" name="penyebab_tidak_tercapai" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="edit_rencana_perbaikan" class="form-label">Rencana Perbaikan</label>
-                            <textarea class="form-control" id="edit_rencana_perbaikan" name="rencana_perbaikan"></textarea>
+                            <textarea class="form-control" id="edit_rencana_perbaikan" name="rencana_perbaikan" tabindex="-1"></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="edit_indikator_penilaian" class="form-label">Indikator Penilaian</label>
-                            <textarea class="form-control" id="edit_indikator_penilaian" name="indikator_penilaian"></textarea>
+                            <textarea class="form-control" id="edit_indikator_penilaian" name="indikator_penilaian" tabindex="-1"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -453,6 +495,9 @@
 @endpush
 
     <script>
+        // Global variable for CKEditor instances
+        window.elemenEditorInstances = {};
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -642,6 +687,7 @@
             let kriteriaNama = $(this).data('kriteria-nama');
 
             $('#indikator_instrumen_kriteria_id').val(kriteriaId);
+            $('#hidden_kriteria_id').val(kriteriaId);
             $('#indikator_instrumen_kriteria_id').prop('disabled', true);
             $('#modalTambahElemenLabel').text('Tambah Elemen - ' + kriteriaNama);
             $('#modalTambahElemen').modal('show');
@@ -651,10 +697,97 @@
         $('#modalTambahElemen').on('hidden.bs.modal', function() {
             $('#formTambahElemen')[0].reset();
             $('#indikator_instrumen_kriteria_id').val('').prop('disabled', true);
+            $('#hidden_kriteria_id').val('');
+            // Reset CKEditor content
+            const addEditorFields = [
+                'uraian',
+                'penyebab_tidak_tercapai',
+                'rencana_perbaikan',
+                'indikator_penilaian',
+                'metode_perhitungan'
+            ];
+            addEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].setData('');
+                }
+            });
+            // Remove validation classes
+            $('.is-invalid').removeClass('is-invalid');
         });
 
         $('#formTambahElemen').on('submit', function(e) {
             e.preventDefault();
+
+            // Update CKEditor content to textarea before submit
+            const addEditorFields = [
+                'uraian',
+                'penyebab_tidak_tercapai',
+                'rencana_perbaikan',
+                'indikator_penilaian',
+                'metode_perhitungan'
+            ];
+            addEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].updateSourceElement();
+                }
+            });
+
+            // Manual form validation
+            let isValid = true;
+            const requiredFields = ['elemen', 'indikator', 'sumber_data', 'target', 'realisasi', 'standar_digunakan'];
+
+            // Validate kriteria field
+            const kriteriaValue = $('#hidden_kriteria_id').val();
+            if (!kriteriaValue || kriteriaValue.trim() === '') {
+                isValid = false;
+                $('#indikator_instrumen_kriteria_id').addClass('is-invalid');
+            } else {
+                $('#indikator_instrumen_kriteria_id').removeClass('is-invalid');
+            }
+
+            // Validate regular fields
+            requiredFields.forEach(fieldName => {
+                const field = $(`[name="${fieldName}"]`);
+                if (!field.val() || field.val().trim() === '') {
+                    isValid = false;
+                    field.addClass('is-invalid');
+                } else {
+                    field.removeClass('is-invalid');
+                }
+            });
+
+            // Validate CKEditor fields (only metode_perhitungan is required)
+            const ckEditorFields = ['metode_perhitungan'];
+            ckEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    const content = window.elemenEditorInstances[fieldId].getData();
+                    const textarea = document.getElementById(fieldId);
+                    if (!content || content.trim() === '' || content === '<p></p>') {
+                        isValid = false;
+                        if (textarea) {
+                            $(textarea).addClass('is-invalid');
+                        }
+                        // Add visual indicator to CKEditor
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
+                        $(editorElement).addClass('is-invalid');
+                    } else {
+                        if (textarea) {
+                            $(textarea).removeClass('is-invalid');
+                        }
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
+                        $(editorElement).removeClass('is-invalid');
+                    }
+                }
+            });
+
+            if (!isValid) {
+                Swal.fire({
+                    title: 'Validasi Error',
+                    text: 'Mohon lengkapi semua field yang wajib diisi.',
+                    icon: 'error'
+                });
+                return;
+            }
 
             $.ajax({
                 url: "{{ route('instrumenProdi.store') }}",
@@ -671,11 +804,26 @@
                     });
                 },
                 error: function(xhr) {
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: 'Terjadi kesalahan saat menambahkan elemen.',
-                        icon: 'error'
-                    });
+                    let errors = xhr.responseJSON?.errors;
+                    if (errors) {
+                        let errorMessages = Object.values(errors).map(errorArray =>
+                            errorArray.map(error => `
+                                <div style="margin: 4px auto; padding-bottom: 4px; color: red; font-weight: 500; text-align: center; border-bottom: 1px solid #ccc; width: 80%;">${error}</div>`
+                            ).join('')
+                        ).join('');
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan!',
+                            html: `<div style="font-size: 1rem;">${errorMessages}</div>`,
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan saat menambahkan elemen.',
+                            icon: 'error'
+                        });
+                    }
                 }
             });
         });
@@ -694,31 +842,23 @@
                     if (response.success) {
                         let data = response.data;
 
+                        // Store kriteria ID for later use
+                        window.editKriteriaId = data.indikator_instrumen_kriteria_id;
+
                         $('#edit_elemen_id').val(id);
                         $('#edit_elemen').val(data.elemen);
-                        $('#edit_kriteria_id').val(data.indikator_instrumen_kriteria_id);
                         $('#edit_indikator').val(data.indikator);
                         $('#edit_sumber_data').val(data.sumber_data);
-                        $('#edit_metode_perhitungan').val(data.metode_perhitungan);
                         $('#edit_target').val(data.target);
                         $('#edit_realisasi').val(data.realisasi);
                         $('#edit_standar_digunakan').val(data.standar_digunakan);
 
-                        // Set CKEditor content
-                        if (elemenEditorInstances['edit_uraian']) {
-                            elemenEditorInstances['edit_uraian'].setData(data.uraian || '');
-                        }
-                        if (elemenEditorInstances['edit_penyebab_tidak_tercapai']) {
-                            elemenEditorInstances['edit_penyebab_tidak_tercapai'].setData(data.penyebab_tidak_tercapai || '');
-                        }
-                        if (elemenEditorInstances['edit_rencana_perbaikan']) {
-                            elemenEditorInstances['edit_rencana_perbaikan'].setData(data.rencana_perbaikan || '');
-                        }
-                        if (elemenEditorInstances['edit_indikator_penilaian']) {
-                            elemenEditorInstances['edit_indikator_penilaian'].setData(data.indikator_penilaian || '');
-                        }
+                        // Store data for form fields (will be set after modal is shown)
+                        window.editElemenData = data;
+                        window.editKriteriaId = data.indikator_instrumen_kriteria_id;
 
                         $('#modalEditElemenLabel').text('Edit Elemen - ' + elemen);
+                        $('#modalEditElemen').modal('show');
                     }
                 },
                 error: function(xhr) {
@@ -731,9 +871,126 @@
             });
         });
 
+        // Reset form edit elemen ketika modal ditutup
+        $('#modalEditElemen').on('hidden.bs.modal', function() {
+            $('#formEditElemen')[0].reset();
+            $('#edit_hidden_kriteria_id').val('');
+            // Reset CKEditor content
+            const editEditorFields = [
+                'edit_uraian',
+                'edit_penyebab_tidak_tercapai',
+                'edit_rencana_perbaikan',
+                'edit_indikator_penilaian',
+                'edit_metode_perhitungan'
+            ];
+            editEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].setData('');
+                }
+            });
+            // Remove validation classes
+            $('.is-invalid').removeClass('is-invalid');
+            // Clear stored data
+            window.editElemenData = null;
+            window.editKriteriaId = null;
+        });
+
+        // Remove validation classes when user starts typing
+        $(document).on('input', 'input, textarea', function() {
+            $(this).removeClass('is-invalid');
+        });
+
+        // Remove validation classes when user selects kriteria
+        $(document).on('change', 'select', function() {
+            $(this).removeClass('is-invalid');
+        });
+
+        // Remove validation classes when CKEditor content changes
+        function addCKEditorChangeListener(fieldId) {
+            if (window.elemenEditorInstances[fieldId]) {
+                window.elemenEditorInstances[fieldId].model.document.on('change:data', function() {
+                    const textarea = document.getElementById(fieldId);
+                    if (textarea) {
+                        $(textarea).removeClass('is-invalid');
+                    }
+                    // Remove visual indicator from CKEditor
+                    const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
+                    $(editorElement).removeClass('is-invalid');
+                });
+            }
+        }
+
         // Handle submit edit elemen
         $('#formEditElemen').on('submit', function(e) {
             e.preventDefault();
+
+            // Update CKEditor content to textarea before submit
+            const editEditorFields = [
+                'edit_uraian',
+                'edit_penyebab_tidak_tercapai',
+                'edit_rencana_perbaikan',
+                'edit_indikator_penilaian',
+                'edit_metode_perhitungan'
+            ];
+            editEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].updateSourceElement();
+                }
+            });
+
+            // Manual form validation
+            let isValid = true;
+
+            // Validate kriteria field (hidden input)
+            const kriteriaValue = $('#edit_hidden_kriteria_id').val();
+            if (!kriteriaValue || kriteriaValue.trim() === '') {
+                isValid = false;
+            }
+
+            // Validate required input fields
+            const requiredInputFields = ['edit_elemen', 'edit_indikator', 'edit_sumber_data', 'edit_target', 'edit_realisasi', 'edit_standar_digunakan'];
+            requiredInputFields.forEach(fieldId => {
+                const field = $(`#${fieldId}`);
+                if (!field.val() || field.val().trim() === '') {
+                    isValid = false;
+                    field.addClass('is-invalid');
+                } else {
+                    field.removeClass('is-invalid');
+                }
+            });
+
+            // Validate CKEditor fields (only metode_perhitungan is required)
+            const ckEditorFields = ['edit_metode_perhitungan'];
+            ckEditorFields.forEach(fieldId => {
+                if (window.elemenEditorInstances[fieldId]) {
+                    const content = window.elemenEditorInstances[fieldId].getData();
+                    const textarea = document.getElementById(fieldId);
+                    if (!content || content.trim() === '' || content === '<p></p>') {
+                        isValid = false;
+                        if (textarea) {
+                            $(textarea).addClass('is-invalid');
+                        }
+                        // Add visual indicator to CKEditor
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
+                        $(editorElement).addClass('is-invalid');
+                    } else {
+                        if (textarea) {
+                            $(textarea).removeClass('is-invalid');
+                        }
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
+                        $(editorElement).removeClass('is-invalid');
+                    }
+                }
+            });
+
+            if (!isValid) {
+                Swal.fire({
+                    title: 'Validasi Error',
+                    text: 'Mohon lengkapi semua field yang wajib diisi.',
+                    icon: 'error'
+                });
+                return;
+            }
 
             let elemenId = $('#edit_elemen_id').val();
 
@@ -752,11 +1009,26 @@
                     });
                 },
                 error: function(xhr) {
-                    Swal.fire({
-                        title: 'Gagal!',
-                        text: 'Terjadi kesalahan saat mengupdate elemen.',
-                        icon: 'error'
-                    });
+                    let errors = xhr.responseJSON?.errors;
+                    if (errors) {
+                        let errorMessages = Object.values(errors).map(errorArray =>
+                            errorArray.map(error => `
+                                <div style="margin: 4px auto; padding-bottom: 4px; color: red; font-weight: 500; text-align: center; border-bottom: 1px solid #ccc; width: 80%;">${error}</div>`
+                            ).join('')
+                        ).join('');
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi Kesalahan!',
+                            html: `<div style="font-size: 1rem;">${errorMessages}</div>`,
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: 'Terjadi kesalahan saat mengupdate elemen.',
+                            icon: 'error'
+                        });
+                    }
                 }
             });
         });
@@ -923,24 +1195,14 @@
             });
         });
 
-        // Inisialisasi CKEditor untuk textarea pada tambah/edit elemen
-        const elemenEditorFields = [
-            'uraian',
-            'penyebab_tidak_tercapai',
-            'rencana_perbaikan',
-            'indikator_penilaian',
-            'edit_uraian',
-            'edit_penyebab_tidak_tercapai',
-            'edit_rencana_perbaikan',
-            'edit_indikator_penilaian'
-        ];
-        const elemenEditorInstances = {};
-        elemenEditorFields.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
+                // Function to initialize CKEditor
+        function initializeCKEditor(elementId) {
+            const element = document.getElementById(elementId);
+            if (element && !window.elemenEditorInstances[elementId]) {
                 ClassicEditor.create(element, {
                     toolbar: ['bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
                     autoParagraph: false,
+                    removePlugins: ['CKFinderUploadAdapter', 'CKFinder', 'EasyImage', 'Image', 'ImageCaption', 'ImageStyle', 'ImageToolbar', 'ImageUpload'],
                     numberedList: {
                         options: [
                             { number: ['1', '2', '3'] },
@@ -956,7 +1218,7 @@
                         ]
                     }
                 }).then(editor => {
-                    elemenEditorInstances[id] = editor;
+                    window.elemenEditorInstances[elementId] = editor;
 
                     const editable = editor.ui.view.editable.element;
 
@@ -976,10 +1238,55 @@
 
                     adjustHeight();
                     editor.model.document.on('change:data', adjustHeight);
+
+                    // Add change listener for validation
+                    addCKEditorChangeListener(elementId);
+
+                    // If this is edit modal and we have data, set it now
+                    if (window.editElemenData && elementId.startsWith('edit_')) {
+                        const data = window.editElemenData;
+                        const fieldName = elementId.replace('edit_', '');
+                        if (data[fieldName]) {
+                            editor.setData(data[fieldName]);
+                        }
+                    }
                 }).catch(error => {
-                    console.error(`Error initializing CKEditor for #${id}:`, error);
+                    console.error(`Error initializing CKEditor for #${elementId}:`, error);
                 });
             }
+        }
+
+        // Initialize CKEditor for add elemen modal when it's shown
+        $('#modalTambahElemen').on('shown.bs.modal', function() {
+            const addEditorFields = [
+                'uraian',
+                'penyebab_tidak_tercapai',
+                'rencana_perbaikan',
+                'indikator_penilaian',
+                'metode_perhitungan'
+            ];
+            addEditorFields.forEach(fieldId => {
+                initializeCKEditor(fieldId);
+            });
+        });
+
+                // Initialize CKEditor for edit elemen modal when it's shown
+        $('#modalEditElemen').on('shown.bs.modal', function() {
+                        // Set kriteria ID to hidden input
+            if (window.editKriteriaId) {
+                $('#edit_hidden_kriteria_id').val(window.editKriteriaId);
+            }
+
+            const editEditorFields = [
+                'edit_uraian',
+                'edit_penyebab_tidak_tercapai',
+                'edit_rencana_perbaikan',
+                'edit_indikator_penilaian',
+                'edit_metode_perhitungan'
+            ];
+            editEditorFields.forEach(fieldId => {
+                initializeCKEditor(fieldId);
+            });
         });
     </script>
 @endpush

@@ -496,7 +496,7 @@
 
     <script>
         // Global variable for CKEditor instances
-        const elemenEditorInstances = {};
+        window.elemenEditorInstances = {};
 
         $.ajaxSetup({
             headers: {
@@ -707,8 +707,8 @@
                 'metode_perhitungan'
             ];
             addEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    elemenEditorInstances[fieldId].setData('');
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].setData('');
                 }
             });
             // Remove validation classes
@@ -727,8 +727,8 @@
                 'metode_perhitungan'
             ];
             addEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    elemenEditorInstances[fieldId].updateSourceElement();
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].updateSourceElement();
                 }
             });
 
@@ -759,8 +759,8 @@
             // Validate CKEditor fields (only metode_perhitungan is required)
             const ckEditorFields = ['metode_perhitungan'];
             ckEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    const content = elemenEditorInstances[fieldId].getData();
+                if (window.elemenEditorInstances[fieldId]) {
+                    const content = window.elemenEditorInstances[fieldId].getData();
                     const textarea = document.getElementById(fieldId);
                     if (!content || content.trim() === '' || content === '<p></p>') {
                         isValid = false;
@@ -768,13 +768,13 @@
                             $(textarea).addClass('is-invalid');
                         }
                         // Add visual indicator to CKEditor
-                        const editorElement = elemenEditorInstances[fieldId].ui.view.editable.element;
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
                         $(editorElement).addClass('is-invalid');
                     } else {
                         if (textarea) {
                             $(textarea).removeClass('is-invalid');
                         }
-                        const editorElement = elemenEditorInstances[fieldId].ui.view.editable.element;
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
                         $(editorElement).removeClass('is-invalid');
                     }
                 }
@@ -884,8 +884,8 @@
                 'edit_metode_perhitungan'
             ];
             editEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    elemenEditorInstances[fieldId].setData('');
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].setData('');
                 }
             });
             // Remove validation classes
@@ -907,14 +907,14 @@
 
         // Remove validation classes when CKEditor content changes
         function addCKEditorChangeListener(fieldId) {
-            if (elemenEditorInstances[fieldId]) {
-                elemenEditorInstances[fieldId].model.document.on('change:data', function() {
+            if (window.elemenEditorInstances[fieldId]) {
+                window.elemenEditorInstances[fieldId].model.document.on('change:data', function() {
                     const textarea = document.getElementById(fieldId);
                     if (textarea) {
                         $(textarea).removeClass('is-invalid');
                     }
                     // Remove visual indicator from CKEditor
-                    const editorElement = elemenEditorInstances[fieldId].ui.view.editable.element;
+                    const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
                     $(editorElement).removeClass('is-invalid');
                 });
             }
@@ -933,8 +933,8 @@
                 'edit_metode_perhitungan'
             ];
             editEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    elemenEditorInstances[fieldId].updateSourceElement();
+                if (window.elemenEditorInstances[fieldId]) {
+                    window.elemenEditorInstances[fieldId].updateSourceElement();
                 }
             });
 
@@ -962,8 +962,8 @@
             // Validate CKEditor fields (only metode_perhitungan is required)
             const ckEditorFields = ['edit_metode_perhitungan'];
             ckEditorFields.forEach(fieldId => {
-                if (elemenEditorInstances[fieldId]) {
-                    const content = elemenEditorInstances[fieldId].getData();
+                if (window.elemenEditorInstances[fieldId]) {
+                    const content = window.elemenEditorInstances[fieldId].getData();
                     const textarea = document.getElementById(fieldId);
                     if (!content || content.trim() === '' || content === '<p></p>') {
                         isValid = false;
@@ -971,13 +971,13 @@
                             $(textarea).addClass('is-invalid');
                         }
                         // Add visual indicator to CKEditor
-                        const editorElement = elemenEditorInstances[fieldId].ui.view.editable.element;
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
                         $(editorElement).addClass('is-invalid');
                     } else {
                         if (textarea) {
                             $(textarea).removeClass('is-invalid');
                         }
-                        const editorElement = elemenEditorInstances[fieldId].ui.view.editable.element;
+                        const editorElement = window.elemenEditorInstances[fieldId].ui.view.editable.element;
                         $(editorElement).removeClass('is-invalid');
                     }
                 }
@@ -1198,7 +1198,7 @@
                 // Function to initialize CKEditor
         function initializeCKEditor(elementId) {
             const element = document.getElementById(elementId);
-            if (element && !elemenEditorInstances[elementId]) {
+            if (element && !window.elemenEditorInstances[elementId]) {
                 ClassicEditor.create(element, {
                     toolbar: ['bold', 'italic', 'link', '|', 'bulletedList', 'numberedList', '|', 'undo', 'redo'],
                     autoParagraph: false,
@@ -1218,7 +1218,7 @@
                         ]
                     }
                 }).then(editor => {
-                    elemenEditorInstances[elementId] = editor;
+                    window.elemenEditorInstances[elementId] = editor;
 
                     const editable = editor.ui.view.editable.element;
 
