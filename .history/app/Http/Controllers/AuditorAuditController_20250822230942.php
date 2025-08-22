@@ -350,9 +350,9 @@ class AuditorAuditController extends Controller
                         // Update data evaluasi yang sudah ada
                         $oldData = $existingEvaluation->toArray();
                         $existingEvaluation->update([
-                            'deskripsi' => $request->deskripsi[$ikssAuditeeId] ?? null,
-                            'pertanyaan' => $request->pertanyaan[$ikssAuditeeId] ?? null,
-                            'nilai' => $request->nilai[$ikssAuditeeId] ?? null
+                            'deskripsi' => $request->deskripsi[$ikssAuditeeId] ?? '',
+                            'pertanyaan' => $request->pertanyaan[$ikssAuditeeId] ?? '',
+                            'nilai' => $request->nilai[$ikssAuditeeId] ?? ''
                         ]);
 
                         Log::info('Updated existing evaluation', [
