@@ -121,33 +121,17 @@ class AuditeePengajuanAmiController extends Controller
     {
         $unitKerjaId = request()->user()->unit_kerja_id;
         $periodeAktif = PeriodeAktif::whereNull('deleted_at')->latest()->first();
-
+    
         // Check if the user has already filled the form
         $sudahMengisi = IkssAuditee::where('auditee_id', $unitKerjaId)
                     ->where('periode_id', $periodeAktif->id)
                     ->exists();
-
-        // ========== KODE LAMA (DIKOMENTARI) ==========
-        // Kode sebelumnya yang hanya menampilkan SS berdasarkan unit_kerja_id tertentu
-        /*
-        $dataIkssProdi = UnitKerja::with([
-            'indikatorKinerjas' => function ($query) {
-                $query->with(['instrumen' => function ($q) {
-                    $q->where('jenis_auditee', 'prodi');
-                }]);
-            }
-        ])
-        ->where('id', Auth::user()->unit_kerja_id)
-        ->get();
-        */
-
-        // ========== KODE BARU (PERUBAHAN) ==========
-        // Modifikasi untuk menampilkan SEMUA Satuan Standar untuk semua auditee
-        // Setiap program studi dapat memilih elemen yang relevan dengan kondisi mereka
-
+    
+        // UBAH: Ambil semua IndikatorKinerja tanpa filter unit_kerja_id
+        // Tapi tetap buat struktur UnitKerja untuk kompatibilitas view
         $currentUnitKerja = UnitKerja::find($unitKerjaId);
-
-        // Ambil SEMUA IndikatorKinerja dengan jenis_auditee 'prodi' tanpa filter unit_kerja_id
+        
+        // Ambil semua IndikatorKinerja yang memiliki instrumen prodi
         $allIndikatorKinerjas = IndikatorKinerja::with([
             'instrumen' => function ($q) {
                 $q->where('jenis_auditee', 'prodi');
@@ -157,25 +141,24 @@ class AuditeePengajuanAmiController extends Controller
             $query->where('jenis_auditee', 'prodi');
         })
         ->get();
-
+    
         // Assign semua indikator ke unit kerja saat ini untuk kompatibilitas view
         $currentUnitKerja->setRelation('indikatorKinerjas', $allIndikatorKinerjas);
-
+        
         $dataIkssProdi = collect([$currentUnitKerja]);
-        // ========== AKHIR KODE BARU ==========
-
+    
         // Get previously selected options if they exist
         $dataTerpilih = [];
         if ($sudahMengisi) {
             $ikssAuditees = IkssAuditee::where('auditee_id', $unitKerjaId)
                     ->where('periode_id', $periodeAktif->id)
                     ->get();
-
+    
             foreach ($ikssAuditees as $ikssAuditee) {
                 $dataTerpilih['pilihan_'.$ikssAuditee->instrumen_id] = $ikssAuditee->status_target;
             }
         }
-
+    
         return view('auditee/pengajuan_ami/pemilihan_ikss', [
             'dataIkssProdi' => $dataIkssProdi,
             'sudahMengisi' => $sudahMengisi,

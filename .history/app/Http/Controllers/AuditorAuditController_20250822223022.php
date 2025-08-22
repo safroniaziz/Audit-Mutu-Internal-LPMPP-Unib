@@ -275,11 +275,11 @@ class AuditorAuditController extends Controller
             'ikss_auditee_ids' => 'required|array',
             'ikss_auditee_ids.*' => 'required|exists:ikss_auditees,id',
             'pertanyaan' => 'required|array',
-            'pertanyaan.*' => 'nullable|string',
+            'pertanyaan.*' => 'required|string',
             'deskripsi' => 'required|array',
-            'deskripsi.*' => 'nullable|string',
+            'deskripsi.*' => 'required|string',
             'nilai' => 'required|array',
-            'nilai.*' => 'nullable|string'
+            'nilai.*' => 'required|string'
         ], [
             'pengajuan_id.required' => 'ID Pengajuan harus diisi',
             'pengajuan_id.exists' => 'ID Pengajuan tidak valid',
@@ -287,9 +287,15 @@ class AuditorAuditController extends Controller
             'ikss_auditee_ids.array' => 'Format data IKSS tidak valid',
             'ikss_auditee_ids.*.required' => 'ID IKSS tidak boleh kosong',
             'ikss_auditee_ids.*.exists' => 'ID IKSS tidak valid',
-            'pertanyaan.array' => 'Format pertanyaan tidak valid',
-            'deskripsi.array' => 'Format deskripsi penilaian tidak valid',
-            'nilai.array' => 'Format nilai tidak valid'
+            'pertanyaan.required' => 'Deskripsi penilaian harus diisi',
+            'pertanyaan.array' => 'Format deskripsi penilaian tidak valid',
+            'pertanyaan.*.required' => 'Deskripsi penilaian tidak boleh kosong',
+            'deskripsi.required' => 'Pertanyaan harus diisi',
+            'deskripsi.array' => 'Format pertanyaan tidak valid',
+            'deskripsi.*.required' => 'Pertanyaan tidak boleh kosong',
+            'nilai.required' => 'Nilai harus diisi',
+            'nilai.array' => 'Format nilai tidak valid',
+            'nilai.*.required' => 'Nilai tidak boleh kosong'
         ]);
 
         if ($validator->fails()) {
@@ -306,16 +312,6 @@ class AuditorAuditController extends Controller
             $pengajuanId = $request->pengajuan_id;
             $auditorId = Auth::user()->id;
 
-            // Log untuk debugging
-            \Log::info('Submit Desk Evaluation', [
-                'pengajuan_id' => $pengajuanId,
-                'auditor_id' => $auditorId,
-                'ikss_auditee_ids' => $request->ikss_auditee_ids,
-                'deskripsi' => $request->deskripsi,
-                'pertanyaan' => $request->pertanyaan,
-                'nilai' => $request->nilai
-            ]);
-
             foreach ($request->ikss_auditee_ids as $ikssAuditeeId) {
                 // Cek apakah auditor ini sudah mengevaluasi IKSS ini
                 $existingEvaluation = IkssAuditeeNilai::where('pengajuan_ami_id', $pengajuanId)
@@ -325,7 +321,7 @@ class AuditorAuditController extends Controller
 
                 if (!$existingEvaluation) {
                     // Simpan data evaluasi baru
-                    $newEvaluation = IkssAuditeeNilai::create([
+                    IkssAuditeeNilai::create([
                         'pengajuan_ami_id' => $pengajuanId,
                         'ikss_auditee_id' => $ikssAuditeeId,
                         'auditor_id' => $auditorId,
@@ -333,26 +329,12 @@ class AuditorAuditController extends Controller
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                     ]);
-
-                    Log::info('Created new evaluation', [
-                        'evaluation_id' => $newEvaluation->id,
-                        'ikss_auditee_id' => $ikssAuditeeId,
-                        'data' => $newEvaluation->toArray()
-                    ]);
                 } else {
                     // Update data evaluasi yang sudah ada
-                    $oldData = $existingEvaluation->toArray();
                     $existingEvaluation->update([
                         'deskripsi' => $request->deskripsi[$ikssAuditeeId],
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
-                    ]);
-
-                    Log::info('Updated existing evaluation', [
-                        'evaluation_id' => $existingEvaluation->id,
-                        'ikss_auditee_id' => $ikssAuditeeId,
-                        'old_data' => $oldData,
-                        'new_data' => $existingEvaluation->fresh()->toArray()
                     ]);
                 }
             }

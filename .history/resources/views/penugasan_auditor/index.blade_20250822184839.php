@@ -238,7 +238,7 @@
                 @endforelse
             </div>
 
-            @include('layouts.partials._modal_penugasan_auditor')
+            @include('layouts.partials.modal_penugasan_auditor')
         </div>
     </div>
 @endsection
@@ -596,6 +596,13 @@
                     loadExistingAssignments(id);
                 });
             });
+
+            // Change button text to Update for edit mode
+            const submitBtn = document.getElementById('btnSimpanPenugasan');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-check fs-2 me-1"></i>Update Penugasan';
+                submitBtn.setAttribute('data-mode', 'edit');
+            }
         }
 
         // Function to check for audit activities
@@ -782,22 +789,7 @@
             fetch(`/penugasan-auditor/get-existing-assignments/${penugasanId}`)
                 .then(response => response.json())
                 .then(data => {
-                    const submitBtn = document.getElementById('btnSimpanPenugasan');
-
                     if (data.success && data.assignments) {
-                        // Check if there are existing assignments
-                        const hasExistingAssignments = (Array.isArray(data.assignments) && data.assignments.length > 0) ||
-                            (typeof data.assignments === 'object' &&
-                             (data.assignments.ketua || data.assignments.pendamping || data.assignments.pendamping_kedua));
-
-                        if (hasExistingAssignments) {
-                            // Change button text to indicate update operation
-                            submitBtn.innerHTML = 'Update Penugasan';
-                        } else {
-                            // Change button text to indicate create operation
-                            submitBtn.innerHTML = 'Simpan';
-                        }
-
                         // Clear previous selections
                         document.getElementById('auditor1').value = '';
                         document.getElementById('auditor2').value = '';
@@ -850,16 +842,10 @@
                                 }
                             }
                         }
-                    } else {
-                        // No existing assignments, this is a create operation
-                        submitBtn.innerHTML = 'Simpan';
                     }
                 })
                 .catch(error => {
                     console.error('Error loading existing assignments:', error);
-                    // Default to create operation on error
-                    const submitBtn = document.getElementById('btnSimpanPenugasan');
-                    submitBtn.innerHTML = 'Simpan';
                 });
         }
 
@@ -879,11 +865,12 @@
 
                     // Reset form state
                     enableAllFormFields();
-
-                    // Reset button text
+                    
+                    // Reset button text and mode
                     const submitBtn = document.getElementById('btnSimpanPenugasan');
                     if (submitBtn) {
-                        submitBtn.innerHTML = 'Simpan';
+                        submitBtn.innerHTML = '<i class="fas fa-check fs-2 me-1"></i>Simpan Penugasan';
+                        submitBtn.removeAttribute('data-mode');
                     }
                 });
             }
@@ -916,7 +903,7 @@
                     };
 
                     // Determine if this is an update or create operation
-                    const isUpdate = originalText.includes('Update');
+                    const isUpdate = submitBtn.getAttribute('data-mode') === 'edit';
                     const url = isUpdate ? '/penugasan-auditor/update-penugasan-auditor' : '/penugasan-auditor/save-penugasan-auditor';
 
                     // Send data via AJAX

@@ -393,7 +393,7 @@
                                             !empty($deskEvaluation[$ikssAuditee->id]->deskripsi) &&
                                             !empty($deskEvaluation[$ikssAuditee->id]->pertanyaan) &&
                                             !empty($deskEvaluation[$ikssAuditee->id]->nilai);
-
+                                        
                                         // Check if there's any partial evaluation data
                                         $hasPartialEvaluation = isset($deskEvaluation[$ikssAuditee->id]) &&
                                             (!empty($deskEvaluation[$ikssAuditee->id]->deskripsi) ||
@@ -412,10 +412,6 @@
                                                 @if($hasEvaluation)
                                                     <span class="badge bg-success-subtle text-success border border-success">
                                                         ✅ Sudah Dievaluasi
-                                                    </span>
-                                                @elseif($hasPartialEvaluation)
-                                                    <span class="badge bg-warning-subtle text-warning border border-warning">
-                                                        ⚠️ Sebagian Terisi
                                                     </span>
                                                 @endif
                                             </div>
@@ -491,7 +487,7 @@
                                                     <textarea rows="2" class="form-control @error('deskripsi.'.$ikssAuditee->id) is-invalid @enderror"
                                                               name="deskripsi[{{ $ikssAuditee->id }}]"
                                                               {{ ($hasEvaluation || $setuju) ? 'disabled' : '' }}
-                                                              required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->deskripsi) ? $deskEvaluation[$ikssAuditee->id]->deskripsi : old('deskripsi.'.$ikssAuditee->id) }}</textarea>
+                                                              required>{{ $hasEvaluation ? $deskEvaluation[$ikssAuditee->id]->deskripsi : old('deskripsi.'.$ikssAuditee->id) }}</textarea>
                                                     @error('deskripsi.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -501,7 +497,7 @@
                                                     <textarea rows="2" class="form-control @error('pertanyaan.'.$ikssAuditee->id) is-invalid @enderror"
                                                               name="pertanyaan[{{ $ikssAuditee->id }}]"
                                                               {{ ($hasEvaluation || $setuju) ? 'disabled' : '' }}
-                                                              required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->pertanyaan) ? $deskEvaluation[$ikssAuditee->id]->pertanyaan : old('pertanyaan.'.$ikssAuditee->id) }}</textarea>
+                                                              required>{{ $hasEvaluation ? $deskEvaluation[$ikssAuditee->id]->pertanyaan : old('pertanyaan.'.$ikssAuditee->id) }}</textarea>
                                                     @error('pertanyaan.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
@@ -513,11 +509,11 @@
                                                             {{ ($hasEvaluation || $setuju) ? 'disabled' : '' }}
                                                             required>
                                                         <option value="">Pilih Nilai</option>
-                                                        <option value="0" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '0') || old('nilai.'.$ikssAuditee->id) == '0' ? 'selected' : '' }}>0</option>
-                                                        <option value="1" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '1') || old('nilai.'.$ikssAuditee->id) == '1' ? 'selected' : '' }}>1</option>
-                                                        <option value="2" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '2') || old('nilai.'.$ikssAuditee->id) == '2' ? 'selected' : '' }}>2</option>
-                                                        <option value="3" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '3') || old('nilai.'.$ikssAuditee->id) == '3' ? 'selected' : '' }}>3</option>
-                                                        <option value="4" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>
+                                                        <option value="0" {{ ($hasEvaluation && $deskEvaluation[$ikssAuditee->id]->nilai == '0') || old('nilai.'.$ikssAuditee->id) == '0' ? 'selected' : '' }}>0</option>
+                                                        <option value="1" {{ ($hasEvaluation && $deskEvaluation[$ikssAuditee->id]->nilai == '1') || old('nilai.'.$ikssAuditee->id) == '1' ? 'selected' : '' }}>1</option>
+                                                        <option value="2" {{ ($hasEvaluation && $deskEvaluation[$ikssAuditee->id]->nilai == '2') || old('nilai.'.$ikssAuditee->id) == '2' ? 'selected' : '' }}>2</option>
+                                                        <option value="3" {{ ($hasEvaluation && $deskEvaluation[$ikssAuditee->id]->nilai == '3') || old('nilai.'.$ikssAuditee->id) == '3' ? 'selected' : '' }}>3</option>
+                                                        <option value="4" {{ ($hasEvaluation && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>
                                                     </select>
                                                     @error('nilai.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>

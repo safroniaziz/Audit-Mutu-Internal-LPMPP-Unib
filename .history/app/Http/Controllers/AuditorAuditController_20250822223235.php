@@ -305,7 +305,7 @@ class AuditorAuditController extends Controller
 
             $pengajuanId = $request->pengajuan_id;
             $auditorId = Auth::user()->id;
-
+            
             // Log untuk debugging
             \Log::info('Submit Desk Evaluation', [
                 'pengajuan_id' => $pengajuanId,
@@ -333,7 +333,7 @@ class AuditorAuditController extends Controller
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                     ]);
-
+                    
                     Log::info('Created new evaluation', [
                         'evaluation_id' => $newEvaluation->id,
                         'ikss_auditee_id' => $ikssAuditeeId,
@@ -347,7 +347,7 @@ class AuditorAuditController extends Controller
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                     ]);
-
+                    
                     Log::info('Updated existing evaluation', [
                         'evaluation_id' => $existingEvaluation->id,
                         'ikss_auditee_id' => $ikssAuditeeId,

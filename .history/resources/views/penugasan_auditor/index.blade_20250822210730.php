@@ -782,22 +782,7 @@
             fetch(`/penugasan-auditor/get-existing-assignments/${penugasanId}`)
                 .then(response => response.json())
                 .then(data => {
-                    const submitBtn = document.getElementById('btnSimpanPenugasan');
-
                     if (data.success && data.assignments) {
-                        // Check if there are existing assignments
-                        const hasExistingAssignments = (Array.isArray(data.assignments) && data.assignments.length > 0) ||
-                            (typeof data.assignments === 'object' &&
-                             (data.assignments.ketua || data.assignments.pendamping || data.assignments.pendamping_kedua));
-
-                        if (hasExistingAssignments) {
-                            // Change button text to indicate update operation
-                            submitBtn.innerHTML = 'Update Penugasan';
-                        } else {
-                            // Change button text to indicate create operation
-                            submitBtn.innerHTML = 'Simpan';
-                        }
-
                         // Clear previous selections
                         document.getElementById('auditor1').value = '';
                         document.getElementById('auditor2').value = '';
@@ -850,16 +835,10 @@
                                 }
                             }
                         }
-                    } else {
-                        // No existing assignments, this is a create operation
-                        submitBtn.innerHTML = 'Simpan';
                     }
                 })
                 .catch(error => {
                     console.error('Error loading existing assignments:', error);
-                    // Default to create operation on error
-                    const submitBtn = document.getElementById('btnSimpanPenugasan');
-                    submitBtn.innerHTML = 'Simpan';
                 });
         }
 
@@ -879,12 +858,6 @@
 
                     // Reset form state
                     enableAllFormFields();
-
-                    // Reset button text
-                    const submitBtn = document.getElementById('btnSimpanPenugasan');
-                    if (submitBtn) {
-                        submitBtn.innerHTML = 'Simpan';
-                    }
                 });
             }
 

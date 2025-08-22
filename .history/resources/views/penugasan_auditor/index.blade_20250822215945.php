@@ -783,13 +783,13 @@
                 .then(response => response.json())
                 .then(data => {
                     const submitBtn = document.getElementById('btnSimpanPenugasan');
-
+                    
                     if (data.success && data.assignments) {
                         // Check if there are existing assignments
                         const hasExistingAssignments = (Array.isArray(data.assignments) && data.assignments.length > 0) ||
-                            (typeof data.assignments === 'object' &&
+                            (typeof data.assignments === 'object' && 
                              (data.assignments.ketua || data.assignments.pendamping || data.assignments.pendamping_kedua));
-
+                        
                         if (hasExistingAssignments) {
                             // Change button text to indicate update operation
                             submitBtn.innerHTML = 'Update Penugasan';
@@ -797,7 +797,7 @@
                             // Change button text to indicate create operation
                             submitBtn.innerHTML = 'Simpan';
                         }
-
+                        
                         // Clear previous selections
                         document.getElementById('auditor1').value = '';
                         document.getElementById('auditor2').value = '';
@@ -879,7 +879,7 @@
 
                     // Reset form state
                     enableAllFormFields();
-
+                    
                     // Reset button text
                     const submitBtn = document.getElementById('btnSimpanPenugasan');
                     if (submitBtn) {

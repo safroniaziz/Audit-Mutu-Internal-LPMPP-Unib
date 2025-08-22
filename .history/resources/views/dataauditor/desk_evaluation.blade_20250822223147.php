@@ -393,7 +393,7 @@
                                             !empty($deskEvaluation[$ikssAuditee->id]->deskripsi) &&
                                             !empty($deskEvaluation[$ikssAuditee->id]->pertanyaan) &&
                                             !empty($deskEvaluation[$ikssAuditee->id]->nilai);
-
+                                        
                                         // Check if there's any partial evaluation data
                                         $hasPartialEvaluation = isset($deskEvaluation[$ikssAuditee->id]) &&
                                             (!empty($deskEvaluation[$ikssAuditee->id]->deskripsi) ||
