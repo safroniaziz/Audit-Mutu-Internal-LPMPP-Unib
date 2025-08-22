@@ -796,7 +796,7 @@ class UnitKerjaSeeder extends Seeder
             // S3 yang kurang
             ['nama_unit_kerja' => 'S3 Linguistik', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S3', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A3A'],
             ['nama_unit_kerja' => 'S3 PSDA', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S3', 'fakultas' => 'Pertanian', 'kode_unit_kerja' => 'C3A'],
-
+            
             // S2 yang kurang
             ['nama_unit_kerja' => 'S2 Pendidikan IPA', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A2E'],
             ['nama_unit_kerja' => 'S2 Pendidikan Matematika', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A2F'],
@@ -812,7 +812,7 @@ class UnitKerjaSeeder extends Seeder
             ['nama_unit_kerja' => 'S2 Statistika', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Matematika dan Ilmu Pengetahuan Alam', 'kode_unit_kerja' => 'B2C'],
             ['nama_unit_kerja' => 'S2 Kenotariatan', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2A'],
             ['nama_unit_kerja' => 'S2 Ilmu Hukum', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2B'],
-
+            
             // S1 yang kurang
             ['nama_unit_kerja' => 'S1 Pendidikan Non Formal', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S1', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A1J'],
             ['nama_unit_kerja' => 'S1 Pendidikan Guru PAUD', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S1', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A1I'],
@@ -928,71 +928,41 @@ class UnitKerjaSeeder extends Seeder
             array('id_auditee' => '400','nama_auditee' => 'S1 TES','ketua_auditee' => 'Dr. TES, SP., M.Si','nip_ketua' => '198987876765565445','nama_fakultas' => 'Pertanian','jenjang' => 'S1','jenis' => 'Prodi','website' => 'unib.ac.id','email' => 'tes@unib.ac.id','no_hp' => '6281367948313','created_at' => '2023-02-21 01:30:59','updated_at' => '2025-02-01 21:22:58')
         );
 
-                // 3. Gabungkan data dari $kelengkapanData ke $data jika nama_unit_kerja cocok dengan nama_auditee
+        // 3. Gabungkan data dari $kelengkapanData ke $data jika nama_unit_kerja cocok dengan nama_auditee
         foreach ($data as &$unit) {
-            // Hapus kolom 'id' karena auto-increment
-            if (isset($unit['id'])) {
-                unset($unit['id']);
-            }
+    // Hapus kolom 'id' karena auto-increment
+    if (isset($unit['id'])) {
+        unset($unit['id']);
+    }
 
-            // Field yang sudah ada di $unit tetapi pastikan ada
-            $unit['kode_unit_kerja'] = $unit['kode_unit_kerja'] ?? '-';
-            $unit['nama_unit_kerja'] = $unit['nama_unit_kerja'] ?? '-';
-            $unit['jenis_unit_kerja'] = $unit['jenis_unit_kerja'] ?? '-';
-            $unit['jenjang'] = $unit['jenjang'] ?? NULL;
-            $unit['fakultas'] = $unit['fakultas'] ?? '-';
+    // Field yang sudah ada di $unit tetapi pastikan ada
+    $unit['kode_unit_kerja'] = $unit['kode_unit_kerja'] ?? '-';
+    $unit['nama_unit_kerja'] = $unit['nama_unit_kerja'] ?? '-';
+    $unit['jenis_unit_kerja'] = $unit['jenis_unit_kerja'] ?? '-';
+    $unit['jenjang'] = $unit['jenjang'] ?? NULL;
+    $unit['fakultas'] = $unit['fakultas'] ?? '-';
 
-            // Field tambahan yang perlu diinisialisasi
-            $unit['nama_ketua'] = $unit['nama_ketua'] ?? null;
-            $unit['nip_ketua'] = $unit['nip_ketua'] ?? null;
-            $unit['website'] = $unit['website'] ?? null;
-            $unit['no_hp'] = $unit['no_hp'] ?? null;
+    // Field tambahan yang perlu diinisialisasi
+    $unit['nama_ketua'] = $unit['nama_ketua'] ?? null;
+    $unit['nip_ketua'] = $unit['nip_ketua'] ?? null;
+    $unit['website'] = $unit['website'] ?? null;
+    $unit['no_hp'] = $unit['no_hp'] ?? null;
 
-            // Timestamp
-            $unit['created_at'] = $unit['created_at'] ?? now();
-            $unit['updated_at'] = $unit['updated_at'] ?? now();
+    // Timestamp
+    $unit['created_at'] = $unit['created_at'] ?? now();
+    $unit['updated_at'] = $unit['updated_at'] ?? now();
 
-            // Cari data tambahan dari $kelengkapanData
-            foreach ($kelengkapanData as $kelengkapan) {
-                if (strtolower(trim($unit['nama_unit_kerja'])) === strtolower(trim($kelengkapan['nama_auditee']))) {
-                    $unit['nama_ketua'] = $kelengkapan['ketua_auditee'];
-                    $unit['nip_ketua'] = $kelengkapan['nip_ketua'];
-                    $unit['website'] = $kelengkapan['website'];
-                    $unit['no_hp'] = $kelengkapan['no_hp'];
-                    break;
-                }
-            }
+    // Cari data tambahan dari $kelengkapanData
+    foreach ($kelengkapanData as $kelengkapan) {
+        if (strtolower(trim($unit['nama_unit_kerja'])) === strtolower(trim($kelengkapan['nama_auditee']))) {
+            $unit['nama_ketua'] = $kelengkapan['ketua_auditee'];
+            $unit['nip_ketua'] = $kelengkapan['nip_ketua'];
+            $unit['website'] = $kelengkapan['website'];
+            $unit['no_hp'] = $kelengkapan['no_hp'];
+            break;
         }
-
-        // 4. Tambahkan prodi baru yang belum ada (cek duplikat)
-        foreach ($prodiBaru as $prodi) {
-            $isDuplicate = false;
-
-            // Cek apakah sudah ada di data lama
-            foreach ($data as $existingUnit) {
-                if (strtolower(trim($existingUnit['nama_unit_kerja'])) === strtolower(trim($prodi['nama_unit_kerja']))) {
-                    $isDuplicate = true;
-                    break;
-                }
-            }
-
-            // Jika tidak duplikat, tambahkan ke data
-            if (!$isDuplicate) {
-                $data[] = [
-                    'kode_unit_kerja' => $prodi['kode_unit_kerja'],
-                    'nama_unit_kerja' => $prodi['nama_unit_kerja'],
-                    'jenis_unit_kerja' => $prodi['jenis_unit_kerja'],
-                    'jenjang' => $prodi['jenjang'],
-                    'fakultas' => $prodi['fakultas'],
-                    'nama_ketua' => null,
-                    'nip_ketua' => null,
-                    'website' => null,
-                    'no_hp' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
+    }
+}
 
 // Untuk debug, tampilkan struktur data sebelum insert
 // dd($data);

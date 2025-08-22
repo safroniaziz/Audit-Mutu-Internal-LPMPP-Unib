@@ -796,7 +796,7 @@ class UnitKerjaSeeder extends Seeder
             // S3 yang kurang
             ['nama_unit_kerja' => 'S3 Linguistik', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S3', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A3A'],
             ['nama_unit_kerja' => 'S3 PSDA', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S3', 'fakultas' => 'Pertanian', 'kode_unit_kerja' => 'C3A'],
-
+            
             // S2 yang kurang
             ['nama_unit_kerja' => 'S2 Pendidikan IPA', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A2E'],
             ['nama_unit_kerja' => 'S2 Pendidikan Matematika', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A2F'],
@@ -812,7 +812,7 @@ class UnitKerjaSeeder extends Seeder
             ['nama_unit_kerja' => 'S2 Statistika', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Matematika dan Ilmu Pengetahuan Alam', 'kode_unit_kerja' => 'B2C'],
             ['nama_unit_kerja' => 'S2 Kenotariatan', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2A'],
             ['nama_unit_kerja' => 'S2 Ilmu Hukum', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2B'],
-
+            
             // S1 yang kurang
             ['nama_unit_kerja' => 'S1 Pendidikan Non Formal', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S1', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A1J'],
             ['nama_unit_kerja' => 'S1 Pendidikan Guru PAUD', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S1', 'fakultas' => 'Keguruan dan Ilmu Pendidikan', 'kode_unit_kerja' => 'A1I'],
@@ -967,7 +967,7 @@ class UnitKerjaSeeder extends Seeder
         // 4. Tambahkan prodi baru yang belum ada (cek duplikat)
         foreach ($prodiBaru as $prodi) {
             $isDuplicate = false;
-
+            
             // Cek apakah sudah ada di data lama
             foreach ($data as $existingUnit) {
                 if (strtolower(trim($existingUnit['nama_unit_kerja'])) === strtolower(trim($prodi['nama_unit_kerja']))) {
@@ -975,7 +975,7 @@ class UnitKerjaSeeder extends Seeder
                     break;
                 }
             }
-
+            
             // Jika tidak duplikat, tambahkan ke data
             if (!$isDuplicate) {
                 $data[] = [

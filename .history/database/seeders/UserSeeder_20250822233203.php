@@ -338,7 +338,7 @@ class UserSeeder extends Seeder
         // Role::whereNotIn('name', $existingRoles)->delete();
 
         // 6. Log untuk monitoring
-        Log::info('UserSeeder: Memproses ' . count($data) . ' user data');
+        \Log::info('UserSeeder: Memproses ' . count($data) . ' user data');
 
         foreach ($data as $key => $newData) {
             $role = match ($newData['role']) {

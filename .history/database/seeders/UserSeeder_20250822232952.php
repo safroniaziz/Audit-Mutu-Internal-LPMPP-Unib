@@ -6,7 +6,6 @@ use App\Models\UnitKerja;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 
 class UserSeeder extends Seeder
 {
@@ -20,7 +19,7 @@ class UserSeeder extends Seeder
             // S3 yang kurang
             ['name' => 'S3 Linguistik', 'username' => 's3linguistik_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S3 Linguistik'],
             ['name' => 'S3 PSDA', 'username' => 's3psda_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S3 PSDA'],
-
+            
             // S2 yang kurang
             ['name' => 'S2 Pendidikan IPA', 'username' => 's2pendidikanipa_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S2 Pendidikan IPA'],
             ['name' => 'S2 Pendidikan Matematika', 'username' => 's2pendidikanmatematika_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S2 Pendidikan Matematika'],
@@ -36,7 +35,7 @@ class UserSeeder extends Seeder
             ['name' => 'S2 Statistika', 'username' => 's2statistika_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S2 Statistika'],
             ['name' => 'S2 Kenotariatan', 'username' => 's2kenotariatan_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S2 Kenotariatan'],
             ['name' => 'S2 Ilmu Hukum', 'username' => 's2ilmuhukum_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S2 Ilmu Hukum'],
-
+            
             // S1 yang kurang
             ['name' => 'S1 Pendidikan Non Formal', 'username' => 's1pendidikannonformal_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S1 Pendidikan Non Formal'],
             ['name' => 'S1 Pendidikan Guru PAUD', 'username' => 's1pendidikangurupaud_ami', 'role' => 'auditee', 'unit_kerja_nama' => 'S1 Pendidikan Guru PAUD'],
@@ -277,69 +276,6 @@ class UserSeeder extends Seeder
             array('id' => '375','nama_auditor' => 'lpmpp','nip' => '198112102008121001','asal_auditor' => 'S1 TEKNIK ELEKTRO','created_at' => '2023-11-17 08:28:35','updated_at' => '2023-11-17 08:28:35')
         );
 
-        // 1. Update unit_kerja_id untuk user yang sudah ada berdasarkan nama prodi
-        foreach ($data as $key => $newData) {
-            if ($newData['role'] === 'auditee' && $newData['name'] !== null) {
-                $nameParts = explode(' ', $newData['name'], 2);
-
-                if (count($nameParts) >= 2) {
-                    $jenjang = strtolower($nameParts[0]);
-                    $namaProdi = $nameParts[1];
-
-                    $unitKerja = UnitKerja::where('jenjang', $jenjang)
-                        ->where('nama_unit_kerja', 'like', '%' . $namaProdi . '%')
-                        ->first();
-
-                    if ($unitKerja) {
-                        $data[$key]['unit_kerja_id'] = $unitKerja->id;
-                    }
-                }
-            }
-        }
-
-        // 2. Tambahkan user baru untuk prodi yang belum ada
-        foreach ($userBaru as $userData) {
-            // Cari unit_kerja berdasarkan nama
-            $unitKerja = UnitKerja::where('nama_unit_kerja', $userData['unit_kerja_nama'])->first();
-
-            if ($unitKerja) {
-                // Generate password dari username (bcrypt)
-                $password = bcrypt($userData['username']);
-
-                $data[] = [
-                    'id' => null, // Auto increment
-                    'unit_kerja_id' => $unitKerja->id,
-                    'name' => $userData['name'],
-                    'username' => $userData['username'],
-                    'email_verified_at' => null,
-                    'email' => strtolower(str_replace([' ', ','], '', $userData['name'])) . '@mail.com',
-                    'role' => $userData['role'],
-                    'password' => $password,
-                    'remember_token' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-        }
-
-        // 3. Update password untuk semua user (kecuali admin) menjadi bcrypt dari username
-        foreach ($data as $key => $newData) {
-            if ($newData['role'] !== 'admin') {
-                $data[$key]['password'] = bcrypt($newData['username']);
-            }
-        }
-
-        // 4. Hapus user yang sudah tidak ada di data (opsional - uncomment jika diperlukan)
-        // $existingUsernames = collect($data)->pluck('username')->toArray();
-        // User::whereNotIn('username', $existingUsernames)->delete();
-
-        // 5. Hapus role yang tidak terpakai (opsional - uncomment jika diperlukan)
-        // $existingRoles = collect($data)->pluck('role')->unique()->toArray();
-        // Role::whereNotIn('name', $existingRoles)->delete();
-
-        // 6. Log untuk monitoring
-        Log::info('UserSeeder: Memproses ' . count($data) . ' user data');
-
         foreach ($data as $key => $newData) {
             $role = match ($newData['role']) {
                 'admin' => 'Administrator',
@@ -404,20 +340,19 @@ class UserSeeder extends Seeder
                 }
             }
 
-                    // Simpan user dengan konsep create or update
-        $user = User::updateOrCreate(
-            ['username' => $newData['username']], // Cari berdasarkan username
-            [
+            // Simpan user tanpa memasukkan kolom 'role' ke dalam database
+            $user = User::create([
                 'name' => $newData['name'],
                 'email' => $newData['email'],
+                'username' => $newData['username'],
                 'password' => $newData['password'],
                 'unit_kerja_id' => $unitKerjaId,
+                'created_at' => now(),
                 'updated_at' => now(),
-            ]
-        );
+            ]);
 
-        // Hapus role lama dan assign role baru (untuk menghindari duplikasi)
-        $user->syncRoles([$role]);
+            // Sinkronisasi role ke setiap user tanpa menyimpannya di kolom 'role'
+            $user->assignRole($role);
         }
     }
 }

@@ -6,7 +6,6 @@ use App\Models\UnitKerja;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 
 class UserSeeder extends Seeder
 {
@@ -329,17 +328,6 @@ class UserSeeder extends Seeder
             }
         }
 
-        // 4. Hapus user yang sudah tidak ada di data (opsional - uncomment jika diperlukan)
-        // $existingUsernames = collect($data)->pluck('username')->toArray();
-        // User::whereNotIn('username', $existingUsernames)->delete();
-
-        // 5. Hapus role yang tidak terpakai (opsional - uncomment jika diperlukan)
-        // $existingRoles = collect($data)->pluck('role')->unique()->toArray();
-        // Role::whereNotIn('name', $existingRoles)->delete();
-
-        // 6. Log untuk monitoring
-        Log::info('UserSeeder: Memproses ' . count($data) . ' user data');
-
         foreach ($data as $key => $newData) {
             $role = match ($newData['role']) {
                 'admin' => 'Administrator',
@@ -404,20 +392,19 @@ class UserSeeder extends Seeder
                 }
             }
 
-                    // Simpan user dengan konsep create or update
-        $user = User::updateOrCreate(
-            ['username' => $newData['username']], // Cari berdasarkan username
-            [
+            // Simpan user tanpa memasukkan kolom 'role' ke dalam database
+            $user = User::create([
                 'name' => $newData['name'],
                 'email' => $newData['email'],
+                'username' => $newData['username'],
                 'password' => $newData['password'],
                 'unit_kerja_id' => $unitKerjaId,
+                'created_at' => now(),
                 'updated_at' => now(),
-            ]
-        );
+            ]);
 
-        // Hapus role lama dan assign role baru (untuk menghindari duplikasi)
-        $user->syncRoles([$role]);
+            // Sinkronisasi role ke setiap user tanpa menyimpannya di kolom 'role'
+            $user->assignRole($role);
         }
     }
 }

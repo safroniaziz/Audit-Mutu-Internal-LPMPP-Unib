@@ -6,7 +6,6 @@ use App\Models\UnitKerja;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Log;
 
 class UserSeeder extends Seeder
 {
@@ -332,13 +331,6 @@ class UserSeeder extends Seeder
         // 4. Hapus user yang sudah tidak ada di data (opsional - uncomment jika diperlukan)
         // $existingUsernames = collect($data)->pluck('username')->toArray();
         // User::whereNotIn('username', $existingUsernames)->delete();
-
-        // 5. Hapus role yang tidak terpakai (opsional - uncomment jika diperlukan)
-        // $existingRoles = collect($data)->pluck('role')->unique()->toArray();
-        // Role::whereNotIn('name', $existingRoles)->delete();
-
-        // 6. Log untuk monitoring
-        Log::info('UserSeeder: Memproses ' . count($data) . ' user data');
 
         foreach ($data as $key => $newData) {
             $role = match ($newData['role']) {
