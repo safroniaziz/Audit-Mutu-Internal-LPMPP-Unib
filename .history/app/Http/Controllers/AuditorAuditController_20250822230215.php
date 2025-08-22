@@ -298,14 +298,14 @@ class AuditorAuditController extends Controller
             $deskripsiKeys = array_keys($request->deskripsi ?? []);
             $pertanyaanKeys = array_keys($request->pertanyaan ?? []);
             $nilaiKeys = array_keys($request->nilai ?? []);
-
+            
             // Cek apakah semua IKSS ID ada di semua array data
             foreach ($ikssIds as $ikssId) {
-                if (!in_array($ikssId, $deskripsiKeys) ||
-                    !in_array($ikssId, $pertanyaanKeys) ||
+                if (!in_array($ikssId, $deskripsiKeys) || 
+                    !in_array($ikssId, $pertanyaanKeys) || 
                     !in_array($ikssId, $nilaiKeys)) {
-
-                    $validator->errors()->add('data_inconsistency',
+                    
+                    $validator->errors()->add('data_inconsistency', 
                         "Data tidak lengkap untuk IKSS ID: {$ikssId}. " .
                         "Deskripsi keys: " . implode(',', $deskripsiKeys) . ". " .
                         "Pertanyaan keys: " . implode(',', $pertanyaanKeys) . ". " .
@@ -342,10 +342,10 @@ class AuditorAuditController extends Controller
 
             foreach ($request->ikss_auditee_ids as $ikssAuditeeId) {
                 // Validasi data yang diperlukan tersedia
-                if (!isset($request->deskripsi[$ikssAuditeeId]) ||
-                    !isset($request->pertanyaan[$ikssAuditeeId]) ||
+                if (!isset($request->deskripsi[$ikssAuditeeId]) || 
+                    !isset($request->pertanyaan[$ikssAuditeeId]) || 
                     !isset($request->nilai[$ikssAuditeeId])) {
-
+                    
                     Log::error('Missing required data for IKSS', [
                         'ikss_auditee_id' => $ikssAuditeeId,
                         'available_deskripsi_keys' => array_keys($request->deskripsi ?? []),
@@ -353,7 +353,7 @@ class AuditorAuditController extends Controller
                         'available_nilai_keys' => array_keys($request->nilai ?? []),
                         'ikss_auditee_ids' => $request->ikss_auditee_ids
                     ]);
-
+                    
                     throw new \Exception("Data tidak lengkap untuk IKSS ID: {$ikssAuditeeId}");
                 }
 
