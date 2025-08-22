@@ -292,7 +292,7 @@ class AuditorAuditController extends Controller
             'nilai.array' => 'Format nilai tidak valid'
         ]);
 
-
+        
 
         if ($validator->fails()) {
             return response()->json([
@@ -333,7 +333,7 @@ class AuditorAuditController extends Controller
                         'auditor_id' => $auditorId,
                         'deskripsi' => $request->deskripsi[$ikssAuditeeId],
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
-                        'nilai' => $request->nilai[$ikssAuditeeId] ?? null
+                        'nilai' => $request->nilai[$ikssAuditeeId]
                     ]);
 
                     Log::info('Created new evaluation', [
@@ -347,7 +347,7 @@ class AuditorAuditController extends Controller
                     $existingEvaluation->update([
                         'deskripsi' => $request->deskripsi[$ikssAuditeeId],
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
-                        'nilai' => $request->nilai[$ikssAuditeeId] ?? null
+                        'nilai' => $request->nilai[$ikssAuditeeId]
                     ]);
 
                     Log::info('Updated existing evaluation', [

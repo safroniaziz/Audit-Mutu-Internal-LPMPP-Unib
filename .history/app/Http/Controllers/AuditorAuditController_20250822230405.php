@@ -292,7 +292,7 @@ class AuditorAuditController extends Controller
             'nilai.array' => 'Format nilai tidak valid'
         ]);
 
-
+        
 
         if ($validator->fails()) {
             return response()->json([

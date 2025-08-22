@@ -292,7 +292,29 @@ class AuditorAuditController extends Controller
             'nilai.array' => 'Format nilai tidak valid'
         ]);
 
+        // Validasi tambahan: pastikan semua IKSS memiliki data yang lengkap
+        if ($validator->passes()) {
+            $ikssIds = $request->ikss_auditee_ids;
+            $deskripsiKeys = array_keys($request->deskripsi ?? []);
+            $pertanyaanKeys = array_keys($request->pertanyaan ?? []);
+            $nilaiKeys = array_keys($request->nilai ?? []);
 
+            // Cek apakah semua IKSS ID ada di semua array data
+            foreach ($ikssIds as $ikssId) {
+                if (!in_array($ikssId, $deskripsiKeys) ||
+                    !in_array($ikssId, $pertanyaanKeys) ||
+                    !in_array($ikssId, $nilaiKeys)) {
+
+                    $validator->errors()->add('data_inconsistency',
+                        "Data tidak lengkap untuk IKSS ID: {$ikssId}. " .
+                        "Deskripsi keys: " . implode(',', $deskripsiKeys) . ". " .
+                        "Pertanyaan keys: " . implode(',', $pertanyaanKeys) . ". " .
+                        "Nilai keys: " . implode(',', $nilaiKeys)
+                    );
+                    break;
+                }
+            }
+        }
 
         if ($validator->fails()) {
             return response()->json([
@@ -319,6 +341,22 @@ class AuditorAuditController extends Controller
             ]);
 
             foreach ($request->ikss_auditee_ids as $ikssAuditeeId) {
+                // Validasi data yang diperlukan tersedia
+                if (!isset($request->deskripsi[$ikssAuditeeId]) ||
+                    !isset($request->pertanyaan[$ikssAuditeeId]) ||
+                    !isset($request->nilai[$ikssAuditeeId])) {
+
+                    Log::error('Missing required data for IKSS', [
+                        'ikss_auditee_id' => $ikssAuditeeId,
+                        'available_deskripsi_keys' => array_keys($request->deskripsi ?? []),
+                        'available_pertanyaan_keys' => array_keys($request->pertanyaan ?? []),
+                        'available_nilai_keys' => array_keys($request->nilai ?? []),
+                        'ikss_auditee_ids' => $request->ikss_auditee_ids
+                    ]);
+
+                    throw new \Exception("Data tidak lengkap untuk IKSS ID: {$ikssAuditeeId}");
+                }
+
                 // Cek apakah auditor ini sudah mengevaluasi IKSS ini
                 $existingEvaluation = IkssAuditeeNilai::where('pengajuan_ami_id', $pengajuanId)
                     ->where('ikss_auditee_id', $ikssAuditeeId)
@@ -333,7 +371,7 @@ class AuditorAuditController extends Controller
                         'auditor_id' => $auditorId,
                         'deskripsi' => $request->deskripsi[$ikssAuditeeId],
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
-                        'nilai' => $request->nilai[$ikssAuditeeId] ?? null
+                        'nilai' => $request->nilai[$ikssAuditeeId]
                     ]);
 
                     Log::info('Created new evaluation', [
@@ -347,7 +385,7 @@ class AuditorAuditController extends Controller
                     $existingEvaluation->update([
                         'deskripsi' => $request->deskripsi[$ikssAuditeeId],
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
-                        'nilai' => $request->nilai[$ikssAuditeeId] ?? null
+                        'nilai' => $request->nilai[$ikssAuditeeId]
                     ]);
 
                     Log::info('Updated existing evaluation', [
