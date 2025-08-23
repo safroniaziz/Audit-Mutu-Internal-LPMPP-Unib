@@ -178,6 +178,124 @@
             }
         });
 
+        console.log
+        // Variabel global
+        var savedKriteriaId = null;
+        var isEditMode = false;
+
+        // Fungsi untuk initialize CKEditor dengan callback
+        function initializeCKEditorWithCallback(callback) {
+            console.log('🚀 Initializing CKEditor...');
+
+            // Destroy existing editors first
+            if (window.editorInstances) {
+                Object.keys(window.editorInstances).forEach(editorId => {
+                    try {
+                        if (window.editorInstances[editorId] && window.editorInstances[editorId].destroy) {
+                            window.editorInstances[editorId].destroy();
+                        }
+                    } catch (e) {
+                        console.log(`Warning: Could not destroy ${editorId}:`, e);
+                    }
+                });
+                window.editorInstances = {};
+            }
+
+            // Initialize editors
+            setTimeout(() => {
+                initializeCKEditor(); // Your existing function
+
+                // Wait for all editors to be ready, then call callback
+                let checkReady = setInterval(() => {
+                    const editorCount = window.editorInstances ? Object.keys(window.editorInstances).length : 0;
+                    console.log(`⏳ Checking CKEditor readiness: ${editorCount}/5 editors ready`);
+
+                    if (editorCount >= 5) {
+                        clearInterval(checkReady);
+                        console.log('✅ All CKEditor instances ready!');
+                        if (callback) callback();
+                    }
+                }, 200);
+
+                // Timeout fallback
+                setTimeout(() => {
+                    clearInterval(checkReady);
+                    console.log('⚠️ CKEditor initialization timeout, proceeding anyway');
+                    if (callback) callback();
+                }, 5000);
+
+            }, 300);
+        }
+
+        // Fungsi untuk populate CKEditor
+        function populateCKEditorData(data) {
+            console.log('📝 Populating CKEditor with data:', data);
+
+            try {
+                // 1. Uraian
+                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_uraian']) {
+                    window.editorInstances['kt_docs_ckeditor_uraian'].setData(data.uraian || '');
+                    console.log('✅ Uraian populated');
+                } else {
+                    console.log('❌ Uraian editor not found');
+                }
+
+                // 2. Penyebab
+                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penyebab']) {
+                    window.editorInstances['kt_docs_ckeditor_penyebab'].setData(data.penyebab_tidak_tercapai || '');
+                    console.log('✅ Penyebab populated');
+                } else {
+                    console.log('❌ Penyebab editor not found');
+                }
+
+                // 3. Rencana
+                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_rencana']) {
+                    window.editorInstances['kt_docs_ckeditor_rencana'].setData(data.rencana_perbaikan || '');
+                    console.log('✅ Rencana populated');
+                } else {
+                    console.log('❌ Rencana editor not found');
+                }
+
+                // 4. Penilaian
+                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
+                    window.editorInstances['kt_docs_ckeditor_penilaian'].setData(data.indikator_penilaian || '');
+                    console.log('✅ Penilaian populated');
+                } else {
+                    console.log('❌ Penilaian editor not found');
+                }
+
+                // 5. Metode
+                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_metode']) {
+                    window.editorInstances['kt_docs_ckeditor_metode'].setData(data.metode_perhitungan || '');
+                    console.log('✅ Metode populated');
+                } else {
+                    console.log('❌ Metode editor not found');
+                }
+
+                console.log('✅ CKEditor population complete!');
+            } catch (error) {
+                console.error('❌ Error populating CKEditor:', error);
+            }
+        }
+
+        // Fungsi untuk clear semua CKEditor
+        function clearAllCKEditors() {
+            console.log('🧹 Clearing all CKEditor instances...');
+            if (window.editorInstances) {
+                Object.keys(window.editorInstances).forEach(editorId => {
+                    try {
+                        if (window.editorInstances[editorId] && window.editorInstances[editorId].setData) {
+                            window.editorInstances[editorId].setData('');
+                            console.log(`✅ Cleared ${editorId}`);
+                        }
+                    } catch (e) {
+                        console.log(`❌ Error clearing ${editorId}:`, e);
+                    }
+                });
+            }
+        }
+
+        // Event handler untuk detail instrumen
         $(document).on('click', '.detail-instrumenProdi', function () {
             const url = $(this).data('url');
 
@@ -209,6 +327,157 @@
             });
         });
 
+        // Event handler untuk EDIT - SOLUSI TERBARU
+        $(document).on('click', '.edit-instrumenProdi', function() {
+            let id = $(this).data('id');
+            let url = $(this).data('url');
+
+            console.log('=== EDIT BUTTON CLICKED - COMPLETE SOLUTION ===');
+            isEditMode = true;
+
+            // 1. Set form properties untuk edit
+            $('#methodField').val('PUT');
+            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.update', '') }}/" + id);
+            $('#kt_modal .modal-title').text('Edit Instrumen Prodi');
+            $('#kt_modal button[type=submit]').text('Update Data');
+
+            // 2. Reset form dan variables
+            $('#kt_modal form')[0].reset();
+            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
+            savedKriteriaId = null;
+
+            // 3. Show loading indicator
+            Swal.fire({
+                title: 'Memuat data...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // 4. Initialize CKEditor dengan callback, kemudian fetch data
+            initializeCKEditorWithCallback(function() {
+                // Setelah CKEditor ready, fetch data dari server
+                console.log('🔄 Fetching data from server for ID:', id);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function(response) {
+                        console.log('📥 Data received from server:', response);
+
+                        if (response.success) {
+                            let data = response.data;
+
+                            // Populate form fields
+                            savedKriteriaId = data.indikator_instrumen_kriteria_id;
+                            $('#kt_modal select[name="indikator_instrumen_id"]').val(data.indikator_instrumen_id).trigger('change');
+                            $('#kt_modal input[name="elemen"]').val(data.elemen);
+                            $('#kt_modal input[name="indikator"]').val(data.indikator);
+                            $('#kt_modal input[name="sumber_data"]').val(data.sumber_data);
+                            $('#kt_modal input[name="target"]').val(data.target);
+                            $('#kt_modal input[name="realisasi"]').val(data.realisasi);
+                            $('#kt_modal input[name="standar_digunakan"]').val(data.standar_digunakan);
+
+                            // Populate CKEditor dengan data
+                            setTimeout(() => {
+                                populateCKEditorData(data);
+
+                                // Close loading dan show modal
+                                Swal.close();
+                                $('#kt_modal').modal('show');
+
+                                console.log('✅ Edit modal ready with populated data!');
+                            }, 200);
+
+                        } else {
+                            Swal.fire('Error', 'Gagal memuat data instrumen', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('❌ Error fetching data:', error);
+                        Swal.close();
+
+                        if (xhr.status === 404) {
+                            Swal.fire("Error", "Route tidak ditemukan. Silakan refresh halaman.", "error");
+                        } else if (xhr.status === 401 || xhr.status === 403) {
+                            Swal.fire("Error", "Anda tidak memiliki izin untuk mengakses data ini.", "error");
+                        } else {
+                            Swal.fire("Error", "Gagal mengambil data Instrumen Prodi: " + error, "error");
+                        }
+                    }
+                });
+            });
+        });
+
+        // Event handler untuk TAMBAH data baru
+        $(document).on('click', 'button[data-bs-target="#kt_modal"]:not(.edit-instrumenProdi)', function() {
+            console.log('=== ADD BUTTON CLICKED ===');
+            isEditMode = false;
+
+            // 1. Set form properties untuk add
+            $('#methodField').val('POST');
+            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
+            $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
+            $('#kt_modal button[type=submit]').text('Simpan');
+
+            // 2. Reset form dan variables
+            $('#kt_modal form')[0].reset();
+            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
+            savedKriteriaId = null;
+
+            // 3. Initialize CKEditor dan clear data
+            initializeCKEditorWithCallback(function() {
+                clearAllCKEditors();
+                console.log('✅ Add modal ready with fresh form!');
+            });
+        });
+
+        // Event handler untuk tombol close modal
+        $(document).on('click', '#cancelModal, .btn-close, [data-bs-dismiss="modal"]', function() {
+            console.log('=== MODAL CLOSE BUTTON CLICKED ===');
+            resetModalToDefault();
+        });
+
+        // Event handler untuk ESC key
+        $(document).on('keydown', function(e) {
+            if (e.key === 'Escape' && $('#kt_modal').hasClass('show')) {
+                console.log('=== ESC KEY PRESSED ===');
+                resetModalToDefault();
+            }
+        });
+
+        // Event listener ketika modal hidden
+        $('#kt_modal').on('hidden.bs.modal', function () {
+            console.log('=== MODAL HIDDEN EVENT ===');
+            resetModalToDefault();
+        });
+
+        // Fungsi untuk reset modal ke default state
+        function resetModalToDefault() {
+            console.log('🔄 Resetting modal to default state...');
+
+            // Reset form properties
+            $('#methodField').val('POST');
+            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
+            $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
+            $('#kt_modal button[type=submit]').text('Simpan Data');
+
+            // Reset variables
+            savedKriteriaId = null;
+            isEditMode = false;
+
+            // Reset form
+            $('#kt_modal form')[0].reset();
+            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
+
+            // Clear CKEditor
+            clearAllCKEditors();
+
+            console.log('✅ Modal reset complete!');
+        }
+
+        // Event handler untuk restore data
         $(document).on('click', '.restore-data', function() {
             let id = $(this).data('id');
 
@@ -251,355 +520,7 @@
             });
         });
 
-        var savedKriteriaId = null;
-
-        $('.edit-instrumenProdi').click(function() {
-            let id = $(this).data('id');
-            let url = $(this).data('url');
-
-            // === SOLUSI RADIKAL - NO RESET, JUST PREPARE ===
-            console.log('=== SOLUSI RADIKAL - EDIT CLICKED ===');
-
-            // 1. Set form properties dulu
-            $('#methodField').val('PUT');
-            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.update', '') }}/" + id);
-            $('#kt_modal .modal-title').text('Edit Instrumen Prodi');
-            $('#kt_modal button[type=submit]').text('Update Data');
-
-            // 2. Reset form (tanpa destroy CKEditor)
-            $('#kt_modal form')[0].reset();
-
-            // 3. Reset dropdown kriteria
-            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
-            // 4. Reset savedKriteriaId
-            savedKriteriaId = null;
-
-            console.log('Form prepared, now loading data...');
-
-            // Ambil data Instrumen Prodi berdasarkan ID
-            $.ajax({
-                url: url,
-                type: 'GET',
-                success: function(response) {
-                    if (response.success) {
-                        let data = response.data;
-                        console.log('Data received:', {
-                            metode_perhitungan: data.metode_perhitungan,
-                            uraian: data.uraian,
-                            penyebab: data.penyebab_tidak_tercapai
-                        });
-
-                        // Destroy CKEditor instances lama sebelum reinitialize
-                        console.log('Destroying old CKEditor instances...');
-                        if (window.editorInstances) {
-                            Object.keys(window.editorInstances).forEach(editorId => {
-                                try {
-                                    if (window.editorInstances[editorId] && window.editorInstances[editorId].destroy) {
-                                        window.editorInstances[editorId].destroy();
-                                        console.log(`💥 Destroyed old instance: ${editorId}`);
-                                    }
-                                } catch (e) {
-                                    console.log(`❌ Error destroying ${editorId}:`, e);
-                                }
-                            });
-                            window.editorInstances = {};
-                        }
-
-                        // Remove old CKEditor DOM elements
-                        $('.ck-editor__editable').remove();
-                        $('.ck.ck-editor').remove();
-                        console.log('💥 Removed old CKEditor DOM elements');
-
-                        // Reinitialize CKEditor instances untuk data baru
-                        console.log('Reinitializing CKEditor instances for new data...');
-                        setTimeout(() => {
-                            initializeCKEditor();
-                        }, 200);
-
-                        // Simpan ID kriteria ke variabel global
-                        savedKriteriaId = data.indikator_instrumen_kriteria_id;
-
-                        // Isi form dalam modal dengan data dari server
-                        $('#kt_modal select[name="indikator_instrumen_id"]').val(data.indikator_instrumen_id).trigger('change');
-                        $('#kt_modal input[name="elemen"]').val(data.elemen);
-                        $('#kt_modal input[name="indikator"]').val(data.indikator);
-                        $('#kt_modal input[name="sumber_data"]').val(data.sumber_data);
-                        $('#kt_modal input[name="metode_perhitungan"]').val(data.metode_perhitungan);
-                        $('#kt_modal input[name="target"]').val(data.target);
-                        $('#kt_modal input[name="realisasi"]').val(data.realisasi);
-                        $('#kt_modal input[name="standar_digunakan"]').val(data.standar_digunakan);
-
-                        // === SOLUSI RADIKAL - POPULATE DENGAN INNERHTML ===
-                        console.log('=== POPULATING CKEditor WITH INNERHTML ===');
-
-                        // Populate CKEditor fields dengan innerHTML (lebih reliable)
-                        const populateCKEditorRadikal = () => {
-                            try {
-                                // 1. Uraian
-                                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_uraian']) {
-                                    const uraianEditor = window.editorInstances['kt_docs_ckeditor_uraian'];
-                                    uraianEditor.setData(data.uraian || '');
-                                    console.log('✅ Uraian populated:', data.uraian);
-                                } else {
-                                    console.log('❌ Uraian editor not ready');
-                                }
-
-                                // 2. Penyebab
-                                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penyebab']) {
-                                    const penyebabEditor = window.editorInstances['kt_docs_ckeditor_penyebab'];
-                                    penyebabEditor.setData(data.penyebab_tidak_tercapai || '');
-                                    console.log('✅ Penyebab populated:', data.penyebab_tidak_tercapai);
-                                } else {
-                                    console.log('❌ Penyebab editor not ready');
-                                }
-
-                                // 3. Rencana
-                                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_rencana']) {
-                                    const rencanaEditor = window.editorInstances['kt_docs_ckeditor_rencana'];
-                                    rencanaEditor.setData(data.rencana_perbaikan || '');
-                                    console.log('✅ Rencana populated:', data.rencana_perbaikan);
-                                } else {
-                                    console.log('❌ Rencana editor not ready');
-                                }
-
-                                // 4. Penilaian
-                                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
-                                    const penilaianEditor = window.editorInstances['kt_docs_ckeditor_penilaian'];
-                                    penilaianEditor.setData(data.indikator_penilaian || '');
-                                    console.log('✅ Penilaian populated:', data.indikator_penilaian);
-                                } else {
-                                    console.log('❌ Penilaian editor not ready');
-                                }
-
-                                // 5. Metode
-                                if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_metode']) {
-                                    const metodeEditor = window.editorInstances['kt_docs_ckeditor_metode'];
-                                    metodeEditor.setData(data.metode_perhitungan || '');
-                                    console.log('✅ Metode populated:', data.metode_perhitungan);
-                                } else {
-                                    console.log('❌ Metode editor not ready');
-                                }
-
-                                console.log('=== CKEditor POPULATION COMPLETE ===');
-                            } catch (error) {
-                                console.error('❌ Error populating CKEditor:', error);
-                            }
-                        };
-
-                        // Populate dengan retry mechanism yang lebih aggressive
-                        let retryCount = 0;
-                        const maxRetries = 10;
-
-                        const populateWithRetry = () => {
-                            const editorCount = window.editorInstances ? Object.keys(window.editorInstances).length : 0;
-                            console.log(`Retry ${retryCount + 1}/${maxRetries}: CKEditor instances ready: ${editorCount}/5`);
-
-                            if (window.editorInstances && editorCount >= 5) {
-                                console.log('✅ All CKEditor instances ready, populating now!');
-                                populateCKEditorRadikal();
-                            } else if (retryCount < maxRetries) {
-                                retryCount++;
-                                console.log(`⏳ Retrying in 200ms... (${retryCount}/${maxRetries})`);
-                                setTimeout(populateWithRetry, 200);
-                            } else {
-                                console.error('❌ Max retries reached, CKEditor still not ready!');
-                                // Fallback: populate what we can
-                                populateCKEditorRadikal();
-                            }
-                        };
-
-                        // Start populating
-                        populateWithRetry();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    if (xhr.status === 404) {
-                        Swal.fire("Error", "Route tidak ditemukan. Silakan refresh halaman.", "error");
-                    } else if (xhr.status === 401 || xhr.status === 403) {
-                        Swal.fire("Error", "Anda tidak memiliki izin untuk mengakses data ini.", "error");
-                    } else {
-                        Swal.fire("Error", "Gagal mengambil data Instrumen Prodi: " + error, "error");
-                    }
-                }
-            });
-        });
-
-                        // Tombol untuk menambah data baru - SOLUSI RADIKAL
-        $('.add-instrumenProdi').click(function() {
-            console.log('=== ADD BUTTON - SOLUSI RADIKAL ===');
-
-            // 1. Destroy CKEditor instances lama untuk mencegah duplicate
-            if (window.editorInstances) {
-                Object.keys(window.editorInstances).forEach(editorId => {
-                    try {
-                        if (window.editorInstances[editorId] && window.editorInstances[editorId].destroy) {
-                            window.editorInstances[editorId].destroy();
-                            console.log(`💥 Destroyed old instance: ${editorId}`);
-                        }
-                    } catch (e) {
-                        console.log(`❌ Error destroying ${editorId}:`, e);
-                    }
-                });
-                window.editorInstances = {};
-            }
-
-            // 2. Remove old CKEditor DOM elements
-            $('.ck-editor__editable').remove();
-            $('.ck.ck-editor').remove();
-            console.log('💥 Removed old CKEditor DOM elements');
-
-            // 3. Set form properties ke default
-            $('#methodField').val('POST');
-            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
-            $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
-            $('#kt_modal button[type=submit]').text('Simpan Data');
-
-            // 4. Reset savedKriteriaId
-            savedKriteriaId = null;
-
-            // 5. Reset dropdown kriteria
-            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
-            // 6. Reset form fields
-            $('#kt_modal form')[0].reset();
-
-            // 7. Reinitialize CKEditor instances
-            setTimeout(() => {
-                console.log('💥 Reinitializing CKEditor instances...');
-                initializeCKEditor();
-            }, 200);
-
-            console.log('=== ADD BUTTON - FORM RESET COMPLETE ===');
-        });
-
-                        // Script untuk tombol tambah - SOLUSI RADIKAL
-        $('button[data-bs-target="#kt_modal"]:not(.edit-instrumenProdi)').click(function() {
-            console.log('=== GENERAL ADD BUTTON - SOLUSI RADIKAL ===');
-
-            // 1. Destroy CKEditor instances lama untuk mencegah duplicate
-            if (window.editorInstances) {
-                Object.keys(window.editorInstances).forEach(editorId => {
-                    try {
-                        if (window.editorInstances[editorId] && window.editorInstances[editorId].destroy) {
-                            window.editorInstances[editorId].destroy();
-                            console.log(`💥 Destroyed old instance: ${editorId}`);
-                        }
-                    } catch (e) {
-                        console.log(`❌ Error destroying ${editorId}:`, e);
-                    }
-                });
-                window.editorInstances = {};
-            }
-
-            // 2. Remove old CKEditor DOM elements
-            $('.ck-editor__editable').remove();
-            $('.ck.ck-editor').remove();
-            console.log('💥 Removed old CKEditor DOM elements');
-
-            // 3. Set form properties ke default
-            $('#methodField').val('POST');
-            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
-            $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
-            $('#kt_modal button[type=submit]').text('Simpan');
-
-            // 4. Reset savedKriteriaId
-            savedKriteriaId = null;
-
-            // 5. Reset dropdown kriteria
-            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
-            // 6. Reset form fields
-            $('#kt_modal form')[0].reset();
-
-            // 7. Reinitialize CKEditor instances
-            setTimeout(() => {
-                console.log('💥 Reinitializing CKEditor instances...');
-                initializeCKEditor();
-            }, 200);
-
-            console.log('=== GENERAL ADD BUTTON - FORM RESET COMPLETE ===');
-        });
-
-
-
-
-
-                // Event handler untuk tombol close modal - SOLUSI RADIKAL
-        $(document).on('click', '#cancelModal, .btn-close, [data-bs-dismiss="modal"]', function() {
-            console.log('=== CLOSE BUTTON - SOLUSI RADIKAL ===');
-
-            // 1. Reset form properties ke default
-            $('#methodField').val('POST');
-            $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
-            $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
-            $('#kt_modal button[type=submit]').text('Simpan Data');
-
-            // 2. Reset savedKriteriaId
-            savedKriteriaId = null;
-
-            // 3. Reset dropdown kriteria
-            $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
-            // 4. Reset form fields (tanpa destroy CKEditor)
-            $('#kt_modal form')[0].reset();
-
-            // 5. Clear CKEditor content dengan setData kosong
-            if (window.editorInstances) {
-                Object.keys(window.editorInstances).forEach(editorId => {
-                    try {
-                        if (window.editorInstances[editorId] && window.editorInstances[editorId].setData) {
-                            window.editorInstances[editorId].setData('');
-                            console.log(`✅ Cleared ${editorId}`);
-                        }
-                    } catch (e) {
-                        console.log(`❌ Error clearing ${editorId}:`, e);
-                    }
-                });
-            }
-
-            console.log('=== CLOSE BUTTON - FORM RESET COMPLETE ===');
-        });
-
-                // Event handler untuk ESC key - SOLUSI RADIKAL
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape' && $('#kt_modal').hasClass('show')) {
-                console.log('=== ESC KEY - SOLUSI RADIKAL ===');
-
-                // 1. Reset form properties ke default
-                $('#methodField').val('POST');
-                $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
-                $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
-                $('#kt_modal button[type=submit]').text('Simpan Data');
-
-                // 2. Reset savedKriteriaId
-                savedKriteriaId = null;
-
-                // 3. Reset dropdown kriteria
-                $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
-                // 4. Reset form fields (tanpa destroy CKEditor)
-                $('#kt_modal form')[0].reset();
-
-                // 5. Clear CKEditor content dengan setData kosong
-                if (window.editorInstances) {
-                    Object.keys(window.editorInstances).forEach(editorId => {
-                        try {
-                            if (window.editorInstances[editorId] && window.editorInstances[editorId].setData) {
-                                window.editorInstances[editorId].setData('');
-                                console.log(`✅ Cleared ${editorId}`);
-                            }
-                        } catch (e) {
-                            console.log(`❌ Error clearing ${editorId}:`, e);
-                        }
-                    });
-                }
-
-                console.log('=== ESC KEY - FORM RESET COMPLETE ===');
-            }
-        });
-
-        // Script untuk delete
+        // Event handler untuk nonaktifkan data
         $(document).on('click', '.nonaktifkan-instrumenProdi', function() {
             let id = $(this).data('id');
 
@@ -700,6 +621,7 @@
             });
         });
 
+        // Event handler untuk hapus permanen
         $(document).on('click', '.delete-permanent', function () {
             var id = $(this).data('id');
             var url = "{{ route('instrumenProdi.hapus_permanen', ':id') }}";
@@ -707,7 +629,7 @@
 
             Swal.fire({
                 title: 'Hapus Permanen?',
-                text: "Data Auditor akan dihapus secara permanen dan tidak bisa dikembalikan.",
+                text: "Data Instrumen akan dihapus secara permanen dan tidak bisa dikembalikan.",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',

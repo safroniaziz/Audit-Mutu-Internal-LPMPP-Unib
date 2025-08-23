@@ -305,12 +305,12 @@
                             });
                             window.editorInstances = {};
                         }
-
+                        
                         // Remove old CKEditor DOM elements
                         $('.ck-editor__editable').remove();
                         $('.ck.ck-editor').remove();
                         console.log('💥 Removed old CKEditor DOM elements');
-
+                        
                         // Reinitialize CKEditor instances untuk data baru
                         console.log('Reinitializing CKEditor instances for new data...');
                         setTimeout(() => {
@@ -428,7 +428,7 @@
                         // Tombol untuk menambah data baru - SOLUSI RADIKAL
         $('.add-instrumenProdi').click(function() {
             console.log('=== ADD BUTTON - SOLUSI RADIKAL ===');
-
+            
             // 1. Destroy CKEditor instances lama untuk mencegah duplicate
             if (window.editorInstances) {
                 Object.keys(window.editorInstances).forEach(editorId => {
@@ -443,40 +443,40 @@
                 });
                 window.editorInstances = {};
             }
-
+            
             // 2. Remove old CKEditor DOM elements
             $('.ck-editor__editable').remove();
             $('.ck.ck-editor').remove();
             console.log('💥 Removed old CKEditor DOM elements');
-
+            
             // 3. Set form properties ke default
             $('#methodField').val('POST');
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
             $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
             $('#kt_modal button[type=submit]').text('Simpan Data');
-
+            
             // 4. Reset savedKriteriaId
             savedKriteriaId = null;
-
+            
             // 5. Reset dropdown kriteria
             $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
+            
             // 6. Reset form fields
             $('#kt_modal form')[0].reset();
-
+            
             // 7. Reinitialize CKEditor instances
             setTimeout(() => {
                 console.log('💥 Reinitializing CKEditor instances...');
                 initializeCKEditor();
             }, 200);
-
+            
             console.log('=== ADD BUTTON - FORM RESET COMPLETE ===');
         });
 
                         // Script untuk tombol tambah - SOLUSI RADIKAL
         $('button[data-bs-target="#kt_modal"]:not(.edit-instrumenProdi)').click(function() {
             console.log('=== GENERAL ADD BUTTON - SOLUSI RADIKAL ===');
-
+            
             // 1. Destroy CKEditor instances lama untuk mencegah duplicate
             if (window.editorInstances) {
                 Object.keys(window.editorInstances).forEach(editorId => {
@@ -491,33 +491,33 @@
                 });
                 window.editorInstances = {};
             }
-
+            
             // 2. Remove old CKEditor DOM elements
             $('.ck-editor__editable').remove();
             $('.ck.ck-editor').remove();
             console.log('💥 Removed old CKEditor DOM elements');
-
+            
             // 3. Set form properties ke default
             $('#methodField').val('POST');
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
             $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
             $('#kt_modal button[type=submit]').text('Simpan');
-
+            
             // 4. Reset savedKriteriaId
             savedKriteriaId = null;
-
+            
             // 5. Reset dropdown kriteria
             $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
+            
             // 6. Reset form fields
             $('#kt_modal form')[0].reset();
-
+            
             // 7. Reinitialize CKEditor instances
             setTimeout(() => {
                 console.log('💥 Reinitializing CKEditor instances...');
                 initializeCKEditor();
             }, 200);
-
+            
             console.log('=== GENERAL ADD BUTTON - FORM RESET COMPLETE ===');
         });
 

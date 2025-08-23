@@ -1259,7 +1259,7 @@
         // Initialize CKEditor for add elemen modal when it's shown
         $('#modalTambahElemen').on('shown.bs.modal', function() {
             console.log('=== ADD ELEMEN MODAL SHOWN - DESTROY OLD INSTANCES ===');
-
+            
             // Destroy old CKEditor instances untuk mencegah duplicate
             const addEditorFields = [
                 'uraian',
@@ -1268,7 +1268,7 @@
                 'indikator_penilaian',
                 'metode_perhitungan'
             ];
-
+            
             addEditorFields.forEach(fieldId => {
                 if (window.elemenEditorInstances[fieldId]) {
                     try {
@@ -1280,12 +1280,12 @@
                     delete window.elemenEditorInstances[fieldId];
                 }
             });
-
+            
             // Remove old CKEditor DOM elements
             $('.ck-editor__editable').remove();
             $('.ck.ck-editor').remove();
             console.log('💥 Removed old CKEditor DOM elements');
-
+            
             // Initialize new CKEditor instances
             addEditorFields.forEach(fieldId => {
                 initializeCKEditor(fieldId);
@@ -1294,14 +1294,11 @@
 
                 // Initialize CKEditor for edit elemen modal when it's shown
         $('#modalEditElemen').on('shown.bs.modal', function() {
-            console.log('=== EDIT ELEMEN MODAL SHOWN - DESTROY OLD INSTANCES ===');
-
-            // Set kriteria ID to hidden input
+                        // Set kriteria ID to hidden input
             if (window.editKriteriaId) {
                 $('#edit_hidden_kriteria_id').val(window.editKriteriaId);
             }
 
-            // Destroy old CKEditor instances untuk mencegah duplicate
             const editEditorFields = [
                 'edit_uraian',
                 'edit_penyebab_tidak_tercapai',
@@ -1309,74 +1306,8 @@
                 'edit_indikator_penilaian',
                 'edit_metode_perhitungan'
             ];
-
-            editEditorFields.forEach(fieldId => {
-                if (window.elemenEditorInstances[fieldId]) {
-                    try {
-                        window.elemenEditorInstances[fieldId].destroy();
-                        console.log(`💥 Destroyed old instance: ${fieldId}`);
-                    } catch (e) {
-                        console.log(`❌ Error destroying ${fieldId}:`, e);
-                    }
-                    delete window.elemenEditorInstances[fieldId];
-                }
-            });
-
-            // Remove old CKEditor DOM elements
-            $('.ck-editor__editable').remove();
-            $('.ck.ck-editor').remove();
-            console.log('💥 Removed old CKEditor DOM elements');
-
-            // Initialize new CKEditor instances
             editEditorFields.forEach(fieldId => {
                 initializeCKEditor(fieldId);
-            });
-        });
-
-        // Cleanup CKEditor instances when modals are hidden
-        $('#modalTambahElemen').on('hidden.bs.modal', function() {
-            console.log('=== ADD ELEMEN MODAL HIDDEN - CLEANUP ===');
-            const addEditorFields = [
-                'uraian',
-                'penyebab_tidak_tercapai',
-                'rencana_perbaikan',
-                'indikator_penilaian',
-                'metode_perhitungan'
-            ];
-
-            addEditorFields.forEach(fieldId => {
-                if (window.elemenEditorInstances[fieldId]) {
-                    try {
-                        window.elemenEditorInstances[fieldId].destroy();
-                        console.log(`💥 Cleanup destroyed instance: ${fieldId}`);
-                    } catch (e) {
-                        console.log(`❌ Error cleanup destroying ${fieldId}:`, e);
-                    }
-                    delete window.elemenEditorInstances[fieldId];
-                }
-            });
-        });
-
-        $('#modalEditElemen').on('hidden.bs.modal', function() {
-            console.log('=== EDIT ELEMEN MODAL HIDDEN - CLEANUP ===');
-            const editEditorFields = [
-                'edit_uraian',
-                'edit_penyebab_tidak_tercapai',
-                'edit_rencana_perbaikan',
-                'edit_indikator_penilaian',
-                'edit_metode_perhitungan'
-            ];
-
-            editEditorFields.forEach(fieldId => {
-                if (window.elemenEditorInstances[fieldId]) {
-                    try {
-                        window.elemenEditorInstances[fieldId].destroy();
-                        console.log(`💥 Cleanup destroyed instance: ${fieldId}`);
-                    } catch (e) {
-                        console.log(`❌ Error cleanup destroying ${fieldId}:`, e);
-                    }
-                    delete window.elemenEditorInstances[fieldId];
-                }
             });
         });
     </script>
