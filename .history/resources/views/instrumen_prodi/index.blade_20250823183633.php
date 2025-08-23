@@ -312,7 +312,7 @@
                         // Try to populate immediately, if not ready, retry with longer delay
                         const editorCount = window.editorInstances ? Object.keys(window.editorInstances).length : 0;
                         console.log('CKEditor instances ready:', editorCount, '/ 5');
-
+                        
                         if (window.editorInstances && editorCount >= 5) {
                             console.log('Populating CKEditor immediately');
                             populateCKEditor();

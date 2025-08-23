@@ -270,11 +270,6 @@
                 success: function(response) {
                     if (response.success) {
                         let data = response.data;
-                        console.log('Data received:', {
-                            metode_perhitungan: data.metode_perhitungan,
-                            uraian: data.uraian,
-                            penyebab: data.penyebab_tidak_tercapai
-                        });
 
                         // Simpan ID kriteria ke variabel global
                         savedKriteriaId = data.indikator_instrumen_kriteria_id;
@@ -312,7 +307,7 @@
                         // Try to populate immediately, if not ready, retry with longer delay
                         const editorCount = window.editorInstances ? Object.keys(window.editorInstances).length : 0;
                         console.log('CKEditor instances ready:', editorCount, '/ 5');
-
+                        
                         if (window.editorInstances && editorCount >= 5) {
                             console.log('Populating CKEditor immediately');
                             populateCKEditor();
