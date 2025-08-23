@@ -1000,30 +1000,49 @@ class UnitKerjaSeeder extends Seeder
 
 unset($unit); // Lepaskan referensi
 
-// 4. Insert ke database dengan updateOrCreate untuk menghindari duplikat
+// 4. Insert ke database
 try {
-    foreach ($data as $unitData) {
-        UnitKerja::updateOrCreate(
-            [
-                'kode_unit_kerja' => $unitData['kode_unit_kerja'],
-            ],
-            [
-                'nama_unit_kerja' => $unitData['nama_unit_kerja'],
-                'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
-                'jenjang' => $unitData['jenjang'],
-                'fakultas' => $unitData['fakultas'],
-                'nama_ketua' => $unitData['nama_ketua'] ?? null,
-                'nip_ketua' => $unitData['nip_ketua'] ?? null,
-                'website' => $unitData['website'] ?? null,
-                'no_hp' => $unitData['no_hp'] ?? null,
-            ]
-        );
+    // Gunakan query builder dengan kolom yang eksplisit
+    $insertData = [];
+    foreach ($data as $unit) {
+        $insertData[] = [
+            'kode_unit_kerja' => $unit['kode_unit_kerja'],
+            'nama_unit_kerja' => $unit['nama_unit_kerja'],
+            'jenis_unit_kerja' => $unit['jenis_unit_kerja'],
+            'jenjang' => $unit['jenjang'],
+            'fakultas' => $unit['fakultas'],
+            'nama_ketua' => $unit['nama_ketua'],
+            'nip_ketua' => $unit['nip_ketua'],
+            'website' => $unit['website'],
+            'no_hp' => $unit['no_hp'],
+            'created_at' => $unit['created_at'],
+            'updated_at' => $unit['updated_at'],
+        ];
     }
 
-    echo "✅ UnitKerjaSeeder completed!\n";
+        // Insert data dengan updateOrCreate untuk menghindari duplikat
+        foreach ($data as $unitData) {
+            UnitKerja::updateOrCreate(
+                [
+                    'kode_unit_kerja' => $unitData['kode_unit_kerja'],
+                ],
+                [
+                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
+                    'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
+                    'jenjang' => $unitData['jenjang'],
+                    'fakultas' => $unitData['fakultas'],
+                    'nama_ketua' => $unitData['nama_ketua'] ?? null,
+                    'nip_ketua' => $unitData['nip_ketua'] ?? null,
+                    'website' => $unitData['website'] ?? null,
+                    'no_hp' => $unitData['no_hp'] ?? null,
+                ]
+            );
+        }
 
-} catch (\Exception $e) {
-    echo "❌ Error: " . $e->getMessage() . "\n";
-}
+        echo "✅ UnitKerjaSeeder completed!\n";
+
+    } catch (\Exception $e) {
+        echo "❌ Error: " . $e->getMessage() . "\n";
+    }
     }
 }
