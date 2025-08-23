@@ -291,11 +291,11 @@
                             });
                             window.editorInstances = {};
                         }
-
+                        
                         // Reset dropdown kriteria
                         $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
                         console.log('Form reset complete, now populating with new data...');
-
+                        
                         // Reinitialize CKEditor instances
                         console.log('Reinitializing CKEditor instances...');
                         setTimeout(() => {

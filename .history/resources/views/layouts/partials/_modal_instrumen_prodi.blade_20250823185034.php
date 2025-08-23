@@ -163,7 +163,7 @@
             }
         });
         };
-
+        
         // Inisialisasi CKEditor pertama kali
         window.initializeCKEditor();
 

@@ -163,13 +163,12 @@
             }
         });
         };
-
+        
         // Inisialisasi CKEditor pertama kali
         window.initializeCKEditor();
 
         // Fungsi untuk reset CKEditor fields
         window.resetCKEditorFields = function() {
-            console.log('Resetting CKEditor fields...');
             editorFields.forEach(id => {
                 if (window.editorInstances[id]) {
                     window.editorInstances[id].setData('');

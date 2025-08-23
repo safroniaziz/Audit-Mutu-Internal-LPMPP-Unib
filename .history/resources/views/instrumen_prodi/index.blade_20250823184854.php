@@ -280,27 +280,15 @@
                         console.log('Resetting form after data loaded...');
                         $('#kt_modal form')[0].reset();
 
-                                                // Destroy dan recreate CKEditor instances untuk memastikan reset sempurna
-                        console.log('Destroying CKEditor instances...');
-                        if (window.editorInstances) {
-                            Object.keys(window.editorInstances).forEach(id => {
-                                if (window.editorInstances[id] && window.editorInstances[id].destroy) {
-                                    window.editorInstances[id].destroy();
-                                    console.log(`Destroyed CKEditor instance: ${id}`);
-                                }
-                            });
-                            window.editorInstances = {};
+                        // Reset semua CKEditor fields
+                        if (window.resetCKEditorFields) {
+                            console.log('Resetting CKEditor fields...');
+                            window.resetCKEditorFields();
                         }
 
                         // Reset dropdown kriteria
                         $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
                         console.log('Form reset complete, now populating with new data...');
-
-                        // Reinitialize CKEditor instances
-                        console.log('Reinitializing CKEditor instances...');
-                        setTimeout(() => {
-                            initializeCKEditor();
-                        }, 100);
 
                         // Simpan ID kriteria ke variabel global
                         savedKriteriaId = data.indikator_instrumen_kriteria_id;
