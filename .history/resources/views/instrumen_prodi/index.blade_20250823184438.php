@@ -260,17 +260,17 @@
             // Reset form dan CKEditor sebelum mengisi data baru
             console.log('Resetting form before loading new data...');
             $('#kt_modal form')[0].reset();
-
+            
             // Reset semua CKEditor fields
             if (window.resetCKEditorFields) {
                 console.log('Resetting CKEditor fields...');
                 window.resetCKEditorFields();
             }
-
+            
             // Reset dropdown kriteria
             $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
             console.log('Form reset complete, loading new data...');
-
+            
             $('#methodField').val('PUT');
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.update', '') }}/" + id);
             $('#kt_modal .modal-title').text('Edit Instrumen Prodi');
@@ -386,26 +386,26 @@
         $('#kt_modal').on('hidden.bs.modal', function () {
             // Reset form
             $('#kt_modal form')[0].reset();
-
+            
             // Reset semua CKEditor fields
             if (window.resetCKEditorFields) {
                 window.resetCKEditorFields();
             }
-
+            
             // Reset dropdown kriteria
             $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
-
+            
             // Reset method dan action
             $('#methodField').val('POST');
             $('#kt_modal_form').attr('action', "{{ route('instrumenProdi.store') }}");
-
+            
             // Reset title dan button
             $('#kt_modal .modal-title').text('Tambah Instrumen Prodi');
             $('#kt_modal button[type=submit]').text('Simpan Data');
-
+            
             // Reset savedKriteriaId
             savedKriteriaId = null;
-
+            
             console.log('Modal closed, form reset complete');
         });
 
