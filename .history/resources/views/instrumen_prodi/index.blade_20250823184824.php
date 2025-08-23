@@ -279,13 +279,13 @@
                         // Reset form dan CKEditor SETELAH data berhasil di-load
                         console.log('Resetting form after data loaded...');
                         $('#kt_modal form')[0].reset();
-
+                        
                         // Reset semua CKEditor fields
                         if (window.resetCKEditorFields) {
                             console.log('Resetting CKEditor fields...');
                             window.resetCKEditorFields();
                         }
-
+                        
                         // Reset dropdown kriteria
                         $('select[name="indikator_instrumen_kriteria_id"]').empty().append('<option disabled selected>-- pilih kriteria instrumen --</option>');
                         console.log('Form reset complete, now populating with new data...');
@@ -331,9 +331,9 @@
                             console.log('Populating CKEditor immediately');
                             populateCKEditor();
                         } else {
-                            console.log('CKEditor not ready, retrying in 500ms');
+                            console.log('CKEditor not ready, retrying in 300ms');
                             // Retry with longer delay if CKEditor not ready
-                            setTimeout(populateCKEditor, 500);
+                            setTimeout(populateCKEditor, 300);
                         }
                     }
                 },
