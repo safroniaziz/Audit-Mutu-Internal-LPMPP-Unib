@@ -1020,29 +1020,12 @@ try {
         ];
     }
 
-        // Insert data dengan updateOrCreate untuk menghindari duplikat
-        foreach ($data as $unitData) {
-            UnitKerja::updateOrCreate(
-                [
-                    'kode_unit_kerja' => $unitData['kode_unit_kerja'],
-                ],
-                [
-                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
-                    'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
-                    'jenjang' => $unitData['jenjang'],
-                    'fakultas' => $unitData['fakultas'],
-                    'nama_ketua' => $unitData['nama_ketua'] ?? null,
-                    'nip_ketua' => $unitData['nip_ketua'] ?? null,
-                    'website' => $unitData['website'] ?? null,
-                    'no_hp' => $unitData['no_hp'] ?? null,
-                ]
-            );
-        }
+    // Insert data
+    DB::table('unit_kerjas')->insert($insertData);
 
-        echo "✅ UnitKerjaSeeder completed!\n";
-
-    } catch (\Exception $e) {
-        echo "❌ Error: " . $e->getMessage() . "\n";
-    }
+} catch (\Exception $e) {
+    // Tampilkan error dengan informasi yang lebih detail
+    dd('Error pada insert: ' . $e->getMessage(), $insertData);
+}
     }
 }

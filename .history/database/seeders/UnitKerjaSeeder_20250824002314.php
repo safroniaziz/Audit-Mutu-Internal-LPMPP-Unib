@@ -1020,14 +1020,14 @@ try {
         ];
     }
 
-        // Insert data dengan updateOrCreate untuk menghindari duplikat
+            // Insert data dengan updateOrCreate untuk menghindari duplikat
         foreach ($data as $unitData) {
             UnitKerja::updateOrCreate(
                 [
                     'kode_unit_kerja' => $unitData['kode_unit_kerja'],
+                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
                 ],
                 [
-                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
                     'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
                     'jenjang' => $unitData['jenjang'],
                     'fakultas' => $unitData['fakultas'],

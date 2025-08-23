@@ -156,6 +156,16 @@ class UnitKerjaSeeder extends Seeder
             ],
             [
                 'id' => 61,
+                'kode_unit_kerja' => 'B1A',
+                'nama_unit_kerja' => 'Ilmu Hukum',
+                'jenis_unit_kerja' => 'prodi',
+                'jenjang' => 'S1',
+                'fakultas' => 'Fakultas Hukum',
+                'created_at' => '2021-07-13 10:47:00',
+                'updated_at' => '2021-07-13 10:47:00',
+            ],
+            [
+                'id' => 62,
                 'kode_unit_kerja' => 'B2A',
                 'nama_unit_kerja' => 'Ilmu Hukum',
                 'jenis_unit_kerja' => 'prodi',
@@ -810,7 +820,6 @@ class UnitKerjaSeeder extends Seeder
             ['nama_unit_kerja' => 'S2 Biologi', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Matematika dan Ilmu Pengetahuan Alam', 'kode_unit_kerja' => 'B2A'],
             ['nama_unit_kerja' => 'S2 Kimia', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Matematika dan Ilmu Pengetahuan Alam', 'kode_unit_kerja' => 'B2B'],
             ['nama_unit_kerja' => 'S2 Statistika', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Matematika dan Ilmu Pengetahuan Alam', 'kode_unit_kerja' => 'B2C'],
-            ['nama_unit_kerja' => 'S1 Ilmu Hukum', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S1', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E1A'],
             ['nama_unit_kerja' => 'S2 Kenotariatan', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2A'],
             ['nama_unit_kerja' => 'S2 Ilmu Hukum', 'jenis_unit_kerja' => 'prodi', 'jenjang' => 'S2', 'fakultas' => 'Hukum', 'kode_unit_kerja' => 'E2B'],
 
@@ -995,54 +1004,32 @@ class UnitKerjaSeeder extends Seeder
             }
         }
 
-// Untuk debug, tampilkan struktur data sebelum insert
-// dd($data);
+        // 5. Insert ke database
+        try {
+            // Gunakan query builder dengan kolom yang eksplisit
+            $insertData = [];
+            foreach ($data as $unit) {
+                $insertData[] = [
+                    'kode_unit_kerja' => $unit['kode_unit_kerja'],
+                    'nama_unit_kerja' => $unit['nama_unit_kerja'],
+                    'jenis_unit_kerja' => $unit['jenis_unit_kerja'],
+                    'jenjang' => $unit['jenjang'],
+                    'fakultas' => $unit['fakultas'],
+                    'nama_ketua' => null,
+                    'nip_ketua' => null,
+                    'website' => null,
+                    'no_hp' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
 
-unset($unit); // Lepaskan referensi
+            // Insert data
+            DB::table('unit_kerjas')->insert($insertData);
 
-// 4. Insert ke database
-try {
-    // Gunakan query builder dengan kolom yang eksplisit
-    $insertData = [];
-    foreach ($data as $unit) {
-        $insertData[] = [
-            'kode_unit_kerja' => $unit['kode_unit_kerja'],
-            'nama_unit_kerja' => $unit['nama_unit_kerja'],
-            'jenis_unit_kerja' => $unit['jenis_unit_kerja'],
-            'jenjang' => $unit['jenjang'],
-            'fakultas' => $unit['fakultas'],
-            'nama_ketua' => $unit['nama_ketua'],
-            'nip_ketua' => $unit['nip_ketua'],
-            'website' => $unit['website'],
-            'no_hp' => $unit['no_hp'],
-            'created_at' => $unit['created_at'],
-            'updated_at' => $unit['updated_at'],
-        ];
-    }
-
-        // Insert data dengan updateOrCreate untuk menghindari duplikat
-        foreach ($data as $unitData) {
-            UnitKerja::updateOrCreate(
-                [
-                    'kode_unit_kerja' => $unitData['kode_unit_kerja'],
-                ],
-                [
-                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
-                    'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
-                    'jenjang' => $unitData['jenjang'],
-                    'fakultas' => $unitData['fakultas'],
-                    'nama_ketua' => $unitData['nama_ketua'] ?? null,
-                    'nip_ketua' => $unitData['nip_ketua'] ?? null,
-                    'website' => $unitData['website'] ?? null,
-                    'no_hp' => $unitData['no_hp'] ?? null,
-                ]
-            );
+        } catch (\Exception $e) {
+            // Tampilkan error dengan informasi yang lebih detail
+            dd('Error pada insert: ' . $e->getMessage(), $insertData);
         }
-
-        echo "✅ UnitKerjaSeeder completed!\n";
-
-    } catch (\Exception $e) {
-        echo "❌ Error: " . $e->getMessage() . "\n";
-    }
     }
 }

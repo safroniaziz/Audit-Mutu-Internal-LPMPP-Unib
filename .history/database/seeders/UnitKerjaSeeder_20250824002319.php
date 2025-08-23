@@ -1025,9 +1025,9 @@ try {
             UnitKerja::updateOrCreate(
                 [
                     'kode_unit_kerja' => $unitData['kode_unit_kerja'],
+                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
                 ],
                 [
-                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
                     'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
                     'jenjang' => $unitData['jenjang'],
                     'fakultas' => $unitData['fakultas'],

@@ -19,11 +19,9 @@ class UserSeeder extends Seeder
 
         // 1. Update semua user prodi yang sudah ada (S1, S2, S3, D3, Profesi)
         echo "📝 Updating existing prodi users...\n";
-        $prodiUsers = User::where(function($query) {
-                $query->where('name', 'like', 'S%')
-                      ->orWhere('name', 'like', 'D3%')
-                      ->orWhere('name', 'like', '%PROFESI%');
-            })
+        $prodiUsers = User::where('name', 'like', 'S%')
+            ->orWhere('name', 'like', 'D3%')
+            ->orWhere('name', 'like', 'Profesi%')
             ->where('name', 'not like', '%Prof.%')
             ->where('name', 'not like', '%Dr.%')
             ->get();
@@ -44,42 +42,9 @@ class UserSeeder extends Seeder
             // Update password = bcrypt(username)
             $newPassword = bcrypt($newUsername);
 
-            // Cari unit_kerja_id dengan mapping yang lebih smart
-            $unitKerja = null;
-
-            // 1. Coba exact match dulu
+            // Cari unit_kerja_id
             $unitKerja = UnitKerja::where('nama_unit_kerja', $user->name)->first();
-
-            // 2. Jika tidak ketemu, coba partial match
-            if (!$unitKerja) {
-                $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%' . $user->name . '%')->first();
-            }
-
-            // 3. Jika masih tidak ketemu, coba match berdasarkan jenjang dan nama prodi
-            if (!$unitKerja) {
-                $parts = explode(' ', $user->name);
-                $jenjang = array_shift($parts); // S1, S2, S3, D3
-                $namaProdi = implode(' ', $parts); // ILMU EKONOMI
-
-                $unitKerja = UnitKerja::where('jenjang', $jenjang)
-                    ->where('nama_unit_kerja', 'like', '%' . $namaProdi . '%')
-                    ->first();
-            }
-
-            // 4. Special case untuk Profesi
-            if (!$unitKerja && (strpos($user->name, 'PROFESI') !== false)) {
-                if (strpos($user->name, 'GURU') !== false) {
-                    $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%PROFESI%GURU%')->first();
-                } elseif (strpos($user->name, 'DOKTER') !== false) {
-                    $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%PROFESI%DOKTER%')->first();
-                }
-            }
-
             $unitKerjaId = $unitKerja ? $unitKerja->id : null;
-
-            if (!$unitKerjaId) {
-                echo "⚠️  Warning: Tidak bisa mapping unit_kerja_id untuk: {$user->name}\n";
-            }
 
             $user->update([
                 'username' => $newUsername,

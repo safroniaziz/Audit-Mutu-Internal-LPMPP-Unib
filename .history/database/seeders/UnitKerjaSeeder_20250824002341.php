@@ -1024,12 +1024,12 @@ try {
         foreach ($data as $unitData) {
             UnitKerja::updateOrCreate(
                 [
-                    'kode_unit_kerja' => $unitData['kode_unit_kerja'],
+                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
+                    'jenjang' => $unitData['jenjang'],
                 ],
                 [
-                    'nama_unit_kerja' => $unitData['nama_unit_kerja'],
+                    'kode_unit_kerja' => $unitData['kode_unit_kerja'],
                     'jenis_unit_kerja' => $unitData['jenis_unit_kerja'],
-                    'jenjang' => $unitData['jenjang'],
                     'fakultas' => $unitData['fakultas'],
                     'nama_ketua' => $unitData['nama_ketua'] ?? null,
                     'nip_ketua' => $unitData['nip_ketua'] ?? null,

@@ -66,15 +66,6 @@ class UserSeeder extends Seeder
                     ->first();
             }
 
-            // 4. Special case untuk Profesi
-            if (!$unitKerja && (strpos($user->name, 'PROFESI') !== false)) {
-                if (strpos($user->name, 'GURU') !== false) {
-                    $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%PROFESI%GURU%')->first();
-                } elseif (strpos($user->name, 'DOKTER') !== false) {
-                    $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%PROFESI%DOKTER%')->first();
-                }
-            }
-
             $unitKerjaId = $unitKerja ? $unitKerja->id : null;
 
             if (!$unitKerjaId) {

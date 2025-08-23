@@ -46,26 +46,26 @@ class UserSeeder extends Seeder
 
             // Cari unit_kerja_id dengan mapping yang lebih smart
             $unitKerja = null;
-
+            
             // 1. Coba exact match dulu
             $unitKerja = UnitKerja::where('nama_unit_kerja', $user->name)->first();
-
+            
             // 2. Jika tidak ketemu, coba partial match
             if (!$unitKerja) {
                 $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%' . $user->name . '%')->first();
             }
-
+            
             // 3. Jika masih tidak ketemu, coba match berdasarkan jenjang dan nama prodi
             if (!$unitKerja) {
                 $parts = explode(' ', $user->name);
                 $jenjang = array_shift($parts); // S1, S2, S3, D3
                 $namaProdi = implode(' ', $parts); // ILMU EKONOMI
-
+                
                 $unitKerja = UnitKerja::where('jenjang', $jenjang)
                     ->where('nama_unit_kerja', 'like', '%' . $namaProdi . '%')
                     ->first();
             }
-
+            
             // 4. Special case untuk Profesi
             if (!$unitKerja && (strpos($user->name, 'PROFESI') !== false)) {
                 if (strpos($user->name, 'GURU') !== false) {
@@ -74,9 +74,9 @@ class UserSeeder extends Seeder
                     $unitKerja = UnitKerja::where('nama_unit_kerja', 'like', '%PROFESI%DOKTER%')->first();
                 }
             }
-
+            
             $unitKerjaId = $unitKerja ? $unitKerja->id : null;
-
+            
             if (!$unitKerjaId) {
                 echo "⚠️  Warning: Tidak bisa mapping unit_kerja_id untuk: {$user->name}\n";
             }
