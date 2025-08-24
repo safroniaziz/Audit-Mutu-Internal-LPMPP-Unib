@@ -211,6 +211,7 @@
                                                            $ikss->instrumen->indikatorKinerja &&
                                                            $ikss->instrumen->indikatorKinerja->satuanStandar;
                                                 })
+                                                @php
                                                     $groupedData = $auditess->ikssAuditee
                                                         ->filter(function($ikss) {
                                                             return $ikss->instrumen &&
@@ -222,6 +223,7 @@
                                                         ->map(function($satuanGroup) {
                                                             return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
                                                         });
+                                                @endphp
                                         ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
                                         ->map(function($satuanGroup) {
                                             return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
