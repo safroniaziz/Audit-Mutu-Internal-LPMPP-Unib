@@ -160,18 +160,10 @@ class AuditeePengajuanAmiController extends Controller
         ->join('satuan_standars', 'indikator_kinerjas.satuan_standar_id', '=', 'satuan_standars.id')
         ->orderBy('satuan_standars.id') // Ganti dengan ordering berdasarkan ID yang sudah berurutan
         ->select('indikator_kinerjas.*') // Pilih hanya kolom dari indikator_kinerjas
-        ->get()
-        ->groupBy('satuan_standar_id')
-        ->sortKeys(); // Urutkan berdasarkan key (satuan_standar_id) secara numerik
-
-        // Flatten kembali collection untuk kompatibilitas dengan view
-        $sortedIndikatorKinerjas = collect();
-        foreach ($allIndikatorKinerjas as $group) {
-            $sortedIndikatorKinerjas = $sortedIndikatorKinerjas->merge($group);
-        }
+        ->get();
 
         // Assign semua indikator ke unit kerja saat ini untuk kompatibilitas view
-        $currentUnitKerja->setRelation('indikatorKinerjas', $sortedIndikatorKinerjas);
+        $currentUnitKerja->setRelation('indikatorKinerjas', $allIndikatorKinerjas);
 
         $dataIkssProdi = collect([$currentUnitKerja]);
         // ========== AKHIR KODE BARU ==========
