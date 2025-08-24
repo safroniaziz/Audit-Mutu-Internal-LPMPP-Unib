@@ -54,8 +54,10 @@
         }
     }
 
-    // Convert to collection after all processing is done
-    $groupedInstrumen = collect($groupedInstrumen);
+    // Convert to collection after all processing is done and sort by SS ID numerically
+    $groupedInstrumen = collect($groupedInstrumen)->sortKeysUsing(function ($a, $b) {
+        return (int)$a <=> (int)$b;
+    });
 @endphp
 
 @push('styles')

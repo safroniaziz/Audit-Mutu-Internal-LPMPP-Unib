@@ -54,8 +54,10 @@
         }
     }
 
-    // Convert to collection after all processing is done
-    $groupedInstrumen = collect($groupedInstrumen);
+    // Convert to collection after all processing is done and sort by SS ID numerically
+    $groupedInstrumen = collect($groupedInstrumen)->sortKeysUsing(function ($a, $b) {
+        return (int)$a <=> (int)$b;
+    });
 @endphp
 
 @push('styles')
@@ -312,7 +314,7 @@
 
                 <div class="ms-auto">
                     @if ($isAllCompleted)
-                        <a href="{{ route('auditee.pengajuanAmi.unggahSiklus') }}" class="btn btn-sm px-4 btn-success">
+                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm px-4 btn-success">
                             <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                         </a>
                     @else
@@ -320,33 +322,6 @@
                             <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                         </a>
                     @endif
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="d-flex flex-column mb-10">
-                <div class="d-flex align-items-center mb-2">
-                    <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Instrumen</span>
-                </div>
-                <div class="d-flex align-items-center mb-2">
-                    <span class="fs-6 fw-semibold text-gray-600">
-                        @if($isAllCompleted)
-                            Semua instrumen telah selesai diisi
-                        @else
-                            {{ $totalCompleted }} instrumen selesai diisi
-                        @endif
-                    </span>
-                </div>
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1 bg-light-primary rounded h-6px me-3">
-                        <div class="bg-primary rounded h-6px" role="progressbar"
-                            style="width: {{ $progressPercentage }}%"
-                            aria-valuenow="{{ $progressPercentage }}"
-                            aria-valuemin="0"
-                            aria-valuemax="100">
-                        </div>
-                    </div>
-                    <span class="fs-6 fw-bold text-gray-800">{{ number_format($progressPercentage, 1) }}%</span>
                 </div>
             </div>
 
@@ -392,6 +367,33 @@
                 @endforeach
             </div>
 
+            <!-- Progress Bar -->
+            <div class="d-flex flex-column mb-10">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Instrumen</span>
+                </div>
+                <div class="d-flex align-items-center mb-2">
+                    <span class="fs-6 fw-semibold text-gray-600">
+                        @if($isAllCompleted)
+                            Semua instrumen telah selesai diisi
+                        @else
+                            {{ $totalCompleted }} instrumen selesai diisi
+                        @endif
+                    </span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="flex-grow-1 bg-light-primary rounded h-6px me-3">
+                        <div class="bg-primary rounded h-6px" role="progressbar"
+                            style="width: {{ $progressPercentage }}%"
+                            aria-valuenow="{{ $progressPercentage }}"
+                            aria-valuemin="0"
+                            aria-valuemax="100">
+                        </div>
+                    </div>
+                    <span class="fs-6 fw-bold text-gray-800">{{ number_format($progressPercentage, 1) }}%</span>
+                </div>
+            </div>
+
             <!-- Wizard Content -->
             @foreach($groupedInstrumen as $ssId => $group)
                 <div class="wizard-content {{ $loop->first ? 'active' : '' }}" data-step="{{ $ssId }}">
@@ -435,7 +437,8 @@
                         @foreach($group['instrumen'] as $item)
                             <div class="card card-bordered mb-10">
                                 <div class="card-header bg-light">
-                                    <h3 class="card-title text-gray-800 fw-bold">{{ $loop->iteration }}. {{ $item['instrumen']->indikator }}</h3>
+                                    <h3 class="card-title text-gray-800 fw-bold">{{ $loop->iteration }}. {!! str_replace(['<p>', '</p>'], '', $item['instrumen']->indikator) !!}
+                                    </h3>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-4">
@@ -444,12 +447,12 @@
                                             <table class="table table-bordered">
                                                 <tr>
                                                     <td width="30%" class="fw-semibold bg-light">Indikator Kinerja RSB</td>
-                                                    <td>{{ $item['instrumen']->indikator }}</td>
+                                                    <td>{!! $item['instrumen']->indikator !!}</td>
                                                 </tr>
                                                 <tr>
                                                     <td class="fw-semibold bg-light">Sumber data/bukti</td>
                                                     <td>
-                                                        {{ $item['instrumen']->sumber }}
+                                                        {!! $item['instrumen']->sumber !!}
                                                         @if(isset($ikssAuditeeData[$item['instrumen']->id]) && $ikssAuditeeData[$item['instrumen']->id]->file_sumber)
                                                             <div class="mb-2">
                                                                 <a href="{{ asset('storage/'.$ikssAuditeeData[$item['instrumen']->id]->file_sumber) }}" target="_blank" class="btn btn-sm btn-outline-info">
@@ -461,6 +464,20 @@
                                                         <div class="mt-2">
                                                             <input type="file" name="bukti_file[{{ $item['instrumen']->id }}]" class="form-control" id="buktiFile_{{ $item['instrumen']->id }}">
                                                             <div class="form-text">Upload file bukti disini</div>
+                                                        </div>
+
+                                                        <div class="mt-3">
+                                                            <div class="input-group">
+                                                                <span class="input-group-text">
+                                                                    <i class="fas fa-link"></i>
+                                                                </span>
+                                                                <input type="url"
+                                                                    class="form-control"
+                                                                    name="url_sumber[{{ $item['instrumen']->id }}]"
+                                                                    value="{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->url_sumber : '' }}"
+                                                                    placeholder="Masukkan URL sumber (opsional)">
+                                                            </div>
+                                                            <div class="form-text text-muted">Tambahkan URL sumber jika ada (contoh: https://example.com)</div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -512,20 +529,9 @@
                             @endif
 
                             <div class="d-flex gap-2">
-                                @if(!$loop->last)
-                                    <button type="button" class="btn btn-primary" onclick="saveAndNext({{ $ssId }})">
-                                        Simpan & Lanjutkan <i class="fas fa-arrow-right"></i>
-                                    </button>
-                                @else
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Selesai
-                                    </button>
-                                    @if($allCompleted)
-                                        <a href="{{ route('auditee.pengajuanAmi.unggahSiklus') }}" class="btn btn-success">
-                                            <i class="fas fa-arrow-right"></i> Proses Selanjutnya
-                                        </a>
-                                    @endif
-                                @endif
+                                <button type="button" class="btn btn-primary" onclick="saveAndNext({{ $ssId }})">
+                                    <i class="fas fa-save"></i> Simpan & {{ $loop->last ? 'Selesai' : 'Lanjutkan' }}
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -710,11 +716,11 @@
                             showConfirmButton: false,
                             timer: 1500
                         }).then(() => {
-                            // Reload halaman dan kemudian navigasi ke step berikutnya
+                            // Reload halaman
                             if (response.redirect) {
-                                window.location.href = response.redirect + '?next_step=' + nextStep.data('step');
+                                window.location.href = response.redirect;
                             } else {
-                                navigateStep('next', currentStepId);
+                                window.location.reload();
                             }
                         });
                     } else {
