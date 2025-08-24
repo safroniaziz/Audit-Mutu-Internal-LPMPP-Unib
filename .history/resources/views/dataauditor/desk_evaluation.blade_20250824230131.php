@@ -99,21 +99,8 @@
     // Create ordered array of SS IDs for proper next step navigation
     $orderedSsIds = $groupedIkss->keys()->toArray();
 
-    // Determine active step - should be first incomplete step in ordered sequence or first step if none completed
-    $activeStep = null;
-
-    // First, try to find the first incomplete step in the ordered sequence
-    foreach ($orderedSsIds as $ssId) {
-        if (isset($ssCompletionStatus[$ssId]) && !$ssCompletionStatus[$ssId]['is_completed']) {
-            $activeStep = $ssId;
-            break;
-        }
-    }
-
-    // If no incomplete step found, use the first step in ordered sequence
-    if (!$activeStep) {
-        $activeStep = $orderedSsIds[0] ?? array_key_first($ssCompletionStatus);
-    }
+    // Determine active step - should be first incomplete step or first step if none completed
+    $activeStep = $firstIncompleteStep ?? array_key_first($ssCompletionStatus);
 @endphp
 
 @push('styles')
@@ -631,7 +618,7 @@
         $('.wizard-step').click(function() {
             const stepElement = $(this);
             const stepId = stepElement.data('step');
-
+            
             // Check if this step can be accessed using ordered SS IDs
             const currentIndex = orderedSsIds.indexOf(stepId);
             const isFirstStep = currentIndex === 0;
