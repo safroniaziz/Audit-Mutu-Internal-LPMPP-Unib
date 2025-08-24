@@ -199,6 +199,7 @@
                                            $ikss->instrumen->indikatorKinerja &&
                                            $ikss->instrumen->indikatorKinerja->satuanStandar;
                                 })
+                                ->sortBy('instrumen.indikatorKinerja.satuanStandar.kode_satuan')
                                 ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
                                 ->map(function($satuanGroup) {
                                     return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
@@ -209,14 +210,7 @@
                                 $firstIkss = $auditess->ikssAuditee
                                     ->where('instrumen.indikatorKinerja.satuanStandar.sasaran', $key)
                                     ->first();
-                                if ($firstIkss && $firstIkss->instrumen && $firstIkss->instrumen->indikatorKinerja && $firstIkss->instrumen->indikatorKinerja->satuanStandar) {
-                                    $kodeSatuan = $firstIkss->instrumen->indikatorKinerja->satuanStandar->kode_satuan;
-                                    // Extract group number from SS code (e.g., "SS 1.1" -> 1, "SS 2.1" -> 2)
-                                    if (preg_match('/SS\s*(\d+)\.\d+/', $kodeSatuan, $matches)) {
-                                        return intval($matches[1]);
-                                    }
-                                }
-                                return 999; // Default for unknown format
+                                return $firstIkss ? $firstIkss->instrumen->indikatorKinerja->satuanStandar->kode_satuan : $key;
                             });
                         @endphp
 
