@@ -204,7 +204,7 @@
                                 ->map(function($satuanGroup) {
                                     return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
                                 });
-
+                            
                             // Sort the grouped data by SS code to maintain proper order
                             $groupedData = $groupedData->sortBy(function($value, $key) use ($auditess) {
                                 $firstIkss = $auditess->ikssAuditee
