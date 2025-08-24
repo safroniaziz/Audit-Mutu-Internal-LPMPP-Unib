@@ -1,15 +1,11 @@
 @extends('dataauditor/dashboard_template')
 
 @section('menuPenilaianInstrumenProdi')
-    @foreach($pengajuan->auditors as $penugasan)
-        @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
-            <li class="nav-item mt-2">
-                <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
-                    <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
-                </a>
-            </li>
-        @endif
-    @endforeach
+    <li class="nav-item mt-2">
+        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
+            <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+        </a>
+    </li>
 @endsection
 
 @section('menuUnduhDokumen')
@@ -87,8 +83,44 @@
         }
     }
 
-    // Determine active step - should be first incomplete step or first step if none completed
-    $activeStep = $firstIncompleteStep ?? array_key_first($ikssCompletionStatus);
+    // Sort ikssCompletionStatus by SS code for proper wizard order
+    uasort($ikssCompletionStatus, function($a, $b) {
+        $kodeA = $a['satuan_standar']->kode_satuan;
+        $kodeB = $b['satuan_standar']->kode_satuan;
+        
+        // Extract group number from SS code (e.g., "SS 1.1" -> 1, "SS 2.1" -> 2)
+        if (preg_match('/SS\s*(\d+)\.\d+/', $kodeA, $matchesA) && preg_match('/SS\s*(\d+)\.\d+/', $kodeB, $matchesB)) {
+            $groupA = intval($matchesA[1]);
+            $groupB = intval($matchesB[1]);
+            if ($groupA !== $groupB) {
+                return $groupA - $groupB;
+            }
+            // If same group, sort by sub-number
+            $subA = intval(explode('.', $kodeA)[1]);
+            $subB = intval(explode('.', $kodeB)[1]);
+            return $subA - $subB;
+        }
+        return strcmp($kodeA, $kodeB);
+    });
+
+    // Create ordered array of SS IDs for proper next step navigation
+    $orderedSsIds = array_keys($ikssCompletionStatus);
+
+    // Determine active step - should be first incomplete step in ordered sequence or first step if none completed
+    $activeStep = null;
+    
+    // First, try to find the first incomplete step in the ordered sequence
+    foreach ($orderedSsIds as $ssId) {
+        if (isset($ikssCompletionStatus[$ssId]) && !$ikssCompletionStatus[$ssId]['is_completed']) {
+            $activeStep = $ssId;
+            break;
+        }
+    }
+    
+    // If no incomplete step found, use the first step in ordered sequence
+    if (!$activeStep) {
+        $activeStep = $orderedSsIds[0] ?? array_key_first($ikssCompletionStatus);
+    }
 @endphp
 
 @push('styles')
@@ -242,6 +274,14 @@
 @endpush
 
 @section('dashboardProfile')
+        <!-- Back Button -->
+    <div class="mb-5">
+        <a href="{{ route('auditor.audit.deskEvaluation', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
+            <i class="fas fa-arrow-left me-2"></i>
+            Kembali ke Desk Evaluation
+        </a>
+    </div>
+
     <div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
         <div class="card-header cursor-pointer">
             <div class="card-title m-0">
@@ -253,6 +293,34 @@
 
         <div class="card-body">
             @if($dataIkss->isNotEmpty())
+                <!-- Alert Informasi Waktu Visitasi -->
+                @if(!$visitasiTimeValidation['is_valid'])
+                    <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
+                        <div class="me-4">
+                            <i class="fas fa-clock fs-2 text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-warning mb-2">
+                                @if($visitasiTimeValidation['type'] === 'too_early')
+                                    ⏰ Menunggu Jadwal Visitasi
+                                @elseif($visitasiTimeValidation['type'] === 'too_late')
+                                    ⚠️ Jadwal Visitasi Berakhir
+                                @else
+                                    ⚠️ Waktu Visitasi Tidak Valid
+                                @endif
+                            </h4>
+                            <div class="fs-6 text-gray-700">
+                                <p class="mb-2">{{ $visitasiTimeValidation['message'] }}</p>
+                                @if($visitasiTimeValidation['type'] === 'too_late')
+                                    <p class="mb-0"><strong>Solusi:</strong> Silakan hubungi administrator untuk memperpanjang jadwal visitasi agar dapat melanjutkan proses.</p>
+                                @elseif($visitasiTimeValidation['type'] === 'too_early')
+                                    <p class="mb-0"><strong>Solusi:</strong> Silakan tunggu hingga waktu yang dijadwalkan untuk melakukan visitasi.</p>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
                 <div class="alert {{ $allCompleted ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10">
                     <div class="me-4">
                         <i class="bi {{ $allCompleted ? 'bi-check-circle-fill fs-2 text-success' : 'bi-exclamation-triangle-fill fs-2 text-danger' }}"></i>
@@ -289,25 +357,28 @@
                     </div>
 
                     <div class="ms-auto">
-                        @foreach($pengajuan->auditors as $penugasan)
-                            @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
-                                @if($allCompleted)
-                                    @if($setuju)
-                                        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                            <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
-                                        </a>
-                                    @else
-                                        <button type="button" class="btn btn-sm px-4 btn-success" id="approve-visitasi-btn" data-id="{{ $pengajuan->id }}">
-                                            <i class="bi bi-check-circle me-2"></i> Setujui
-                                        </button>
-                                    @endif
+                        @php
+                            $currentAuditor = $pengajuan->auditors->where('user_id', Auth::id())->first();
+                        @endphp
+                        @if($currentAuditor)
+                            @if($allCompleted)
+                                @if($setuju)
+                                    <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                        <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
+                                    </a>
                                 @else
-                                    <button type="button" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
-                                        <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                                    <button type="button" class="btn btn-sm px-4 btn-success {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
+                                            id="approve-visitasi-btn" data-id="{{ $pengajuan->id }}"
+                                            {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
+                                        <i class="bi bi-check-circle me-2"></i> Setujui
                                     </button>
                                 @endif
+                            @else
+                                <button type="button" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
+                                    <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                                </button>
                             @endif
-                        @endforeach
+                        @endif
                     </div>
                 </div>
 
@@ -557,12 +628,14 @@
 
                                     @if(!$allCompleted)
                                         @if(!$loop->last)
-                                            <button type="button" class="btn btn-primary next-step"
-                                                    data-next="{{ $loop->index + 1 }}">
+                                            <button type="button" class="btn btn-primary next-step {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
+                                                    data-next="{{ $loop->index + 1 }}"
+                                                    {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
                                                 Simpan & Lanjutkan <i class="bi bi-arrow-right ms-2"></i>
                                             </button>
                                         @else
-                                            <button type="button" class="btn btn-success submit-final-step">
+                                            <button type="button" class="btn btn-success submit-final-step {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
+                                                    {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
                                                 <i class="bi bi-check-circle me-2"></i> Simpan Evaluasi
                                             </button>
                                         @endif
@@ -583,6 +656,9 @@
 
 @push('scripts')
     <script>
+        // Pass ordered SS IDs from PHP to JavaScript
+        const orderedSsIds = @json($orderedSsIds);
+        
         $(document).ready(function() {
             // Initial setup - ensure only first section is visible
             initializeWizard();
@@ -641,6 +717,16 @@
 
             // Handle next step button
             $('.next-step').click(function() {
+                // Check if button is disabled due to time validation
+                if ($(this).hasClass('disabled')) {
+                    Swal.fire({
+                        title: 'Tidak Dapat Menyimpan',
+                        text: 'Visitasi tidak dapat dilakukan karena waktu tidak valid. Silakan hubungi administrator untuk memperpanjang jadwal.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
                 const currentStep = $('.wizard-content.active');
                 if (validateStep(currentStep)) {
                     submitStep(currentStep, $(this).data('next'));
@@ -649,6 +735,16 @@
 
             // Handle final step submission
             $('.submit-final-step').click(function() {
+                // Check if button is disabled due to time validation
+                if ($(this).hasClass('disabled')) {
+                    Swal.fire({
+                        title: 'Tidak Dapat Menyimpan',
+                        text: 'Visitasi tidak dapat dilakukan karena waktu tidak valid. Silakan hubungi administrator untuk memperpanjang jadwal.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
                 const currentStep = $('.wizard-content.active');
                 if (validateStep(currentStep)) {
                     submitStep(currentStep);
@@ -824,6 +920,16 @@
 
             // Approve visitasi
             $('#approve-visitasi-btn').click(function() {
+                // Check if button is disabled due to time validation
+                if ($(this).hasClass('disabled')) {
+                    Swal.fire({
+                        title: 'Tidak Dapat Menyetujui',
+                        text: 'Visitasi tidak dapat disetujui karena waktu tidak valid. Silakan hubungi administrator untuk memperpanjang jadwal.',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
                 const pengajuanId = $(this).data('id');
                 Swal.fire({
                     title: 'Konfirmasi',

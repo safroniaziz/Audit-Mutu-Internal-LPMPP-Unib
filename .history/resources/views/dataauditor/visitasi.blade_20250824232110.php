@@ -1,15 +1,11 @@
 @extends('dataauditor/dashboard_template')
 
 @section('menuPenilaianInstrumenProdi')
-    @foreach($pengajuan->auditors as $penugasan)
-        @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
-            <li class="nav-item mt-2">
-                <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
-                    <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
-                </a>
-            </li>
-        @endif
-    @endforeach
+    <li class="nav-item mt-2">
+        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
+            <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+        </a>
+    </li>
 @endsection
 
 @section('menuUnduhDokumen')
@@ -87,8 +83,44 @@
         }
     }
 
-    // Determine active step - should be first incomplete step or first step if none completed
-    $activeStep = $firstIncompleteStep ?? array_key_first($ikssCompletionStatus);
+    // Sort ikssCompletionStatus by SS code for proper wizard order
+    uasort($ikssCompletionStatus, function($a, $b) {
+        $kodeA = $a['satuan_standar']->kode_satuan;
+        $kodeB = $b['satuan_standar']->kode_satuan;
+
+        // Extract group number from SS code (e.g., "SS 1.1" -> 1, "SS 2.1" -> 2)
+        if (preg_match('/SS\s*(\d+)\.\d+/', $kodeA, $matchesA) && preg_match('/SS\s*(\d+)\.\d+/', $kodeB, $matchesB)) {
+            $groupA = intval($matchesA[1]);
+            $groupB = intval($matchesB[1]);
+            if ($groupA !== $groupB) {
+                return $groupA - $groupB;
+            }
+            // If same group, sort by sub-number
+            $subA = intval(explode('.', $kodeA)[1]);
+            $subB = intval(explode('.', $kodeB)[1]);
+            return $subA - $subB;
+        }
+        return strcmp($kodeA, $kodeB);
+    });
+
+    // Create ordered array of SS IDs for proper next step navigation
+    $orderedSsIds = array_keys($ikssCompletionStatus);
+
+    // Determine active step - should be first incomplete step in ordered sequence or first step if none completed
+    $activeStep = null;
+
+    // First, try to find the first incomplete step in the ordered sequence
+    foreach ($orderedSsIds as $ssId) {
+        if (isset($ikssCompletionStatus[$ssId]) && !$ikssCompletionStatus[$ssId]['is_completed']) {
+            $activeStep = $ssId;
+            break;
+        }
+    }
+
+    // If no incomplete step found, use the first step in ordered sequence
+    if (!$activeStep) {
+        $activeStep = $orderedSsIds[0] ?? array_key_first($ikssCompletionStatus);
+    }
 @endphp
 
 @push('styles')
@@ -242,6 +274,14 @@
 @endpush
 
 @section('dashboardProfile')
+        <!-- Back Button -->
+    <div class="mb-5">
+        <a href="{{ route('auditor.audit.deskEvaluation', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
+            <i class="fas fa-arrow-left me-2"></i>
+            Kembali ke Desk Evaluation
+        </a>
+    </div>
+
     <div class="card mb-5 mb-xl-10" id="kt_profile_details_view">
         <div class="card-header cursor-pointer">
             <div class="card-title m-0">
@@ -317,27 +357,28 @@
                     </div>
 
                     <div class="ms-auto">
-                        @foreach($pengajuan->auditors as $penugasan)
-                            @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
-                                @if($allCompleted)
-                                    @if($setuju)
-                                        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                            <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
-                                        </a>
-                                    @else
-                                        <button type="button" class="btn btn-sm px-4 btn-success {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
-                                                id="approve-visitasi-btn" data-id="{{ $pengajuan->id }}"
-                                                {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
-                                            <i class="bi bi-check-circle me-2"></i> Setujui
-                                        </button>
-                                    @endif
+                        @php
+                            $currentAuditor = $pengajuan->auditors->where('user_id', Auth::id())->first();
+                        @endphp
+                        @if($currentAuditor)
+                            @if($allCompleted)
+                                @if($setuju)
+                                    <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                        <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
+                                    </a>
                                 @else
-                                    <button type="button" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
-                                        <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                                    <button type="button" class="btn btn-sm px-4 btn-success {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
+                                            id="approve-visitasi-btn" data-id="{{ $pengajuan->id }}"
+                                            {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
+                                        <i class="bi bi-check-circle me-2"></i> Setujui
                                     </button>
                                 @endif
+                            @else
+                                <button type="button" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
+                                    <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                                </button>
                             @endif
-                        @endforeach
+                        @endif
                     </div>
                 </div>
 
@@ -376,7 +417,7 @@
                             $isActive = $satuanStandarId == $activeStep;
                             $stepClass = $isCompleted ? 'completed' : ($isActive ? 'active' : 'disabled');
                         @endphp
-                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $satuanStandarId }}">
+                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $satuanStandarId }}" data-order="{{ $loop->index }}">
                             <div class="step-number">{{ $loop->iteration }}</div>
                             <div class="step-label">{{ $status['satuan_standar']->kode_satuan }}</div>
                             <div class="step-desc">
@@ -615,6 +656,9 @@
 
 @push('scripts')
     <script>
+        // Pass ordered SS IDs from PHP to JavaScript
+        const orderedSsIds = @json($orderedSsIds);
+
         $(document).ready(function() {
             // Initial setup - ensure only first section is visible
             initializeWizard();
@@ -637,15 +681,23 @@
             $('.wizard-step').click(function() {
                 const stepElement = $(this);
                 const stepId = stepElement.data('step');
-                const prevStep = stepElement.prev('.wizard-step');
+
+                // Check if this step can be accessed using ordered SS IDs
+                const currentIndex = orderedSsIds.indexOf(stepId);
+                const isFirstStep = currentIndex === 0;
+                const prevStepId = currentIndex > 0 ? orderedSsIds[currentIndex - 1] : null;
+                const prevStepElement = prevStepId ? $(`.wizard-step[data-step="${prevStepId}"]`) : null;
+                const isPrevStepCompleted = prevStepElement && prevStepElement.hasClass('completed');
 
                 // Allow navigation if:
                 // 1. Step is completed
                 // 2. Step is currently active
-                // 3. Previous step is completed
+                // 3. Previous step (in ordered sequence) is completed
+                // 4. This is the first step
                 if (stepElement.hasClass('completed') ||
                     stepElement.hasClass('active') ||
-                    (prevStep.length && prevStep.hasClass('completed'))) {
+                    isPrevStepCompleted ||
+                    isFirstStep) {
                     showStep(stepId);
                 } else {
                     Swal.fire({
