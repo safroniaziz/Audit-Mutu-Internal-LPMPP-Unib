@@ -77,7 +77,7 @@
     uasort($groupedIkss, function($a, $b) {
         $kodeA = $a['satuan_standar']->kode_satuan;
         $kodeB = $b['satuan_standar']->kode_satuan;
-
+        
         // Extract group number from SS code (e.g., "SS 1.1" -> 1, "SS 2.1" -> 2)
         if (preg_match('/SS\s*(\d+)\.\d+/', $kodeA, $matchesA) && preg_match('/SS\s*(\d+)\.\d+/', $kodeB, $matchesB)) {
             $groupA = intval($matchesA[1]);
