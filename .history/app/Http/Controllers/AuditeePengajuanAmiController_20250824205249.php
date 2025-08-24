@@ -378,15 +378,15 @@ class AuditeePengajuanAmiController extends Controller
         // Buat unit kerja untuk kompatibilitas view
         $currentUnitKerja = UnitKerja::find($unitKerjaId);
         $currentUnitKerja->setRelation('indikatorKinerjas', $allIndikatorKinerjas);
-
+        
         $dataIkssProdi = collect([$currentUnitKerja]);
-
+    
         // Hitung total instrumen yang perlu diisi (yang status_target = 1)
         $totalInstrumen = IkssAuditee::where('auditee_id', $unitKerjaId)
                 ->where('periode_id', $periodeAktif->id)
                 ->where('status_target', 1)
                 ->count();
-
+    
         // hitung instrumen yang sudah diisi lengkap
         $totalCompleted = IkssAuditee::where('auditee_id', $unitKerjaId)
                             ->where('periode_id', $periodeAktif->id)
@@ -395,7 +395,7 @@ class AuditeePengajuanAmiController extends Controller
                             ->whereNotNull('akar')
                             ->whereNotNull('rencana')
                             ->count();
-
+    
         // hanya ambil yang SUDAH diisi realisasinya
         $ikssAuditeeData = IkssAuditee::where('auditee_id', $unitKerjaId)
                             ->where('periode_id', $periodeAktif->id)
@@ -403,7 +403,7 @@ class AuditeePengajuanAmiController extends Controller
                             ->whereNotNull('realisasi')
                             ->get()
                             ->keyBy('instrumen_id');
-
+    
         return view('auditee/pengajuan_ami/pengisian_instrumen', [
             'dataIkssProdi' => $dataIkssProdi,
             'periodeAktif' => $periodeAktif,
