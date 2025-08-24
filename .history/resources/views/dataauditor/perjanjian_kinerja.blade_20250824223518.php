@@ -1,11 +1,19 @@
 @extends('dataauditor/dashboard_template')
 
 @section('menuPenilaianInstrumenProdi')
+    <li class="nav-item mt-2">
+        <a class="nav-link text-active-primary ms-0 me-10 py-5">
+            <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+        </a>
+    </li>
+@endsection
+
+@section('menuUnduhDokumen')
     @foreach($auditess->auditors as $penugasan)
         @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
             <li class="nav-item mt-2">
-                <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled">
-                    <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+                <a class="nav-link text-active-primary ms-0 me-10 py-5">
+                    <i class="fas fa-download me-2"></i> Unduh Dokumen
                 </a>
             </li>
         @endif
@@ -81,6 +89,14 @@
 @endsection
 
 @section('dashboardProfile')
+    <!-- Back Button -->
+    <div class="mb-5">
+        <a href="{{ route('auditor.audit.daftarAuditee') }}" class="btn btn-light-primary btn-sm">
+            <i class="fas fa-arrow-left me-2"></i>
+            Kembali ke Daftar Auditee
+        </a>
+    </div>
+
     <!--begin::Welcome Card-->
     <div class="card mb-5 mb-xl-8">
         <div class="card-body">
@@ -183,6 +199,19 @@
                                            $ikss->instrumen->indikatorKinerja &&
                                            $ikss->instrumen->indikatorKinerja->satuanStandar;
                                 })
+                                @php
+                                    $groupedData = $auditess->ikssAuditee
+                                        ->filter(function($ikss) {
+                                            return $ikss->instrumen &&
+                                                   $ikss->instrumen->indikatorKinerja &&
+                                                   $ikss->instrumen->indikatorKinerja->satuanStandar;
+                                        })
+                                        ->sortBy('instrumen.indikatorKinerja.satuanStandar.id') // Urutkan berdasarkan ID SS
+                                        ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
+                                        ->map(function($satuanGroup) {
+                                            return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
+                                        });
+                                @endphp
                                 ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
                                 ->map(function($satuanGroup) {
                                     return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
