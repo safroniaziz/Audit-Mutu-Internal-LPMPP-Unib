@@ -12,15 +12,161 @@ use App\Models\Tujuan;
 use App\Models\IndikatorInstrumenKriteria;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class LaporanHasilAuditController extends Controller
 {
     public function index(){
-        $penugasanAuditors = PengajuanAmi::with(['auditors','auditee','ikssAuditee.nilai','periodeAktif'])
-                                ->withCount(['auditors'])->orderBy('created_at','desc')->get();
+        // Get current active period
+        $currentPeriod = PeriodeAktif::whereNull('deleted_at')->first();
+
+        // Get all periods for filter dropdown
+        $allPeriods = PeriodeAktif::withTrashed()
+            ->orderByRaw('deleted_at IS NULL DESC')
+            ->orderBy('tahun_ami', 'desc')
+            ->get();
+
+        // Get penugasan auditors filtered by current active period
+        $query = PengajuanAmi::with(['auditors.auditor','auditee','ikssAuditee.nilai','periodeAktif'])
+            ->withCount(['auditors'])
+            ->orderBy('created_at','desc');
+
+        // Filter by current active period if exists
+        if ($currentPeriod) {
+            $query->where('periode_id', $currentPeriod->id);
+        }
+
+        $penugasanAuditors = $query->get();
+
+                // Add audit status to each pengajuan
+        $penugasanAuditors->each(function ($pengajuan) {
+            $pengajuan->audit_status = $this->getAuditStatus($pengajuan);
+        });
+
         return view('laporan.index',[
-            'penugasanAuditors'    =>  $penugasanAuditors,
+            'penugasanAuditors' => $penugasanAuditors,
+            'currentPeriod' => $currentPeriod,
+            'allPeriods' => $allPeriods,
+        ]);
+    }
+
+        private function getAuditStatus($pengajuan)
+    {
+        // Check if pengajuan is approved
+        if (!$pengajuan->is_disetujui) {
+            return [
+                'status' => 'not_approved',
+                'label' => 'Belum Disetujui',
+                'color' => 'secondary',
+                'icon' => 'fas fa-clock'
+            ];
+        }
+
+        // Check all approval fields for all auditors
+        $allAuditorsCompleted = true;
+        $anyAuditorInProgress = false;
+        $anyAuditorStarted = false;
+
+        foreach ($pengajuan->auditors as $auditor) {
+            // Check if auditor has completed all stages - handle null values
+            $isSetuju = (bool)$auditor->is_setuju;
+            $isSetujuVisitasi = (bool)$auditor->is_setuju_visitasi;
+            $isSetujuIndikatorProdi = (bool)$auditor->is_setuju_indikator_prodi;
+
+            $auditorCompleted = $isSetuju && $isSetujuVisitasi && $isSetujuIndikatorProdi;
+            $auditorInProgress = ($isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi) && !$auditorCompleted; // Minimal satu field true tapi belum selesai
+            $auditorStarted = $isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi; // Minimal satu field true
+
+
+
+            if ($auditorInProgress) {
+                $anyAuditorInProgress = true;
+            }
+
+            if ($auditorStarted) {
+                $anyAuditorStarted = true;
+            }
+
+            if (!$auditorCompleted) {
+                $allAuditorsCompleted = false;
+            }
+        }
+
+
+
+        if ($allAuditorsCompleted) {
+            return [
+                'status' => 'completed',
+                'label' => 'Selesai',
+                'color' => 'success',
+                'icon' => 'fas fa-check-circle'
+            ];
+        } elseif ($anyAuditorStarted) {
+            return [
+                'status' => 'in_progress',
+                'label' => 'Dalam Proses',
+                'color' => 'warning',
+                'icon' => 'fas fa-clock'
+            ];
+        } else {
+            // If pengajuan is approved but no auditor has started (all is_setuju = false)
+            return [
+                'status' => 'not_started',
+                'label' => 'Belum Mulai',
+                'color' => 'secondary',
+                'icon' => 'fas fa-hourglass-start'
+            ];
+        }
+    }
+
+    public function getFilteredData(Request $request)
+    {
+        $query = PengajuanAmi::with([
+            'auditors.auditor',
+            'auditee',
+            'periodeAktif',
+            'ikssAuditee.nilai'
+        ])
+        ->withCount(['auditors'])
+        ->orderBy('created_at', 'desc');
+
+        // Filter by period if specified, otherwise use current active period
+        if ($request->filled('period')) {
+            $periodeId = $request->period;
+            $query->where('periode_id', $periodeId);
+        } else {
+            // Use current active period as default
+            $currentPeriod = PeriodeAktif::whereNull('deleted_at')->first();
+            if ($currentPeriod) {
+                $query->where('periode_id', $currentPeriod->id);
+            }
+        }
+
+        // Filter by search term if specified
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->whereHas('auditee', function($subQ) use ($searchTerm) {
+                    $subQ->where('nama_unit_kerja', 'like', '%' . $searchTerm . '%')
+                         ->orWhere('fakultas', 'like', '%' . $searchTerm . '%');
+                })
+                ->orWhereHas('auditors.auditor', function($subQ) use ($searchTerm) {
+                    $subQ->where('name', 'like', '%' . $searchTerm . '%');
+                });
+            });
+        }
+
+        $penugasanAuditors = $query->get();
+
+        // Add audit status to each pengajuan
+        $penugasanAuditors->each(function ($pengajuan) {
+            $pengajuan->audit_status = $this->getAuditStatus($pengajuan);
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $penugasanAuditors
         ]);
     }
 
@@ -131,7 +277,7 @@ class LaporanHasilAuditController extends Controller
                             $isPenugasanKetua = false;
 
                             foreach ($nilai->auditor->penugasan as $penugasan) {
-                                if ($penugasan->pengajuan_ami_id == $id &&
+                                if ($penugasan->pengajuan_ami_id == $pengajuan->id &&
                                     $penugasan->user_id == $nilai->auditor_id) {
                                     // Only include scores from ketua and pendamping roles
                                     if ($penugasan->role == 'ketua' || $penugasan->role == 'pendamping') {
@@ -196,11 +342,82 @@ class LaporanHasilAuditController extends Controller
 
             $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
+        // Get Evaluasi data for Auditee
+        $evaluasiAuditee = \App\Models\Evaluasi::where('jenis_evaluasi', 'auditee')->get();
+        $evaluasiSubmissionsAuditee = \App\Models\EvaluasiSubmission::where('pengajuan_ami_id', $id)
+            ->where('jenis', 'auditee')
+            ->get()
+            ->keyBy('evaluasi_id');
+        $evaluasiMasukanAuditee = \App\Models\EvaluasiMasukan::where('pengajuan_ami_id', $id)
+            ->where('user_id', $pengajuan->auditee->user_id ?? null)
+            ->first();
+
+        // Get Evaluasi data for each Auditor (hanya ketua)
+        $evaluasiAuditor = \App\Models\Evaluasi::where('jenis_evaluasi', 'auditor')->get();
+        $auditorEvaluasiData = [];
+
+        foreach ($pengajuanAmis->auditors as $auditor) {
+            // Hanya ambil data evaluasi untuk ketua auditor
+            if ($auditor->role == 'ketua') {
+                $evaluasiSubmissions = \App\Models\EvaluasiSubmission::where('pengajuan_ami_id', $id)
+                    ->where('jenis', 'auditor')
+                    ->where('user_id', $auditor->user_id)
+                    ->get()
+                    ->keyBy('evaluasi_id');
+
+                $evaluasiMasukan = \App\Models\EvaluasiMasukan::where('pengajuan_ami_id', $id)
+                    ->where('user_id', $auditor->user_id)
+                    ->first();
+
+                $auditorEvaluasiData[] = [
+                    'auditor' => $auditor->auditor,
+                    'role' => $auditor->role,
+                    'evaluasi_submissions' => $evaluasiSubmissions,
+                    'evaluasi_masukan' => $evaluasiMasukan
+                ];
+            }
+        }
+
+        // Get Kuisioner data for ketua auditor yang bertugas mengaudit pengajuan_ami ini
+        $kuisioners = \App\Models\Kuisioner::with(['opsis'])->get();
+        $auditorKuisionerData = [];
+
+        // Ambil penugasan auditor ketua yang bertugas mengaudit pengajuan_ami ini
+        $activePenugasan = \App\Models\PenugasanAuditor::where('pengajuan_ami_id', $id)
+            ->where('role', 'ketua')
+            ->whereNull('deleted_at')
+            ->first();
+
+        if ($activePenugasan) {
+            // Ambil jawaban kuisioner hanya dari ketua auditor yang bertugas mengaudit pengajuan_ami ini
+            $allKuisionerJawaban = \App\Models\KuisionerJawaban::with(['kuisioner', 'opsi'])
+                ->where('pengajuan_id', $id)
+                ->where('penugasan_auditor_id', $activePenugasan->id)
+                ->get();
+
+            if ($allKuisionerJawaban->count() > 0) {
+                $auditorKuisionerData[] = [
+                    'auditor_id' => $activePenugasan->user_id,
+                    'auditor_name' => $activePenugasan->auditor->name,
+                    'role' => $activePenugasan->role,
+                    'created_at' => $allKuisionerJawaban->first()->created_at,
+                    'kuisioner_jawaban' => $allKuisionerJawaban->keyBy('kuisioner_id')
+                ];
+            }
+        }
+
         return view('laporan.detail', [
             'periodeAktif' => $periodeAktif,
             'pengajuanAmis' => $pengajuanAmis,
             'sortedGrouped' => $sortedGrouped,
             'kriteriaScores' => $kriteriaScores,
+            'evaluasiAuditee' => $evaluasiAuditee,
+            'evaluasiSubmissionsAuditee' => $evaluasiSubmissionsAuditee,
+            'evaluasiMasukanAuditee' => $evaluasiMasukanAuditee,
+            'evaluasiAuditor' => $evaluasiAuditor,
+            'auditorEvaluasiData' => $auditorEvaluasiData,
+            'kuisioners' => $kuisioners,
+            'auditorKuisionerData' => $auditorKuisionerData,
         ]);
     }
 
@@ -262,10 +479,16 @@ class LaporanHasilAuditController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -344,9 +567,15 @@ class LaporanHasilAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Sasaran Strategis
+        // Process each Sasaran Strategis - only show those with prodi elements
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
+            $hasProdiElements = $satuanStandar->has_prodi_elements;
+
+            // Skip SS that don't have prodi elements
+            if (!$hasProdiElements) {
+                continue;
+            }
 
             // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
@@ -412,7 +641,7 @@ class LaporanHasilAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Sasaran Strategis with no data
+                // Add Sasaran Strategis with no data (but has prodi elements)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,

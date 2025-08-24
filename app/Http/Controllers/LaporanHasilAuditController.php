@@ -479,10 +479,16 @@ class LaporanHasilAuditController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -561,9 +567,15 @@ class LaporanHasilAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Sasaran Strategis
+        // Process each Sasaran Strategis - only show those with prodi elements
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
+            $hasProdiElements = $satuanStandar->has_prodi_elements;
+
+            // Skip SS that don't have prodi elements
+            if (!$hasProdiElements) {
+                continue;
+            }
 
             // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
@@ -629,7 +641,7 @@ class LaporanHasilAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Sasaran Strategis with no data
+                // Add Sasaran Strategis with no data (but has prodi elements)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,

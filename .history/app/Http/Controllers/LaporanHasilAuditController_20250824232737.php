@@ -65,16 +65,24 @@ class LaporanHasilAuditController extends Controller
 
         // Check all approval fields for all auditors
         $allAuditorsCompleted = true;
+        $anyAuditorInProgress = false;
         $anyAuditorStarted = false;
 
         foreach ($pengajuan->auditors as $auditor) {
             // Check if auditor has completed all stages - handle null values
-            $isSetuju = $auditor->is_setuju === true;
-            $isSetujuVisitasi = $auditor->is_setuju_visitasi === true;
-            $isSetujuIndikatorProdi = $auditor->is_setuju_indikator_prodi === true;
+            $isSetuju = (bool)$auditor->is_setuju;
+            $isSetujuVisitasi = (bool)$auditor->is_setuju_visitasi;
+            $isSetujuIndikatorProdi = (bool)$auditor->is_setuju_indikator_prodi;
 
             $auditorCompleted = $isSetuju && $isSetujuVisitasi && $isSetujuIndikatorProdi;
-            $auditorStarted = $isSetuju; // Only check is_setuju for "started" status
+            $auditorInProgress = ($isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi) && !$auditorCompleted; // Minimal satu field true tapi belum selesai
+            $auditorStarted = $isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi; // Minimal satu field true
+
+
+
+            if ($auditorInProgress) {
+                $anyAuditorInProgress = true;
+            }
 
             if ($auditorStarted) {
                 $anyAuditorStarted = true;
@@ -85,26 +93,7 @@ class LaporanHasilAuditController extends Controller
             }
         }
 
-        // Debug logging
-        \Log::info("Audit Status Debug for Pengajuan ID: " . $pengajuan->id, [
-            'auditee' => $pengajuan->auditee->nama_unit_kerja ?? 'N/A',
-            'is_disetujui' => $pengajuan->is_disetujui,
-            'anyAuditorStarted' => $anyAuditorStarted,
-            'allAuditorsCompleted' => $allAuditorsCompleted,
-            'auditors_count' => $pengajuan->auditors->count(),
-            'auditor_details' => $pengajuan->auditors->map(function($auditor) {
-                return [
-                    'auditor_name' => $auditor->auditor->name ?? 'N/A',
-                    'is_setuju' => $auditor->is_setuju,
-                    'is_setuju_visitasi' => $auditor->is_setuju_visitasi,
-                    'is_setuju_indikator_prodi' => $auditor->is_setuju_indikator_prodi,
-                    'started' => $auditor->is_setuju === true,
-                    'completed' => ($auditor->is_setuju === true &&
-                                   $auditor->is_setuju_visitasi === true &&
-                                   $auditor->is_setuju_indikator_prodi === true)
-                ];
-            })
-        ]);
+
 
         if ($allAuditorsCompleted) {
             return [
@@ -490,10 +479,16 @@ class LaporanHasilAuditController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {

@@ -70,13 +70,15 @@ class LaporanHasilAuditController extends Controller
 
         foreach ($pengajuan->auditors as $auditor) {
             // Check if auditor has completed all stages - handle null values
-            $isSetuju = $auditor->is_setuju === true;
-            $isSetujuVisitasi = $auditor->is_setuju_visitasi === true;
-            $isSetujuIndikatorProdi = $auditor->is_setuju_indikator_prodi === true;
+            $isSetuju = (bool)$auditor->is_setuju;
+            $isSetujuVisitasi = (bool)$auditor->is_setuju_visitasi;
+            $isSetujuIndikatorProdi = (bool)$auditor->is_setuju_indikator_prodi;
 
             $auditorCompleted = $isSetuju && $isSetujuVisitasi && $isSetujuIndikatorProdi;
             $auditorInProgress = ($isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi) && !$auditorCompleted; // Minimal satu field true tapi belum selesai
             $auditorStarted = $isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi; // Minimal satu field true
+
+
 
             if ($auditorInProgress) {
                 $anyAuditorInProgress = true;
@@ -91,30 +93,7 @@ class LaporanHasilAuditController extends Controller
             }
         }
 
-        // Debug logging
-        Log::info("Audit Status Debug for Pengajuan ID: " . $pengajuan->id, [
-            'auditee' => $pengajuan->auditee->nama_unit_kerja ?? 'N/A',
-            'is_disetujui' => $pengajuan->is_disetujui,
-            'anyAuditorInProgress' => $anyAuditorInProgress,
-            'anyAuditorStarted' => $anyAuditorStarted,
-            'allAuditorsCompleted' => $allAuditorsCompleted,
-            'auditors_count' => $pengajuan->auditors->count(),
-                                'auditor_details' => $pengajuan->auditors->map(function($auditor) {
-                        $isSetuju = $auditor->is_setuju === true;
-                        $isSetujuVisitasi = $auditor->is_setuju_visitasi === true;
-                        $isSetujuIndikatorProdi = $auditor->is_setuju_indikator_prodi === true;
 
-                        return [
-                            'auditor_name' => $auditor->auditor->name ?? 'N/A',
-                            'is_setuju' => $auditor->is_setuju,
-                            'is_setuju_visitasi' => $auditor->is_setuju_visitasi,
-                            'is_setuju_indikator_prodi' => $auditor->is_setuju_indikator_prodi,
-                            'in_progress' => ($isSetuju || $isSetujuVisitasi || $isSetujuIndikatorProdi) &&
-                                           !($isSetuju && $isSetujuVisitasi && $isSetujuIndikatorProdi),
-                            'completed' => ($isSetuju && $isSetujuVisitasi && $isSetujuIndikatorProdi)
-                        ];
-                    })
-        ]);
 
         if ($allAuditorsCompleted) {
             return [
@@ -500,10 +479,16 @@ class LaporanHasilAuditController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -582,9 +567,15 @@ class LaporanHasilAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Sasaran Strategis
+        // Process each Sasaran Strategis - only show those with prodi elements
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
+            $hasProdiElements = $satuanStandar->has_prodi_elements;
+
+            // Skip SS that don't have prodi elements
+            if (!$hasProdiElements) {
+                continue;
+            }
 
             // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
@@ -650,7 +641,7 @@ class LaporanHasilAuditController extends Controller
                     'has_data' => true
                 ]);
             } else {
-                // Add Sasaran Strategis with no data
+                // Add Sasaran Strategis with no data (but has prodi elements)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
