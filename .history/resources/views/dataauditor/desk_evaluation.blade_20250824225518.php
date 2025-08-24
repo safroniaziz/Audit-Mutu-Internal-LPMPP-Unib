@@ -595,7 +595,7 @@
 <script>
     // Pass ordered SS IDs from PHP to JavaScript
     const orderedSsIds = @json($orderedSsIds);
-
+    
     $(document).ready(function() {
         // Initial setup - ensure only first section is visible
         initializeWizard();

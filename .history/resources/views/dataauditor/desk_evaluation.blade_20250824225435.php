@@ -362,7 +362,7 @@
                             $isActive = $ssId == $activeStep;
                             $stepClass = $isCompleted ? 'completed' : ($isActive ? 'active' : 'disabled');
                         @endphp
-                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $ssId }}" data-order="{{ $loop->index }}">
+                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $ssId }}">
                             <div class="step-number">{{ $loop->iteration }}</div>
                             <div class="step-label">{{ $group['satuan_standar']->kode_satuan }}</div>
                             <div class="step-desc">
@@ -593,9 +593,6 @@
 
 @push('scripts')
 <script>
-    // Pass ordered SS IDs from PHP to JavaScript
-    const orderedSsIds = @json($orderedSsIds);
-
     $(document).ready(function() {
         // Initial setup - ensure only first section is visible
         initializeWizard();
@@ -923,11 +920,8 @@
                             },
                             success: function(response) {
                                 if (response.status === 'success' || response.success) {
-                                    // Get next step ID using ordered SS IDs for proper navigation
-                                    const currentStepId = $('.wizard-step.active').data('step');
-                                    const currentIndex = orderedSsIds.indexOf(currentStepId);
-                                    const nextIndex = currentIndex + 1;
-                                    const nextStepId = nextIndex < orderedSsIds.length ? orderedSsIds[nextIndex] : null;
+                                    // Get next step ID before showing alert
+                                    const nextStepId = $('.wizard-step.active').next('.wizard-step').data('step');
 
                                     Swal.fire({
                                         title: 'Berhasil!',
