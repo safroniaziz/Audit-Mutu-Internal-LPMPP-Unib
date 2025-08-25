@@ -642,11 +642,10 @@ class LaporanHasilAuditController extends Controller
                     'rata_rata' => $avgNilai,
                     'jumlah_penilaian' => $countAssessments,
                     'items' => $ikssItems,
-                    'has_data' => true,
-                    'has_prodi_elements' => $hasProdiElements
+                    'has_data' => true
                 ]);
             } else {
-                // Add Sasaran Strategis with no data (but still show all SS)
+                // Add Sasaran Strategis with no data (but has prodi elements)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -657,8 +656,7 @@ class LaporanHasilAuditController extends Controller
                     'rata_rata' => 0,
                     'jumlah_penilaian' => 0,
                     'items' => collect(),
-                    'has_data' => false,
-                    'has_prodi_elements' => $hasProdiElements
+                    'has_data' => false
                 ]);
             }
         }
