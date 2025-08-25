@@ -1109,10 +1109,9 @@ class AuditorAuditController extends Controller
         // Initialize results array
         $sortedGrouped = collect();
 
-        // Process each Sasaran Strategis - show all SS but data only for those with prodi elements
+        // Process each Sasaran Strategis
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandarId = $satuanStandar->id;
-            $hasProdiElements = $satuanStandar->has_prodi_elements;
 
             // Check if this Sasaran Strategis has audit data
             if ($groupedBySatuanId->has($satuanStandarId)) {
@@ -1175,11 +1174,10 @@ class AuditorAuditController extends Controller
                     'rata_rata' => $avgNilai,
                     'jumlah_penilaian' => $countAssessments,
                     'items' => $ikssItems,
-                    'has_data' => true,
-                    'has_prodi_elements' => $hasProdiElements
+                    'has_data' => true
                 ]);
             } else {
-                // Add Sasaran Strategis with no data (but still show all SS)
+                // Add Sasaran Strategis with no data
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -1190,8 +1188,7 @@ class AuditorAuditController extends Controller
                     'rata_rata' => 0,
                     'jumlah_penilaian' => 0,
                     'items' => collect(),
-                    'has_data' => false,
-                    'has_prodi_elements' => $hasProdiElements
+                    'has_data' => false
                 ]);
             }
         }
