@@ -1182,5 +1182,5 @@
     </script>
 
     {{-- Include File Viewer Modal --}}
-
+    @include('components.file-viewer-modal', ['id' => 'fileViewerModal', 'title' => 'Preview Dokumen'])
 @endpush
