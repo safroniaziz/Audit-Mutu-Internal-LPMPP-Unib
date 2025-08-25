@@ -118,10 +118,16 @@ class AuditeeLaporanAmiController extends Controller
     {
         $pengajuan = PengajuanAmi::findOrFail($id);
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
             'ikssAuditee' => function ($query) {
@@ -200,7 +206,7 @@ class AuditeeLaporanAmiController extends Controller
                 $avgNilai = $allScores->avg();
                 $countAssessments = $allScores->count();
 
-                // Add to results collection
+                                // Add to results collection
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -211,10 +217,11 @@ class AuditeeLaporanAmiController extends Controller
                     'rata_rata' => $avgNilai,
                     'jumlah_penilaian' => $countAssessments,
                     'items' => $ikssItems,
-                    'has_data' => true
+                    'has_data' => true,
+                    'has_prodi_elements' => $satuanStandar->has_prodi_elements
                 ]);
             } else {
-                // Add Sasaran Strategis with no data
+                // Add Sasaran Strategis with no data (but still show all SS)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -225,17 +232,74 @@ class AuditeeLaporanAmiController extends Controller
                     'rata_rata' => 0,
                     'jumlah_penilaian' => 0,
                     'items' => collect(),
-                    'has_data' => false
+                    'has_data' => false,
+                    'has_prodi_elements' => $satuanStandar->has_prodi_elements
                 ]);
-                }
+            }
             }
 
             $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
+
+        // Get Instrumen Prodi data - calculate per kriteria with specified columns
+        // Only get kriteria from instrumen that belong to this prodi
+        $kriterias = IndikatorInstrumenKriteria::with([
+            'instrumenProdi.nilaiAuditor' => function ($query) use ($pengajuan) {
+                $query->where('pengajuan_ami_id', $pengajuan->id);
+            }
+        ])
+        ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })
+        ->get();
+
+        // Calculate scores per kriteria
+        $kriteriaScores = [];
+        foreach ($kriterias as $kriteria) {
+            $ketuaScores = collect();
+            $anggotaScores = collect();
+
+            foreach ($kriteria->instrumenProdi as $instrumenProdi) {
+                foreach ($instrumenProdi->nilaiAuditor as $nilai) {
+                    if ($nilai->nilai) {
+                        // Get auditor role from penugasan
+                        $penugasan = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                            ->where('user_id', $nilai->auditor_id)
+                            ->first();
+
+                        if ($penugasan) {
+                            $scoreValue = (float)$nilai->nilai;
+                            if ($penugasan->role == 'ketua') {
+                                $ketuaScores->push($scoreValue);
+                            } elseif ($penugasan->role == 'pendamping') {
+                                $anggotaScores->push($scoreValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Calculate averages
+            $avgKetua = $ketuaScores->avg();
+            $avgAnggota = $anggotaScores->avg();
+            $avgTotal = collect([$avgKetua, $avgAnggota])->filter()->avg();
+
+            if ($avgTotal > 0) {
+                $kriteriaScores[] = [
+                    'kode_kriteria' => $kriteria->kode_kriteria,
+                    'nama_kriteria' => $kriteria->nama_kriteria,
+                    'rata_rata' => $avgTotal,
+                    'rata_rata_ketua' => $avgKetua,
+                    'rata_rata_anggota' => $avgAnggota,
+                    'jumlah_penilaian' => $ketuaScores->count() + $anggotaScores->count()
+                ];
+            }
+        }
 
         return view('auditee.laporan.detail', [
             'periodeAktif' => $periodeAktif,
             'pengajuanAmis' => $pengajuanAmis,
             'sortedGrouped' => $sortedGrouped,
+            'kriteriaScores' => $kriteriaScores,
         ]);
     }
 
@@ -255,10 +319,16 @@ class AuditeeLaporanAmiController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -402,10 +472,11 @@ class AuditeeLaporanAmiController extends Controller
                     'rata_rata' => $avgNilai,
                     'jumlah_penilaian' => $countAssessments,
                     'items' => $ikssItems,
-                    'has_data' => true
+                    'has_data' => true,
+                    'has_prodi_elements' => $satuanStandar->has_prodi_elements
                 ]);
             } else {
-                // Add Sasaran Strategis with no data
+                // Add Sasaran Strategis with no data (but still show all SS)
                 $sortedGrouped->push([
                     'satuan_standar_id' => $satuanStandarId,
                     'kode_satuan' => $satuanStandar->kode_satuan,
@@ -416,7 +487,8 @@ class AuditeeLaporanAmiController extends Controller
                     'rata_rata' => 0,
                     'jumlah_penilaian' => 0,
                     'items' => collect(),
-                    'has_data' => false
+                    'has_data' => false,
+                    'has_prodi_elements' => $satuanStandar->has_prodi_elements
                 ]);
             }
         }

@@ -118,10 +118,16 @@ class AuditeeLaporanAmiController extends Controller
     {
         $pengajuan = PengajuanAmi::findOrFail($id);
 
-        // Get only SatuanStandar that belong to this prodi's indikator kinerja
-        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
-        })->orderBy('kode_satuan')->get();
+        // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
+        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        
+        // Mark which SS have elements assigned to this prodi
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
+                ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
+                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                })->exists();
+        }
 
         $pengajuanAmis = PengajuanAmi::with([
             'ikssAuditee' => function ($query) {
@@ -232,10 +238,66 @@ class AuditeeLaporanAmiController extends Controller
 
             $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
+        // Get Instrumen Prodi data - calculate per kriteria with specified columns
+        // Only get kriteria from instrumen that belong to this prodi
+        $kriterias = IndikatorInstrumenKriteria::with([
+            'instrumenProdi.nilaiAuditor' => function ($query) use ($pengajuan) {
+                $query->where('pengajuan_ami_id', $pengajuan->id);
+            }
+        ])
+        ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })
+        ->get();
+
+        // Calculate scores per kriteria
+        $kriteriaScores = [];
+        foreach ($kriterias as $kriteria) {
+            $ketuaScores = collect();
+            $anggotaScores = collect();
+
+            foreach ($kriteria->instrumenProdi as $instrumenProdi) {
+                foreach ($instrumenProdi->nilaiAuditor as $nilai) {
+                    if ($nilai->nilai) {
+                        // Get auditor role from penugasan
+                        $penugasan = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                            ->where('user_id', $nilai->auditor_id)
+                            ->first();
+
+                        if ($penugasan) {
+                            $scoreValue = (float)$nilai->nilai;
+                            if ($penugasan->role == 'ketua') {
+                                $ketuaScores->push($scoreValue);
+                            } elseif ($penugasan->role == 'pendamping') {
+                                $anggotaScores->push($scoreValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Calculate averages
+            $avgKetua = $ketuaScores->avg();
+            $avgAnggota = $anggotaScores->avg();
+            $avgTotal = collect([$avgKetua, $avgAnggota])->filter()->avg();
+
+            if ($avgTotal > 0) {
+                $kriteriaScores[] = [
+                    'kode_kriteria' => $kriteria->kode_kriteria,
+                    'nama_kriteria' => $kriteria->nama_kriteria,
+                    'rata_rata' => $avgTotal,
+                    'rata_rata_ketua' => $avgKetua,
+                    'rata_rata_anggota' => $avgAnggota,
+                    'jumlah_penilaian' => $ketuaScores->count() + $anggotaScores->count()
+                ];
+            }
+        }
+
         return view('auditee.laporan.detail', [
             'periodeAktif' => $periodeAktif,
             'pengajuanAmis' => $pengajuanAmis,
             'sortedGrouped' => $sortedGrouped,
+            'kriteriaScores' => $kriteriaScores,
         ]);
     }
 
@@ -255,7 +317,10 @@ class AuditeeLaporanAmiController extends Controller
         $tujuans = Tujuan::all();
         $lingkupAudits = LingkupAudit::all();
 
-        $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
+        // Get only SatuanStandar that belong to this prodi's indikator kinerja
+        $allSatuanStandar = SatuanStandar::whereHas('indikatorKinerjas.unitKerjas', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })->orderBy('kode_satuan')->get();
 
         $pengajuanAmis = PengajuanAmi::with([
                             'ikssAuditee' => function ($query) {
@@ -271,6 +336,60 @@ class AuditeeLaporanAmiController extends Controller
                             'auditee',
                             'auditors.auditor.unitKerja',
                         ])->where('id', $pengajuan->id)->first();
+
+        // Get Instrumen Prodi data - calculate per kriteria with specified columns
+        // Only get kriteria from instrumen that belong to this prodi
+        $kriterias = IndikatorInstrumenKriteria::with([
+            'instrumenProdi.nilaiAuditor' => function ($query) use ($pengajuan) {
+                $query->where('pengajuan_ami_id', $pengajuan->id);
+            }
+        ])
+        ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
+            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+        })
+        ->get();
+
+        // Calculate scores per kriteria
+        $kriteriaScores = [];
+        foreach ($kriterias as $kriteria) {
+            $ketuaScores = collect();
+            $anggotaScores = collect();
+
+            foreach ($kriteria->instrumenProdi as $instrumenProdi) {
+                foreach ($instrumenProdi->nilaiAuditor as $nilai) {
+                    if ($nilai->nilai) {
+                        // Get auditor role from penugasan
+                        $penugasan = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+                            ->where('user_id', $nilai->auditor_id)
+                            ->first();
+
+                        if ($penugasan) {
+                            if ($penugasan->role == 'ketua') {
+                                $ketuaScores->push((float)$nilai->nilai);
+                            } elseif ($penugasan->role == 'pendamping') {
+                                $anggotaScores->push((float)$nilai->nilai);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $totalNilaiKetua = $ketuaScores->sum();
+            $totalNilaiAnggota = $anggotaScores->sum();
+            $totalNilai = $totalNilaiKetua + $totalNilaiAnggota;
+            $jumlahPenilaian = $ketuaScores->count() + $anggotaScores->count();
+            $rataRata = $jumlahPenilaian > 0 ? $totalNilai / $jumlahPenilaian : 0;
+
+            $kriteriaScores[] = [
+                'kode_kriteria' => $kriteria->kode_kriteria,
+                'nama_kriteria' => $kriteria->nama_kriteria,
+                'total_nilai_ketua' => $totalNilaiKetua,
+                'total_nilai_anggota' => $totalNilaiAnggota,
+                'total_nilai' => $totalNilai,
+                'jumlah_penilaian' => $jumlahPenilaian,
+                'rata_rata' => $rataRata
+            ];
+        }
 
         $ikssAuditeeCollection = collect($pengajuanAmis->ikssAuditee);
         $groupedBySatuanId = $ikssAuditeeCollection->groupBy(function ($ikssAuditee) {
@@ -371,6 +490,7 @@ class AuditeeLaporanAmiController extends Controller
             'pengajuanAmis'   =>  $pengajuanAmis,
             'sortedGrouped'   =>  $sortedGrouped,
             'jawabanKuisioner'   =>  $jawabanKuisioner,
+            'kriteriaScores' => $kriteriaScores,
         ];
 
         $pdf = Pdf::loadView('cetak.laporan_ami', $data);
