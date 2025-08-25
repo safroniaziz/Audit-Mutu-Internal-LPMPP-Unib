@@ -176,7 +176,7 @@ class LaporanHasilAuditController extends Controller
 
         // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
         $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
-
+        
         // Mark which SS have elements assigned to this prodi
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()

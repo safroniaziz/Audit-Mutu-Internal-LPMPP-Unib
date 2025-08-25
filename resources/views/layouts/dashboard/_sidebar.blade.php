@@ -156,7 +156,7 @@
                             <span class="menu-icon">
                                 <i class="fas fa-tasks fs-4"></i>
                             </span>
-                            <span class="menu-title">Instrumen Akreditasi</span>
+                            <span class="menu-title">Instrumen RSB</span>
                             <span class="menu-arrow"></span>
                         </span>
                         <div class="menu-sub menu-sub-accordion">
@@ -187,7 +187,7 @@
                         </div>
                     </div>
 
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('rsbProdi.index','rsbFakultas.index') ? 'show' : '' }}">
+                    {{-- <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('rsbProdi.index','rsbFakultas.index') ? 'show' : '' }}">
                         <span class="menu-link">
                             <span class="menu-icon">
                                 <i class="fas fa-clipboard-list fs-4"></i>
@@ -213,7 +213,7 @@
                                 </a>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
 
                     <div class="menu-item {{ Route::is('dokumenAmi.index') ? 'show' : '' }}">
                         <!--begin:Menu link-->
