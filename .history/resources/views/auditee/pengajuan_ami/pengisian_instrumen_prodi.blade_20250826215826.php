@@ -785,7 +785,13 @@ $(document).ready(function() {
                                 customClass: {
                                     confirmButton: 'btn btn-primary fw-semibold'
                                 }
-                                                        }).then((result) => {
+                            }).then((result) => {
+                                // Update completion status for current kriteria
+                                updateKriteriaCompletionStatus(kriteriaId, true);
+
+                                // Find next incomplete kriteria
+                                const nextKriteriaId = findNextIncompleteKriteria();
+
                                 // Show success message
                                 Swal.fire({
                                     title: 'Data Berhasil Disimpan!',

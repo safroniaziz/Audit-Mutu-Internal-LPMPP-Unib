@@ -904,7 +904,7 @@ class AuditeePengajuanAmiController extends Controller
                 foreach ($kriteria->instrumenProdi as $instrumenProdi) {
                     // Load submission with proper filtering
                     $instrumenProdi->submission = $instrumenProdi->submissionForUnitAndPeriode($unitKerjaId, $periodeAktif->id)->first();
-
+                    
                     // Debug: Log what data is being loaded
                     \Log::info("InstrumenProdi ID: {$instrumenProdi->id}", [
                         'submission_loaded' => $instrumenProdi->submission ? 'YES' : 'NO',

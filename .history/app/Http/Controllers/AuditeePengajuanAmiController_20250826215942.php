@@ -904,17 +904,6 @@ class AuditeePengajuanAmiController extends Controller
                 foreach ($kriteria->instrumenProdi as $instrumenProdi) {
                     // Load submission with proper filtering
                     $instrumenProdi->submission = $instrumenProdi->submissionForUnitAndPeriode($unitKerjaId, $periodeAktif->id)->first();
-
-                    // Debug: Log what data is being loaded
-                    \Log::info("InstrumenProdi ID: {$instrumenProdi->id}", [
-                        'submission_loaded' => $instrumenProdi->submission ? 'YES' : 'NO',
-                        'submission_data' => $instrumenProdi->submission ? [
-                            'id' => $instrumenProdi->submission->id,
-                            'realisasi' => $instrumenProdi->submission->realisasi,
-                            'periode_id' => $instrumenProdi->submission->periode_id,
-                            'unit_kerja_id' => $instrumenProdi->submission->unit_kerja_id
-                        ] : null
-                    ]);
                 }
             }
         }

@@ -656,8 +656,20 @@ $(document).ready(function() {
         return firstIncompleteId;
     }
 
-        // Show the appropriate kriteria content on page load
-    const activeKriteriaId = findFirstIncompleteStep();
+    // Show the appropriate kriteria content on page load
+    let activeKriteriaId = findFirstIncompleteStep();
+
+    // Check if there's a next_kriteria parameter from URL (after form submission)
+    const urlParams = new URLSearchParams(window.location.search);
+    const nextKriteriaParam = urlParams.get('next_kriteria');
+
+    if (nextKriteriaParam) {
+        // Use the next kriteria from URL parameter
+        activeKriteriaId = nextKriteriaParam;
+        // Clean up URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     if (activeKriteriaId) {
         showKriteriaContent(activeKriteriaId);
     }
@@ -785,7 +797,13 @@ $(document).ready(function() {
                                 customClass: {
                                     confirmButton: 'btn btn-primary fw-semibold'
                                 }
-                                                        }).then((result) => {
+                            }).then((result) => {
+                                // Update completion status for current kriteria
+                                updateKriteriaCompletionStatus(kriteriaId, true);
+
+                                // Find next incomplete kriteria
+                                const nextKriteriaId = findNextIncompleteKriteria();
+
                                 // Show success message
                                 Swal.fire({
                                     title: 'Data Berhasil Disimpan!',
@@ -888,7 +906,49 @@ $(document).ready(function() {
 
     window.showKriteriaContent = showKriteriaContent;
 
+    // Function to update kriteria completion status
+    function updateKriteriaCompletionStatus(kriteriaId, isCompleted) {
+        const stepElement = $(`.wizard-step[data-kriteria-id="${kriteriaId}"]`);
+        if (isCompleted) {
+            stepElement.addClass('completed').removeClass('active');
+        }
+    }
 
+    // Function to find next incomplete kriteria
+    function findNextIncompleteKriteria() {
+        let nextKriteriaId = null;
+        $('.wizard-step').each(function() {
+            const $step = $(this);
+            const kriteriaId = $step.data('kriteria-id');
+            const isCompleted = $step.hasClass('completed');
+            const isAccessible = $step.data('accessible');
+
+            if (!isCompleted && isAccessible && !nextKriteriaId) {
+                nextKriteriaId = kriteriaId;
+                return false; // break loop
+            }
+        });
+        return nextKriteriaId;
+    }
+
+    // Function to update wizard step status
+    function updateWizardStepStatus(completedKriteriaId, nextKriteriaId) {
+        // Mark completed step as completed
+        $(`.wizard-step[data-kriteria-id="${completedKriteriaId}"]`).addClass('completed');
+
+        // Mark next step as active and accessible
+        $(`.wizard-step[data-kriteria-id="${nextKriteriaId}"]`).addClass('active');
+
+        // Enable next step if it was disabled
+        $(`.wizard-step[data-kriteria-id="${nextKriteriaId}"]`).removeClass('disabled').data('accessible', true);
+    }
+
+    // Function to refresh form data for a specific kriteria
+    function refreshKriteriaFormData(kriteriaId) {
+        // Reload the page to get fresh data from server
+        // This ensures the form shows the newly saved data
+        window.location.reload();
+    }
 });
 </script>
 @endpush

@@ -35,6 +35,20 @@ class InstrumenProdi extends Model
     }
 
     /**
+     * Get the submission for specific unit kerja and periode
+     *
+     * @param int $unitKerjaId
+     * @param int $periodeId
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function submissionForUnitAndPeriode($unitKerjaId, $periodeId)
+    {
+        return $this->hasOne(InstrumenProdiSubmission::class, 'instrumen_prodi_id')
+                    ->where('unit_kerja_id', $unitKerjaId)
+                    ->where('periode_id', $periodeId);
+    }
+
+    /**
      * Get the submission for specific unit kerja
      *
      * @param int $unitKerjaId
@@ -85,6 +99,6 @@ class InstrumenProdi extends Model
     {
         return $this->hasOne(InstrumenProdiNilai::class, 'instrumen_prodi_id')
                     ->where('pengajuan_ami_id', $pengajuanId)
-                    ->where('auditor_id', auth()->id());
+                    ->where('auditor_id', Auth::id());
     }
 }

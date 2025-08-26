@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 
 class InstrumenProdi extends Model
 {
@@ -31,6 +32,20 @@ class InstrumenProdi extends Model
     public function submission()
     {
         return $this->hasOne(InstrumenProdiSubmission::class, 'instrumen_prodi_id');
+    }
+
+    /**
+     * Get the submission for specific unit kerja and periode
+     *
+     * @param int $unitKerjaId
+     * @param int $periodeId
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function submissionForUnitAndPeriode($unitKerjaId, $periodeId)
+    {
+        return $this->hasOne(InstrumenProdiSubmission::class, 'instrumen_prodi_id')
+                    ->where('unit_kerja_id', $unitKerjaId)
+                    ->where('periode_id', $periodeId);
     }
 
     /**
@@ -84,6 +99,6 @@ class InstrumenProdi extends Model
     {
         return $this->hasOne(InstrumenProdiNilai::class, 'instrumen_prodi_id')
                     ->where('pengajuan_ami_id', $pengajuanId)
-                    ->where('auditor_id', auth()->id());
+                    ->where('auditor_id', Auth::id());
     }
 }

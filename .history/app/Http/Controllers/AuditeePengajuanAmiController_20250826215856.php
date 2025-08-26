@@ -890,34 +890,18 @@ class AuditeePengajuanAmiController extends Controller
         // Get IndikatorInstrumen for this Prodi with proper eager loading
         $indikatorInstrumens = IndikatorInstrumen::with([
             'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $periodeAktif) {
-                $query->with(['kriteriaInstrumen.indikatorInstrumen']);
+                $query->with(['kriteriaInstrumen.indikatorInstrumen',
+                    'submission' => function($subQuery) use ($unitKerjaId, $periodeAktif) {
+                        $subQuery->where('unit_kerja_id', $unitKerjaId)
+                                ->where('periode_id', $periodeAktif->id);
+                    }
+                ]);
             }
         ])
             ->whereHas('prodis', function($query) use ($unitKerjaId) {
                 $query->where('unit_kerja_id', $unitKerjaId);
             })
             ->get();
-
-        // Manually load submission data for each instrumen prodi with proper filtering
-        foreach ($indikatorInstrumens as $indikator) {
-            foreach ($indikator->kriterias as $kriteria) {
-                foreach ($kriteria->instrumenProdi as $instrumenProdi) {
-                    // Load submission with proper filtering
-                    $instrumenProdi->submission = $instrumenProdi->submissionForUnitAndPeriode($unitKerjaId, $periodeAktif->id)->first();
-
-                    // Debug: Log what data is being loaded
-                    \Log::info("InstrumenProdi ID: {$instrumenProdi->id}", [
-                        'submission_loaded' => $instrumenProdi->submission ? 'YES' : 'NO',
-                        'submission_data' => $instrumenProdi->submission ? [
-                            'id' => $instrumenProdi->submission->id,
-                            'realisasi' => $instrumenProdi->submission->realisasi,
-                            'periode_id' => $instrumenProdi->submission->periode_id,
-                            'unit_kerja_id' => $instrumenProdi->submission->unit_kerja_id
-                        ] : null
-                    ]);
-                }
-            }
-        }
 
         return view('auditee.pengajuan_ami.pengisian_instrumen_prodi', [
             'indikatorInstrumens' => $indikatorInstrumens,
@@ -997,7 +981,10 @@ class AuditeePengajuanAmiController extends Controller
 
             DB::commit();
 
-
+            // Clear any cached data and force refresh
+            if (method_exists($this, 'clearCache')) {
+                $this->clearCache();
+            }
 
             return response()->json([
                 'success' => true,
