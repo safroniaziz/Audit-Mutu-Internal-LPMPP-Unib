@@ -885,15 +885,13 @@ class AuditeePengajuanAmiController extends Controller
     public function pengisianInstrumenProdi()
     {
         $unitKerjaId = Auth::user()->unit_kerja_id;
-        $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
         // Get IndikatorInstrumen for this Prodi with proper eager loading
         $indikatorInstrumens = IndikatorInstrumen::with([
-            'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $periodeAktif) {
+            'kriterias.instrumenProdi' => function($query) use ($unitKerjaId) {
                 $query->with(['kriteriaInstrumen.indikatorInstrumen',
-                    'submission' => function($subQuery) use ($unitKerjaId, $periodeAktif) {
-                        $subQuery->where('unit_kerja_id', $unitKerjaId)
-                                ->where('periode_id', $periodeAktif->id);
+                    'submission' => function($subQuery) use ($unitKerjaId) {
+                        $subQuery->where('unit_kerja_id', $unitKerjaId);
                     }
                 ]);
             }
@@ -916,7 +914,6 @@ class AuditeePengajuanAmiController extends Controller
 
             $user = Auth::user();
             $unitKerja = $user->unitKerja;
-            $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
             // Get all instrumen IDs from the form
             $instrumenIds = $request->input('instrumen_ids', []);
@@ -958,7 +955,6 @@ class AuditeePengajuanAmiController extends Controller
                     'akar_penyebab' => $akarPenyebab,
                     'rencana_perbaikan' => $rencanaPerbaikan,
                     'url_sumber' => $urlSumber,
-                    'periode_id' => $periodeAktif->id,
                 ];
 
                 // Handle file upload if any
@@ -973,7 +969,6 @@ class AuditeePengajuanAmiController extends Controller
                 [
                         'instrumen_prodi_id' => $instrumenProdi->id,
                         'unit_kerja_id' => $unitKerja->id,
-                        'periode_id' => $periodeAktif->id,
                 ],
                     $submissionData
                 );

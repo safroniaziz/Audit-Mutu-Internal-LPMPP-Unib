@@ -958,7 +958,6 @@ class AuditeePengajuanAmiController extends Controller
                     'akar_penyebab' => $akarPenyebab,
                     'rencana_perbaikan' => $rencanaPerbaikan,
                     'url_sumber' => $urlSumber,
-                    'periode_id' => $periodeAktif->id,
                 ];
 
                 // Handle file upload if any

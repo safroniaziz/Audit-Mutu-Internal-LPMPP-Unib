@@ -916,7 +916,6 @@ class AuditeePengajuanAmiController extends Controller
 
             $user = Auth::user();
             $unitKerja = $user->unitKerja;
-            $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
             // Get all instrumen IDs from the form
             $instrumenIds = $request->input('instrumen_ids', []);
@@ -958,7 +957,6 @@ class AuditeePengajuanAmiController extends Controller
                     'akar_penyebab' => $akarPenyebab,
                     'rencana_perbaikan' => $rencanaPerbaikan,
                     'url_sumber' => $urlSumber,
-                    'periode_id' => $periodeAktif->id,
                 ];
 
                 // Handle file upload if any
@@ -973,7 +971,6 @@ class AuditeePengajuanAmiController extends Controller
                 [
                         'instrumen_prodi_id' => $instrumenProdi->id,
                         'unit_kerja_id' => $unitKerja->id,
-                        'periode_id' => $periodeAktif->id,
                 ],
                     $submissionData
                 );
