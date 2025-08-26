@@ -10,24 +10,23 @@ class InstrumenProdiSubmission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'indikator_instrumen_id',
+        'instrumen_prodi_id',
         'unit_kerja_id',
-        'nilai',
-        'deskripsi'
+        'periode_id',
+        'realisasi',
+        'file_sumber',
+        'akar_penyebab',
+        'rencana_perbaikan',
+        'url_sumber'
     ];
 
-    public function indikatorInstrumen()
+    public function instrumenProdi()
     {
-        return $this->belongsTo(IndikatorInstrumen::class);
+        return $this->belongsTo(InstrumenProdi::class);
     }
 
     public function unitKerja()
     {
         return $this->belongsTo(UnitKerja::class);
-    }
-
-    public function dokumen()
-    {
-        return $this->hasMany(DokumenInstrumenProdi::class, 'submission_id');
     }
 }

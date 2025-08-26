@@ -12,6 +12,7 @@ class InstrumenProdiSubmission extends Model
     protected $fillable = [
         'instrumen_prodi_id',
         'unit_kerja_id',
+        'periode_id',
         'realisasi',
         'file_sumber',
         'akar_penyebab',
