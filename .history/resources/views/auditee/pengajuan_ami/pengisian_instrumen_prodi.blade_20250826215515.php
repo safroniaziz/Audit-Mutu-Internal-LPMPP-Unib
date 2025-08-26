@@ -658,18 +658,18 @@ $(document).ready(function() {
 
     // Show the appropriate kriteria content on page load
     let activeKriteriaId = findFirstIncompleteStep();
-
+    
     // Check if there's a next_kriteria parameter from URL (after form submission)
     const urlParams = new URLSearchParams(window.location.search);
     const nextKriteriaParam = urlParams.get('next_kriteria');
-
+    
     if (nextKriteriaParam) {
         // Use the next kriteria from URL parameter
         activeKriteriaId = nextKriteriaParam;
         // Clean up URL parameter
         window.history.replaceState({}, document.title, window.location.pathname);
     }
-
+    
     if (activeKriteriaId) {
         showKriteriaContent(activeKriteriaId);
     }
@@ -800,10 +800,10 @@ $(document).ready(function() {
                             }).then((result) => {
                                 // Update completion status for current kriteria
                                 updateKriteriaCompletionStatus(kriteriaId, true);
-
+                                
                                 // Find next incomplete kriteria
                                 const nextKriteriaId = findNextIncompleteKriteria();
-
+                                
                                 if (nextKriteriaId) {
                                     // Show success message for next step
                                     Swal.fire({
@@ -940,7 +940,7 @@ $(document).ready(function() {
             const kriteriaId = $step.data('kriteria-id');
             const isCompleted = $step.hasClass('completed');
             const isAccessible = $step.data('accessible');
-
+            
             if (!isCompleted && isAccessible && !nextKriteriaId) {
                 nextKriteriaId = kriteriaId;
                 return false; // break loop
@@ -953,10 +953,10 @@ $(document).ready(function() {
     function updateWizardStepStatus(completedKriteriaId, nextKriteriaId) {
         // Mark completed step as completed
         $(`.wizard-step[data-kriteria-id="${completedKriteriaId}"]`).addClass('completed');
-
+        
         // Mark next step as active and accessible
         $(`.wizard-step[data-kriteria-id="${nextKriteriaId}"]`).addClass('active');
-
+        
         // Enable next step if it was disabled
         $(`.wizard-step[data-kriteria-id="${nextKriteriaId}"]`).removeClass('disabled').data('accessible', true);
     }
