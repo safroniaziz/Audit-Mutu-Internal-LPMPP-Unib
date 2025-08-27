@@ -51,7 +51,7 @@
 
         <div class="flex-lg-row-fluid ms-lg-15">
             <div class="d-flex flex-wrap mb-8">
-                <h2 class="fw-bold text-dark me-5 my-2">📋 Instrumen Kinerja Satuan/Sistem (IKSS)</h2>
+                <h2 class="fw-bold text-dark me-5 my-2">📋 Indikator Kinerja Sasaran Strategis (IKSS)</h2>
                 <ul class="nav nav-pills nav-line-pills border-0 fs-5 fw-semibold flex-nowrap overflow-auto">
             </div>
 

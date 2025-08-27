@@ -294,7 +294,7 @@
             </div>
 
             <div class="d-flex flex-wrap mb-8">
-                <h2 class="fw-bold text-dark me-5">📋 Instrumen Kinerja Satuan/Sistem (IKSS)</h2>
+                <h2 class="fw-bold text-dark me-5">📋 Indikator Kinerja Sasaran Strategis (IKSS)</h2>
             </div>
 
             <form id="formPemilihanIkss" action="{{ route('auditee.pengajuanAmi.saveIkss') }}" method="POST" {{ $semuaInstrumenDiisi ? 'class=form-disabled' : '' }}>
