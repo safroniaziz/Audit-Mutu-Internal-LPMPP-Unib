@@ -1,25 +1,11 @@
 @extends('dataauditor/dashboard_template')
 
 @section('menuPenilaianInstrumenProdi')
-    @php
-        $isKetua = false;
-        foreach($auditess as $auditee) {
-            foreach($auditee->auditors as $penugasan) {
-                if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id()) {
-                    $isKetua = true;
-                    break 2;
-                }
-            }
-        }
-    @endphp
-
-    @if($isKetua)
-        <li class="nav-item mt-2">
-            <a href="#" class="nav-link text-active-primary ms-0 me-10 py-5">
-                <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
-            </a>
-        </li>
-    @endif
+    <li class="nav-item mt-2">
+        <a href="#" class="nav-link text-active-primary ms-0 me-10 py-5">
+            <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+        </a>
+    </li>
 @endsection
 
 @section('menuUnduhDokumen')
@@ -79,15 +65,25 @@
                             $activePeriods = $auditess->filter(function($auditee) {
                                 return $auditee->is_audit_period_active;
                             });
-                            $inactivePeriods = $auditess->filter(function($auditee) {
-                                return !$auditee->is_audit_period_active;
+                            $notStartedPeriods = $auditess->filter(function($auditee) {
+                                return $auditee->audit_period_status === 'not_started';
+                            });
+                            $endedPeriods = $auditess->filter(function($auditee) {
+                                return $auditee->audit_period_status === 'ended';
                             });
                         @endphp
-                        @if($inactivePeriods->count() > 0)
+                        @if($notStartedPeriods->count() > 0)
+                            <div class="mt-3 p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded">
+                                <i class="fas fa-clock text-info me-2"></i>
+                                <strong>Informasi:</strong> {{ $notStartedPeriods->count() }} auditee belum dapat diaudit karena jadwal audit belum dimulai.
+                                Tombol "Mulai Audit" dan "Lanjutkan" akan aktif setelah jadwal audit dimulai.
+                            </div>
+                        @endif
+                        @if($endedPeriods->count() > 0)
                             <div class="mt-3 p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded">
                                 <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                <strong>Perhatian:</strong> {{ $inactivePeriods->count() }} auditee belum dapat diaudit karena jadwal audit belum aktif.
-                                Tombol "Mulai Audit" dan "Lanjutkan" akan aktif setelah jadwal audit dimulai.
+                                <strong>Perhatian:</strong> {{ $endedPeriods->count() }} auditee belum dapat diaudit karena jadwal audit sudah berakhir.
+                                Tombol "Mulai Audit" dan "Lanjutkan" akan aktif setelah jadwal audit diperpanjang.
                             </div>
                         @endif
                     </div>
@@ -344,8 +340,8 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-muted fw-semibold fs-8">Periode Audit</span>
                                                     <span class="fw-bold fs-7 text-dark">
-                                                        @if($activePeriod)
-                                                            {{ $activePeriod->nomor_surat ?? 'N/A' }}/{{ $activePeriod->siklus ?? 'N/A' }}
+                                                        @if($auditee->periodeAktif)
+                                                            {{ $auditee->periodeAktif->nomor_surat ?? 'N/A' }}/{{ $auditee->periodeAktif->siklus ?? 'N/A' }}
                                                         @else
                                                             N/A
                                                         @endif
@@ -367,7 +363,15 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-muted fw-semibold fs-8">Jadwal Audit</span>
                                                     <span class="fw-bold fs-7 text-dark">
-                                                        {{ $auditee->is_audit_period_active ? 'Aktif' : 'Belum Aktif' }}
+                                                        @if($auditee->audit_period_status === 'active')
+                                                            Aktif
+                                                        @elseif($auditee->audit_period_status === 'not_started')
+                                                            Belum Mulai
+                                                        @elseif($auditee->audit_period_status === 'ended')
+                                                            Sudah Berakhir
+                                                        @else
+                                                            Tidak Tersedia
+                                                        @endif
                                                     </span>
                                                 </div>
                                             </div>
@@ -442,7 +446,13 @@
                                         @elseif(!$auditee->is_audit_period_active)
                                             <button class="btn btn-sm btn-secondary flex-grow-1" disabled>
                                                 <i class="fas fa-calendar-times me-1"></i>
-                                                Jadwal Audit Sudah Berakhir
+                                                @if($auditee->audit_period_status === 'not_started')
+                                                    Jadwal Audit Belum Mulai
+                                                @elseif($auditee->audit_period_status === 'ended')
+                                                    Jadwal Audit Sudah Berakhir
+                                                @else
+                                                    Jadwal Audit Tidak Tersedia
+                                                @endif
                                             </button>
                                         @else
                                             <a href="{{ route('auditor.audit.perjanjianKinerja', $auditee->id) }}"

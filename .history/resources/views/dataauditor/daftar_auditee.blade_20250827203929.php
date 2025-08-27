@@ -340,8 +340,8 @@
                                                 <div class="d-flex flex-column">
                                                     <span class="text-muted fw-semibold fs-8">Periode Audit</span>
                                                     <span class="fw-bold fs-7 text-dark">
-                                                        @if($activePeriod)
-                                                            {{ $activePeriod->nomor_surat ?? 'N/A' }}/{{ $activePeriod->siklus ?? 'N/A' }}
+                                                        @if($auditee->periodeAktif)
+                                                            {{ $auditee->periodeAktif->nomor_surat ?? 'N/A' }}/{{ $auditee->periodeAktif->siklus ?? 'N/A' }}
                                                         @else
                                                             N/A
                                                         @endif
