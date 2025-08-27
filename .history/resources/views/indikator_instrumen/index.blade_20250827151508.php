@@ -89,7 +89,7 @@
                                 <th class="min-w-50px ps-3">No</th>
                                 <th class="min-w-125px">Nama Indikator</th>
                                 <th class="min-w-200px">Program Studi</th>
-                                <th class="min-w-100px text-center">Jumlah Elemen</th>
+                                <th class="min-w-100px text-center">Jumlah Kriteria</th>
                                 <th class="min-w-100px text-center">Status</th>
                                 <th class="min-w-auto text-center">Aksi</th>
                             </tr>
@@ -125,17 +125,11 @@
                                             <span class="text-danger fst-italic">Tidak ada prodi terkait</span>
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                        @if($indikator->elemen_count > 0)
-                                            <a href="#" class="btn btn-sm btn-light-info view-elemen"
-                                               data-id="{{ $indikator->id }}"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#modalElemen">
-                                                <i class="fas fa-list"></i> {{ $indikator->elemen_count }} Elemen
-                                            </a>
-                                        @else
-                                            <span class="badge badge-light-secondary">0 Elemen</span>
-                                        @endif
+                                                                        <td class="text-center">
+                                        <a href="{{ route('indikatorInstrumen.getKriteria', $indikator->id) }}"
+                                           class="btn btn-sm {{ $indikator->kriteria_count > 0 ? 'btn-light-info' : 'btn-light-secondary' }}">
+                                            <i class="fas fa-list"></i> {{ $indikator->kriteria_count }} Kriteria
+                                        </a>
                                     </td>
                                     <td class="text-center">
                                         @if ($indikator->deleted_at)
@@ -178,7 +172,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">Data tidak tersedia</td>
+                                    <td colspan="7" class="text-center">Data tidak tersedia</td>
                                 </tr>
                                 @endforelse
                         </tbody>
@@ -189,39 +183,7 @@
         </div>
     </div>
 
-    <!-- Modal untuk menampilkan elemen -->
-    <div class="modal fade" id="modalElemen" tabindex="-1" data-bs-backdrop="static" data-bs-focus="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl">
-            <div class="modal-content">
-                <div class="modal-header px-10">
-                    <h2 class="fw-bold">Daftar Elemen - <span id="indikatorName"></span></h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body d-flex flex-column scroll-y px-10" style="flex-grow: 1;">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-center" style="width: 5%">No</th>
-                                    <th style="width: 20%">Kriteria</th>
-                                    <th style="width: 25%">Elemen</th>
-                                    <th style="width: 20%">Indikator</th>
-                                    <th style="width: 15%">Standar Digunakan</th>
-                                    <th style="width: 15%">Uraian</th>
-                                </tr>
-                            </thead>
-                            <tbody id="elemenTableBody">
-                                <!-- Data elemen akan diisi melalui JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @push('scripts')
@@ -233,6 +195,8 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+
 
         $(document).on('click', '.restore-data', function() {
             let id = $(this).data('id');

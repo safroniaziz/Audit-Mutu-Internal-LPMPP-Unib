@@ -126,14 +126,10 @@
                                         @endif
                                     </td>
                                                                         <td class="text-center">
-                                        @if($indikator->kriteria_count > 0)
-                                            <a href="{{ route('indikatorInstrumen.getKriteria', $indikator->id) }}"
-                                               class="btn btn-sm btn-light-info">
-                                                <i class="fas fa-list"></i> {{ $indikator->kriteria_count }} Kriteria
-                                            </a>
-                                        @else
-                                            <span class="badge badge-light-secondary">0 Kriteria</span>
-                                        @endif
+                                        <a href="{{ route('indikatorInstrumen.getKriteria', $indikator->id) }}"
+                                           class="btn btn-sm {{ $indikator->kriteria_count > 0 ? 'btn-light-info' : 'btn-light-secondary' }}">
+                                            <i class="fas fa-list"></i> {{ $indikator->kriteria_count }} Kriteria
+                                        </a>
                                     </td>
                                     <td class="text-center">
                                         @if ($indikator->deleted_at)
