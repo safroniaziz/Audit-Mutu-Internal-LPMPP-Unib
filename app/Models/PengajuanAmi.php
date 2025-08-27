@@ -70,7 +70,8 @@ class PengajuanAmi extends Model
      */
     public function periodeAktif(): BelongsTo
     {
-        return $this->belongsTo(PeriodeAktif::class, 'periode_id', 'id');
+        return $this->belongsTo(PeriodeAktif::class, 'periode_id', 'id')
+                    ->withTrashed();
     }
 
     public function evaluasiSubmissions()

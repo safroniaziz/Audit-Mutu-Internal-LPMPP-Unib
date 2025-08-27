@@ -60,6 +60,22 @@ class PengajuanAmi extends Model
      */
     public function perjanjianKinerja(): HasOne
     {
-        return $this->hasOne(PerjanjianKinerja::class, 'pengajuan_ami_id', 'local_key');
+        return $this->hasOne(PerjanjianKinerja::class, 'pengajuan_ami_id', 'id');
+    }
+
+    /**
+     * Get the periodeAktif that owns the PengajuanAmi
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function periodeAktif(): BelongsTo
+    {
+        return $this->belongsTo(PeriodeAktif::class, 'periode_id', 'id')
+                    ->withTrashed();
+    }
+
+    public function evaluasiSubmissions()
+    {
+        return $this->hasMany(EvaluasiSubmission::class, 'pengajuan_ami_id');
     }
 }
