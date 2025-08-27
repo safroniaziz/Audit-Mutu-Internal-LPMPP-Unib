@@ -412,7 +412,7 @@
 
         <div class="footer">
             <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 </body>

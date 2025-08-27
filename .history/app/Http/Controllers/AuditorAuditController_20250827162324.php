@@ -603,9 +603,9 @@ class AuditorAuditController extends Controller
         $indikatorInstrumens = IndikatorInstrumen::with([
             'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $pengajuan) {
                 $query->with(['kriteriaInstrumen.indikatorInstrumen',
-                    'submissionForUnitAndPeriode' => function ($query) use ($pengajuan) {
-                        $query->where('unit_kerja_id', $pengajuan->auditee->id)
-                              ->where('periode_id', $pengajuan->periode_id);
+                    'submission' => function($subQuery) use ($unitKerjaId, $pengajuan) {
+                        $subQuery->where('unit_kerja_id', $unitKerjaId)
+                                 ->where('periode_id', $pengajuan->periode_id);
                     },
                     'nilaiAuditor' => function($nilaiQuery) use ($pengajuan) {
                         $nilaiQuery->where('pengajuan_ami_id', $pengajuan->id)

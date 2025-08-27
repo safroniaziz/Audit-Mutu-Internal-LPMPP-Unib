@@ -232,10 +232,7 @@
         <table class="header-table" style="margin-top: 0;">
             <tr>
                 <td rowspan="4" class="logo-cell">
-                    <!-- Logo temporarily removed due to DomPDF image loading issue -->
-                    <div style="width: 90px; height: 90px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd;">
-                        <span style="font-size: 12px; color: #666; text-align: center;">LOGO<br>UNIB</span>
-                    </div>
+                    <img src="{{ public_path('assets/src/images/logo_unib.png') }}" alt="Logo UNIB" style="width: 90px; height: auto;">
                 </td>
                 <td rowspan="2" class="title-cell">
                     UNIVERSITAS<br>BENGKULU
@@ -435,14 +432,7 @@
     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; height: 80px; min-width: 120px;">
         @foreach($pengajuanAmis->auditors as $penugasan)
             @if($penugasan->role == 'ketua')
-                @php
-                    $pathTtdKetua = public_path('storage/' . $penugasan->auditor->ttd);
-                @endphp
-                @if (file_exists($pathTtdKetua) && is_file($pathTtdKetua))
-                    <img src="{{ $pathTtdKetua }}" alt="TTD Ketua" style="max-height: 50px;">
-                @else
-                    <span>-</span>
-                @endif
+                {{-- <img src="{{ public_path('storage/' . $penugasan->auditor->ttd) }}" alt="TTD pendamping" style="max-height: 50px;"> --}}
             @endif
         @endforeach
     </td>
@@ -452,7 +442,7 @@
     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; height: 80px; min-width: 120px;">
         @foreach($pengajuanAmis->auditors as $penugasan)
             @if($penugasan->role == 'pendamping')
-                <img src="{{ public_path('storage/' . $penugasan->auditor->ttd) }}" alt="TTD pendamping" style="max-height: 50px;">
+                {{-- <img src="{{ public_path('storage/' . $penugasan->auditor->ttd) }}" alt="TTD pendamping" style="max-height: 50px;"> --}}
             @endif
         @endforeach
     </td>
@@ -465,7 +455,7 @@
         @endphp
 
         @if (file_exists($pathTtd) && is_file($pathTtd))
-            <img src="{{ $pathTtd }}" alt="TTD Auditee" style="max-height: 50px;">
+            {{-- <img src="{{ $pathTtd }}" alt="TTD Auditee" style="max-height: 50px;"> --}}
         @else
             <span>-</span>
         @endif
@@ -756,6 +746,39 @@
             </tbody>
         </table>
 
+        @if(isset($kriteriaScores) && count($kriteriaScores) > 0)
+        <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
+
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">No</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Kode Kriteria</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Nama Kriteria</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai Ketua</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai Anggota</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Jumlah Penilaian</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Rata-Rata</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($kriteriaScores as $index => $kriteria)
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $index + 1 }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $kriteria['kode_kriteria'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $kriteria['nama_kriteria'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai_ketua'], 2) }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai_anggota'], 2) }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai'], 2) }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $kriteria['jumlah_penilaian'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['rata_rata'], 2) }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+
         <div class="signature-section">
             <div class="signature-right">
                 <p class="date">Bengkulu, 05 Mei 2025</p>
@@ -764,7 +787,7 @@
 
         <div class="footer">
             <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 

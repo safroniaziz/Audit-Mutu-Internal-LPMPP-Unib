@@ -15,7 +15,7 @@
             <img alt="Logo" src="{{ asset('assets/src/images/pppep.png') }}" class="h-35px app-sidebar-logo-minimize d-none" />
             <div class="d-flex flex-column ms-3 app-sidebar-logo-default">
                 <span class="fs-3 fw-bolder text-uppercase" style="letter-spacing: 1px; font-family: 'Segoe UI', sans-serif; color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.3);">LPMPP UNIB</span>
-                <span class="fs-8 fw-light" style="margin-top: -4px; letter-spacing: 0.5px; color: rgba(255,255,255,0.9); text-shadow: 0 0 5px rgba(255,255,255,0.2);">Sistem Informasi Audit Mutu Internal</span>
+                <span class="fs-8 fw-light" style="margin-top: -4px; letter-spacing: 0.5px; color: rgba(255,255,255,0.9); text-shadow: 0 0 5px rgba(255,255,255,0.2);">Sistem Integrasi Mutu UNIB</span>
             </div>
         </a>
 

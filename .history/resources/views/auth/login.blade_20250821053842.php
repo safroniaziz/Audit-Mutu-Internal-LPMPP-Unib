@@ -394,7 +394,7 @@
                         <img src="{{ asset('assets/src/images/pppep.png') }}" class="h-24" alt="logo PPPP">
                     </div>
                     <h2 class="text-2xl font-bold text-blue-600">SIAMI LPMPP UNIB</h2>
-                    <p class="text-sm text-gray-500">Sistem Informasi Audit Mutu Internal</p>
+                    <p class="text-sm text-gray-500">Sistem Integrasi Mutu UNIB</p>
                 </div>
 
                 @if (!session('success') && !session('error') && !$errors->any())

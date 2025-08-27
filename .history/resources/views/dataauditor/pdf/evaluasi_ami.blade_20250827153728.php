@@ -264,10 +264,7 @@
         <table class="header-table" style="margin-top: 0;">
             <tr>
                 <td rowspan="4" class="logo-cell">
-                    <!-- Logo temporarily removed due to DomPDF image loading issue -->
-                    <div style="width: 90px; height: 90px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border: 1px solid #ddd;">
-                        <span style="font-size: 12px; color: #666; text-align: center;">LOGO<br>UNIB</span>
-                    </div>
+                    <img src="{{ public_path('assets/src/images/logo_unib.png') }}" alt="Logo UNIB" style="width: 90px; height: auto;">
                 </td>
                 <td rowspan="2" class="title-cell">
                     UNIVERSITAS<br>BENGKULU
@@ -415,7 +412,7 @@
 
         <div class="footer">
             <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 </body>

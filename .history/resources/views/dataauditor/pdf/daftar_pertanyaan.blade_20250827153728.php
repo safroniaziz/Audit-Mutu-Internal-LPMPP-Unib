@@ -262,7 +262,7 @@
 
         <!-- Deskripsi -->
         <div class="section">
-            Dengan ini dinyatakan bahwa pada tanggal <strong>{{ format_indonesian_time($pengajuanAmis->waktu, 'l, d F Y') }}</strong>, telah dilaksanakan Audit Mutu Internal (AMI) oleh:
+            Dengan ini dinyatakan bahwa pada tanggal <strong>{{ \Carbon\Carbon::parse($pengajuanAmis->waktu)->translatedFormat('l, d F Y') }}</strong>, telah dilaksanakan Audit Mutu Internal (AMI) oleh:
         </div>
 
         <!-- Informasi Auditor -->
@@ -280,7 +280,7 @@
                 <tr>
                     <td style="vertical-align: top;">Waktu</td>
                     <td>:</td>
-                    <td>{{ \Carbon\Carbon::parse($pengajuanAmis->waktu)->setTimezone('Asia/Jakarta')->format('H:i') }} WIB</td>
+                    <td>{{ \Carbon\Carbon::parse($pengajuanAmis->waktu)->format('H:i') }} WIB</td>
 
                     <td style="background-color: #e6f2ff; font-weight: bold; text-align:center;" colspan="3">Data Auditor</td>
                 </tr>
@@ -374,7 +374,7 @@
 
         <div class="footer">
             <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 

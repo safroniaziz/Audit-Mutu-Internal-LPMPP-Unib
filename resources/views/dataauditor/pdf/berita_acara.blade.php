@@ -254,7 +254,7 @@
 
         <div class="footer">
             <p>Dibuat pada {{ now()->format('l, d F Y H:i') }} WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 

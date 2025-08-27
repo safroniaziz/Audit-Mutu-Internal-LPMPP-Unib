@@ -725,6 +725,10 @@
                     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;">4</td>
                     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;" colspan="4">Daftar Hadir ({{ $periodeAktif ? $periodeAktif->nomor_surat : '-' }})</td>
                 </tr>
+                <tr>
+                    <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;">5</td>
+                    <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;" colspan="4">Penilaian Instrumen Prodi ({{ $periodeAktif ? $periodeAktif->nomor_surat : '-' }})</td>
+                </tr>
             </tbody>
         </table>
 
@@ -760,53 +764,66 @@
             </tbody>
         </table>
 
-        <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
+                <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
 
-        @foreach ($groupedInstrumenProdi as $indikatorId => $indikatorData)
-            <p style="font-weight: bold; font-size:14px; color:#00447c; margin-top: 20px;">{{ $indikatorData['indikator']->indikator }}</p>
-
-            @foreach ($indikatorData['kriterias'] as $kriteriaId => $kriteriaData)
-                <p style="font-weight: bold; font-size:12px; color:#333; margin-top: 10px; margin-bottom: 5px;">
-                    {{ $kriteriaData['kriteria']->kode_kriteria }}. {{ $kriteriaData['kriteria']->kriteria }}
-                </p>
-
-                <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px; margin-bottom: 15px;">
-                    <thead>
-                        <tr>
-                            <th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:11px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">No</th>
-                            <th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:11px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Instrumen</th>
-                            <th style="padding: 8px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:11px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Nilai</th>
-                            <th style="padding: 8px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:11px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Catatan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($kriteriaData['instrumens'] as $index => $instrumenProdi)
-                            @php
-                                $nilaiAuditor = $instrumenProdi->nilaiAuditor->first();
-                            @endphp
-                            <tr>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">{{ $index + 1 }}</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 11px;">{{ $instrumenProdi->instrumen }}</td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">
-                                    @if($nilaiAuditor && $nilaiAuditor->nilai)
-                                        {{ $nilaiAuditor->nilai }}
-                                    @else
-                                        <span style="color: red;">-</span>
-                                    @endif
-                                </td>
-                                <td style="padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 11px;">
-                                    @if($nilaiAuditor && $nilaiAuditor->catatan)
-                                        {{ $nilaiAuditor->catatan }}
-                                    @else
-                                        <span style="color: #999;">-</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @endforeach
-        @endforeach
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">No</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Kode Kriteria</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Nama Kriteria</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai Ketua</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai Anggota</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Total Nilai</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Jumlah Penilaian</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Rata-Rata</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($kriteriaScores as $index => $kriteria)
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $index + 1 }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $kriteria['kode_kriteria'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $kriteria['nama_kriteria'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai_ketua'] > 0)
+                                {{ number_format($kriteria['total_nilai_ketua'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai_anggota'] > 0)
+                                {{ number_format($kriteria['total_nilai_anggota'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai'] > 0)
+                                {{ number_format($kriteria['total_nilai'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['jumlah_penilaian'] > 0)
+                                {{ $kriteria['jumlah_penilaian'] }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['rata_rata'] > 0)
+                                {{ number_format($kriteria['rata_rata'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
         <div class="signature-section">
             <div class="signature-right">
@@ -816,7 +833,7 @@
 
         <div class="footer">
             <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 

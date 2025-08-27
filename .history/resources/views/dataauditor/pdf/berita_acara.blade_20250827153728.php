@@ -214,17 +214,17 @@
             <tr>
                 <td>Nama Ka. Prodi/Perwakilan</td>
                 <td>:</td>
-                <td>{{ $pengajuan->auditee->nama ?? 'N/A' }}</td>
+                <td>{{ $pengajuan->auditee->nama_ketua ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <td>NIP/NIDN</td>
                 <td>:</td>
-                <td>{{ $pengajuan->auditee->nip ?? 'N/A' }}</td>
+                <td>{{ $pengajuan->auditee->nip_ketua ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <td>Program Studi/Jurusan</td>
                 <td>:</td>
-                <td>{{ $pengajuan->auditee->nama ?? 'N/A' }}</td>
+                <td>{{ $pengajuan->auditee->nama_unit_kerja ?? 'N/A' }}</td>
             </tr>
             <tr>
                 <td>Fakultas</td>
@@ -248,13 +248,13 @@
             </tr>
             <tr>
                 <td>({{ Auth::user()->name }})</td>
-                <td>({{ $pengajuan->auditee->nama ?? 'N/A' }})</td>
+                <td>({{ $pengajuan->auditee->nama_unit_kerja ?? 'N/A' }})</td>
             </tr>
         </table>
 
         <div class="footer">
             <p>Dibuat pada {{ now()->format('l, d F Y H:i') }} WIB</p>
-            <p>Sistem Informasi Audit Mutu Internal Universitas Bengkulu</p>
+            <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>
 
