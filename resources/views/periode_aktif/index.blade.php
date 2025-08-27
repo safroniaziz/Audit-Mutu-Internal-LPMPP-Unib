@@ -7,8 +7,7 @@
 
 @section('menu')
     Data Periode Aktif
-@endsection
-@section('link')
+@endsection@section('link')
     <li class="breadcrumb-item text-muted">
         <a href="index.html" class="text-muted text-hover-primary">Home</a>
     </li>
@@ -933,3 +932,19 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     @endpush
 @endsection
+
+/* Alternative solution with higher z-index */
+.dropdown-menu {
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+
+/* Ensure proper stacking context */
+.card-footer .dropdown {
+    position: static;
+}
+
+.card-footer .dropdown .dropdown-menu {
+    position: absolute;
+    z-index: 9999 !important;
+}

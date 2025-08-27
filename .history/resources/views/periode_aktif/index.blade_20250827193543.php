@@ -7,8 +7,7 @@
 
 @section('menu')
     Data Periode Aktif
-@endsection
-@section('link')
+@endsection@section('link')
     <li class="breadcrumb-item text-muted">
         <a href="index.html" class="text-muted text-hover-primary">Home</a>
     </li>
@@ -365,15 +364,15 @@
                                 <div class="d-flex flex-column gap-2">
                                     <!-- Primary Actions -->
                                     <div class="d-flex gap-2">
-                                        @if (!$periodeAktif->deleted_at)
-                                            <button type="button" class="btn btn-sm btn-primary flex-grow-1 edit-periodeAktif"
-                                                data-id="{{ $periodeAktif->id }}"
-                                                data-url="{{ route('periodeAktif.edit', $periodeAktif->id) }}"
-                                                data-bs-toggle="modal" data-bs-target="#kt_modal">
-                                                <i class="fas fa-edit me-1"></i>
-                                                Edit Periode
-                                            </button>
-                                        @else
+                                        <button type="button" class="btn btn-sm btn-primary flex-grow-1 edit-periodeAktif"
+                                            data-id="{{ $periodeAktif->id }}"
+                                            data-url="{{ route('periodeAktif.edit', $periodeAktif->id) }}"
+                                            data-bs-toggle="modal" data-bs-target="#kt_modal">
+                                            <i class="fas fa-edit me-1"></i>
+                                            Edit Periode
+                                        </button>
+
+                                        @if ($periodeAktif->deleted_at)
                                             <button type="button" class="btn btn-sm btn-success flex-grow-1" onclick="aktifkanPeriode({{ $periodeAktif->id }})">
                                                 <i class="fas fa-sync-alt me-1"></i>
                                                 Aktifkan Periode
@@ -437,66 +436,48 @@
 
             <!-- Modal Atur Jadwal -->
             <div class="modal fade" id="aturJadwalModal" tabindex="-1" aria-labelledby="aturJadwalModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-dialog modal-dialog-centered">
                     <form id="jadwalForm" method="POST">
                         @csrf
-                        <div class="modal-content border-0 shadow-lg rounded-4">
-                            <div class="modal-header bg-gradient-primary text-white border-0 pb-3">
+                        <div class="modal-content border-0 shadow">
+                            <div class="modal-header border-0 pb-0">
                                 <h5 class="modal-title fw-bold" id="aturJadwalModalLabel">
-                                    <i class="fas fa-calendar-alt me-2"></i>
-                                    Atur Jadwal <span id="jadwalTitle" class="text-warning"></span>
+                                    Atur Jadwal <span id="jadwalTitle" class="text-primary"></span>
                                 </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body p-6">
+                            <div class="modal-body pt-0">
                                 <div class="alert alert-danger error-message" style="display: none;"></div>
 
                                 <input type="hidden" id="periodeId" name="periode_id" value="">
                                 <input type="hidden" id="jadwalType" name="jadwal" value="">
 
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group mb-4">
-                                            <label for="dateRange" class="form-label fw-semibold fs-6 text-dark mb-3">
-                                                <i class="fas fa-calendar-day me-2 text-primary"></i>
-                                                Pilih Rentang Tanggal
-                                            </label>
-                                            <div class="input-group input-group-lg">
-                                                <span class="input-group-text bg-light-primary border-0">
-                                                    <i class="fas fa-calendar text-primary"></i>
-                                                </span>
-                                                <input type="text" class="form-control form-control-lg border-0 bg-light-primary" id="dateRange" name="tanggal" placeholder="Pilih tanggal mulai - tanggal selesai" readonly>
-                                            </div>
-                                            <div class="form-text text-muted mt-2">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                Pilih rentang tanggal untuk jadwal yang akan diatur
-                                            </div>
-                                        </div>
+                                <div class="form-group mb-4">
+                                    <label for="dateRange" class="form-label fw-semibold mb-2">
+                                        Pilih Rentang Tanggal
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                        <input type="text" class="form-control" id="dateRange" name="tanggal" placeholder="Pilih tanggal mulai - tanggal selesai" readonly>
+                                    </div>
+                                    <div class="form-text text-muted mt-1">
+                                        Pilih rentang tanggal untuk jadwal yang akan diatur
                                     </div>
                                 </div>
 
                                 <!-- Preview Section -->
-                                <div class="row mt-4">
-                                    <div class="col-12">
-                                        <div class="card bg-light-primary border-0 rounded-3">
-                                            <div class="card-body p-4">
-                                                <h6 class="fw-bold text-primary mb-3">
-                                                    <i class="fas fa-eye me-2"></i>
-                                                    Preview Jadwal
-                                                </h6>
-                                                <div id="jadwalPreview" class="text-muted">
-                                                    Pilih rentang tanggal untuk melihat preview jadwal
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div id="jadwalPreview" class="alert alert-info border-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Pilih rentang tanggal untuk melihat preview jadwal
                                 </div>
                             </div>
-                            <div class="modal-footer border-0 pt-0 px-6 pb-6">
-                                <button type="button" class="btn btn-light-secondary btn-lg" data-bs-dismiss="modal">
+                            <div class="modal-footer border-0 pt-0">
+                                <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
                                     <i class="fas fa-times me-2"></i>Batal
                                 </button>
-                                <button type="submit" class="btn btn-primary btn-lg">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>Simpan Jadwal
                                 </button>
                             </div>
@@ -803,11 +784,16 @@
                 }
                 $('#jadwalTitle').text(jadwalTitle);
 
-                // Reset form
+                // Reset form and destroy existing daterangepicker
                 $('#jadwalForm')[0].reset();
                 $('.error-message').hide();
 
-                // Initialize date range picker
+                // Destroy existing daterangepicker if exists
+                if ($('#dateRange').data('daterangepicker')) {
+                    $('#dateRange').data('daterangepicker').remove();
+                }
+
+                // Initialize default date range picker first
                 $('#dateRange').daterangepicker({
                     locale: {
                         format: 'DD/MM/YYYY',
@@ -832,6 +818,62 @@
                         '60 Hari Kedepan': [moment(), moment().add(60, 'days')]
                     }
                 });
+
+                // Set default preview
+                $('#jadwalPreview').html(`
+                    <div class="alert alert-info border-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Jadwal belum diatur</strong> - Silakan pilih rentang tanggal
+                    </div>
+                `);
+
+                // Get existing jadwal data
+                $.ajax({
+                    url: '{{ route("periodeAktif.getJadwalData") }}',
+                    type: 'GET',
+                    data: {
+                        periode_id: periodeId,
+                        jenis: jadwalType
+                    },
+                    success: function(response) {
+                        if (response.status === 'success' && response.data) {
+                            const jadwal = response.data;
+
+                            // If jadwal exists, update with existing dates
+                            if (jadwal.waktu_mulai && jadwal.waktu_selesai) {
+                                const startDate = moment(jadwal.waktu_mulai);
+                                const endDate = moment(jadwal.waktu_selesai);
+
+                                // Update daterangepicker with existing dates
+                                $('#dateRange').data('daterangepicker').setStartDate(startDate);
+                                $('#dateRange').data('daterangepicker').setEndDate(endDate);
+
+                                // Update preview
+                                $('#jadwalPreview').html(`
+                                    <div class="alert alert-success border-0">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong>Jadwal sudah diatur:</strong> ${startDate.format('DD MMMM YYYY')} - ${endDate.format('DD MMMM YYYY')}
+                                    </div>
+                                `);
+                            }
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching jadwal data:', xhr);
+                    }
+                });
+
+                // Update preview when date changes
+                $('#dateRange').off('apply.daterangepicker').on('apply.daterangepicker', function(ev, picker) {
+                    const start = picker.startDate.format('DD MMMM YYYY');
+                    const end = picker.endDate.format('DD MMMM YYYY');
+                    $('#jadwalPreview').html(`
+                        <div class="alert alert-primary border-0">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            <strong>Preview Jadwal:</strong> ${start} - ${end}
+                        </div>
+                    `);
+                });
             });
 
             // Handle jadwal form submission
@@ -841,6 +883,12 @@
                 const formData = new FormData(this);
                 formData.append('_token', '{{ csrf_token() }}');
 
+                // Debug: log data yang akan dikirim
+                console.log('Data yang akan dikirim:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ': ' + value);
+                }
+
                 $.ajax({
                     url: '{{ route("periodeAktif.aturJadwal") }}',
                     type: 'POST',
@@ -848,6 +896,7 @@
                     processData: false,
                     contentType: false,
                     success: function(response) {
+                        console.log('Response success:', response);
                         Swal.fire({
                             title: '✅ Berhasil!',
                             text: response.message,
@@ -860,6 +909,7 @@
                         });
                     },
                     error: function(xhr) {
+                        console.error('Response error:', xhr);
                         let message = 'Terjadi kesalahan saat menyimpan jadwal.';
                         if (xhr.responseJSON && xhr.responseJSON.message) {
                             message = xhr.responseJSON.message;
@@ -882,3 +932,19 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     @endpush
 @endsection
+
+/* Alternative solution with higher z-index */
+.dropdown-menu {
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+
+/* Ensure proper stacking context */
+.card-footer .dropdown {
+    position: static;
+}
+
+.card-footer .dropdown .dropdown-menu {
+    position: absolute;
+    z-index: 9999 !important;
+}
