@@ -623,8 +623,7 @@
                     Swal.fire({
                         icon: 'warning',
                         title: 'Tidak dapat melanjutkan',
-                        text: message,
-                        confirmButtonText: 'OK'
+                        text: message
                     });
                     return;
                 }
@@ -803,8 +802,7 @@
                     icon: 'warning',
                     title: 'Form Belum Lengkap',
                     text: 'Harap lengkapi semua field sebelum melanjutkan ke tahap berikutnya.',
-                    footer: `Field yang belum diisi: ${emptyFields.join(', ')}`,
-                    confirmButtonText: 'OK'
+                    footer: `Field yang belum diisi: ${emptyFields.join(', ')}`
                 });
                 if (firstEmptyField) {
                     firstEmptyField.focus();
