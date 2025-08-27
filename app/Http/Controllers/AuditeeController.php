@@ -18,7 +18,14 @@ class AuditeeController extends Controller
             ->distinct()
             ->orderBy('jenis_unit_kerja', 'asc')
             ->pluck('jenis_unit_kerja');
-        $unitKerjas = UnitKerja::all();
+        // Hanya tampilkan Unit Kerja yang belum terpakai oleh Auditee mana pun
+        $assignedUnitKerjaIds = User::role('Auditee')
+            ->whereNotNull('unit_kerja_id')
+            ->pluck('unit_kerja_id')
+            ->filter()
+            ->unique();
+
+        $unitKerjas = UnitKerja::whereNotIn('id', $assignedUnitKerjaIds)->get();
 
         $roleExists = Role::where('name', 'Auditee')->where('guard_name', 'web')->exists();
         $auditees = $roleExists
@@ -121,6 +128,11 @@ class AuditeeController extends Controller
         $auditee->foto_url = $auditee->foto
             ? Storage::url($auditee->foto)
             : null;
+
+        // Sertakan informasi Unit Kerja agar opsi bisa ditambahkan saat edit jika tidak tersedia di dropdown
+        $auditee->load('unitKerja');
+        $auditee->unit_kerja_nama = optional($auditee->unitKerja)->nama_unit_kerja;
+        $auditee->unit_kerja_jenis = optional($auditee->unitKerja)->jenis_unit_kerja;
 
         return response()->json(['success' => true, 'data' => $auditee]);
     }
