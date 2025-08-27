@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SIAMI LPMPP UNIB - Login</title>
+    <title>SINTAMU LPMPP UNIB - Login</title>
     <link rel="shortcut icon" href="{{ asset('assets/src/images/logo_unib.png') }}">
 
     <!-- tailwind -->
@@ -393,7 +393,7 @@
                         <img src="{{ asset('assets/src/images/logo_unib.png') }}" class="h-24" alt="logo UNIB">
                         <img src="{{ asset('assets/src/images/pppep.png') }}" class="h-24" alt="logo PPPP">
                     </div>
-                    <h2 class="text-2xl font-bold text-blue-600">SIAMI LPMPP UNIB</h2>
+                    <h2 class="text-2xl font-bold text-blue-600">SINTAMU LPMPP UNIB</h2>
                     <p class="text-sm text-gray-500">Sistem Integrasi Mutu UNIB</p>
                 </div>
 
