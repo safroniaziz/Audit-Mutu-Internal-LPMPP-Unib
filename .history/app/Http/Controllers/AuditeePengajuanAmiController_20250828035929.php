@@ -169,19 +169,7 @@ class AuditeePengajuanAmiController extends Controller
         $sortedIndikatorKinerjas = collect();
         foreach ($allIndikatorKinerjas as $group) {
             // Sort each group by kode_ikss to ensure proper ordering within each Satuan Standar
-            // Use custom sorting to handle numerical parts correctly (e.g., 2.1.10 should come after 2.1.9)
-            $sortedGroup = $group->sortBy(function ($item) {
-                // Extract numerical parts from kode_ikss (e.g., "IKSS 2.1.10" -> [2, 1, 10])
-                if (preg_match('/IKSS\s+(\d+)\.(\d+)\.(\d+)/', $item->kode_ikss, $matches)) {
-                    $major = (int)$matches[1];
-                    $minor = (int)$matches[2];
-                    $patch = (int)$matches[3];
-                    // Create a sortable key that maintains numerical order
-                    return sprintf('%03d.%03d.%03d', $major, $minor, $patch);
-                }
-                // Fallback to original kode_ikss if pattern doesn't match
-                return $item->kode_ikss;
-            });
+            $sortedGroup = $group->sortBy('kode_ikss');
             $sortedIndikatorKinerjas = $sortedIndikatorKinerjas->merge($sortedGroup);
         }
 

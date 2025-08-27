@@ -159,7 +159,9 @@ class AuditeePengajuanAmiController extends Controller
         })
         ->join('satuan_standars', 'indikator_kinerjas.satuan_standar_id', '=', 'satuan_standars.id')
         ->orderBy('satuan_standars.id') // Urutkan berdasarkan ID Satuan Standar
-        ->orderBy('indikator_kinerjas.kode_ikss') // Tambahkan ordering berdasarkan kode_ikss untuk urutan yang benar
+        ->orderByRaw('CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(indikator_kinerjas.kode_ikss, ".", 1), " ", -1) AS UNSIGNED)') // Major version
+        ->orderByRaw('CAST(SUBSTRING_INDEX(SUBSTRING_INDEX(indikator_kinerjas.kode_ikss, ".", 2), ".", -1) AS UNSIGNED)') // Minor version  
+        ->orderByRaw('CAST(SUBSTRING_INDEX(indikator_kinerjas.kode_ikss, ".", -1) AS UNSIGNED)') // Patch version
         ->select('indikator_kinerjas.*') // Pilih hanya kolom dari indikator_kinerjas
         ->get()
         ->groupBy('satuan_standar_id')
@@ -169,19 +171,7 @@ class AuditeePengajuanAmiController extends Controller
         $sortedIndikatorKinerjas = collect();
         foreach ($allIndikatorKinerjas as $group) {
             // Sort each group by kode_ikss to ensure proper ordering within each Satuan Standar
-            // Use custom sorting to handle numerical parts correctly (e.g., 2.1.10 should come after 2.1.9)
-            $sortedGroup = $group->sortBy(function ($item) {
-                // Extract numerical parts from kode_ikss (e.g., "IKSS 2.1.10" -> [2, 1, 10])
-                if (preg_match('/IKSS\s+(\d+)\.(\d+)\.(\d+)/', $item->kode_ikss, $matches)) {
-                    $major = (int)$matches[1];
-                    $minor = (int)$matches[2];
-                    $patch = (int)$matches[3];
-                    // Create a sortable key that maintains numerical order
-                    return sprintf('%03d.%03d.%03d', $major, $minor, $patch);
-                }
-                // Fallback to original kode_ikss if pattern doesn't match
-                return $item->kode_ikss;
-            });
+            $sortedGroup = $group->sortBy('kode_ikss');
             $sortedIndikatorKinerjas = $sortedIndikatorKinerjas->merge($sortedGroup);
         }
 
