@@ -400,7 +400,6 @@
                                                 <li>
                                                     <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#aturJadwalModal" data-jadwal="login" data-periode-id="{{ $periodeAktif->id }}">
                                                         <i class="fas fa-user-tick me-2 text-primary"></i>
-                                                        Jadwal Login
                                                     </a>
                                                 </li>
                                                 <li>

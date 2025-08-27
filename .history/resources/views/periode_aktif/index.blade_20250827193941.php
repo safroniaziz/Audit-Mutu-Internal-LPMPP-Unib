@@ -391,7 +391,7 @@
                                         @endif
 
                                         <!-- Jadwal Dropdown Button -->
-                                        <div class="dropup">
+                                        <div class="drop">
                                             <button class="btn btn-sm btn-info dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 <i class="fas fa-clock me-1"></i>
                                                 Atur Jadwal
