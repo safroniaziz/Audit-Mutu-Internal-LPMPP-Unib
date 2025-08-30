@@ -44,7 +44,7 @@
                                             </i>
                                         </div>
                                         <div>
-                                            <h1 class="text-white fw-bold fs-2hx mb-1">Selamat Datang di SIAMI</h1>
+                                            <h1 class="text-white fw-bold fs-2hx mb-1">Selamat Datang di SINTAMU</h1>
                                             <div class="d-flex align-items-center">
                                                 <span class="badge badge-light-primary fs-8 fw-bold me-2">v2.0</span>
                                                 <span class="text-white-75 fs-7">Sistem Terintegrasi</span>

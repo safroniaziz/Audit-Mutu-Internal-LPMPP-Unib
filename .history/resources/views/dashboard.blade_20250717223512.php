@@ -24,7 +24,7 @@
                         <div class="card-body p-8">
                             <div class="row align-items-center">
                                 <div class="col-lg-8">
-                                    <h1 class="text-white fw-bold fs-2hx mb-3">Selamat Datang di SIAMI</h1>
+                                    <h1 class="text-white fw-bold fs-2hx mb-3">Selamat Datang di SINTAMU</h1>
                                     <p class="text-white-75 fs-6 mb-0">Sistem Audit Mutu Internal Universitas Bengkulu</p>
                                     <p class="text-white-50 fs-7 mt-2">Dashboard Analytics & Performance Monitoring</p>
                                 </div>
