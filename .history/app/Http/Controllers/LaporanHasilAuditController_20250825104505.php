@@ -176,7 +176,7 @@ class LaporanHasilAuditController extends Controller
 
         // Get ALL SatuanStandar but mark which ones have elements assigned to this prodi
         $allSatuanStandar = SatuanStandar::orderBy('kode_satuan')->get();
-        
+
         // Mark which SS have elements assigned to this prodi
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
@@ -463,7 +463,7 @@ class LaporanHasilAuditController extends Controller
         return $pdf->stream('Berita_Acara_Audit.pdf');
     }
 
-    public function evaluasiAmi($id)
+    public function evaluaSINTAMU($id)
     {
         $pengajuan = PengajuanAmi::with(['auditee', 'auditors.auditor', 'ikssAuditee'])->findOrFail($id);
         $pdf = Pdf::loadView('cetak.evaluasi_ami', [

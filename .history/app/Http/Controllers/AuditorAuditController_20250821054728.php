@@ -223,7 +223,7 @@ class AuditorAuditController extends Controller
             $perjanjianKinerja = \App\Models\PerjanjianKinerja::where('auditee_id', $auditess->auditee_id)
                 ->where('periode_id', $auditess->periode_id)
                 ->first();
-            
+
             $auditess->perjanjianKinerja = $perjanjianKinerja;
         }
 
@@ -810,7 +810,7 @@ class AuditorAuditController extends Controller
         return $pdf->stream('Berita_Acara_Audit.pdf');
     }
 
-    public function evaluasiAmi(Request $request, PengajuanAmi $pengajuan)
+    public function evaluaSINTAMU(Request $request, PengajuanAmi $pengajuan)
     {
         $validator = Validator::make($request->all(), [
             'nilai' => 'required|array',
@@ -903,13 +903,13 @@ class AuditorAuditController extends Controller
         }
     }
 
-    public function downloadEvaluasiAmi(PengajuanAmi $pengajuan)
+    public function downloadEvaluaSINTAMU(PengajuanAmi $pengajuan)
     {
         $pdf_path = storage_path('app/public/temp/evaluasi_ami_' . $pengajuan->id . '.pdf');
         return response()->download($pdf_path, 'Evaluasi_Ami.pdf')->deleteFileAfterSend(true);
     }
 
-    public function viewEvaluasiAmi(PengajuanAmi $pengajuan)
+    public function viewEvaluaSINTAMU(PengajuanAmi $pengajuan)
     {
         // Get evaluasi data for PDF
         $evaluasis = Evaluasi::where('jenis_evaluasi', 'auditor')->get();

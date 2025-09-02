@@ -61,7 +61,7 @@ class CreateSampleActivities extends Command
             ],
             [
                 'log_name' => 'user_login',
-                'description' => 'User login ke sistem SIAMI',
+                'description' => 'User login ke sistem SINTAMU',
                 'created_at' => Carbon::now()->subDays(2)
             ],
             [

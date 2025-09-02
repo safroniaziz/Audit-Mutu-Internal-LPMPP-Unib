@@ -22,12 +22,12 @@ class DokumenAmiSeeder extends Seeder
         'path' => 'ami/peraturan_kode_etik_auditor.pdf',
     ],
     [
-        'judul' => 'Manual Book SIAMI (Auditee)',
-        'path' => 'ami/manual_book_siami_auditee.pdf',
+        'judul' => 'Manual Book SINTAMU (Auditee)',
+        'path' => 'ami/manual_book_SINTAMU_auditee.pdf',
     ],
     [
-        'judul' => 'Manual Book SIAMI (Auditor)',
-        'path' => 'ami/manual_book_siami_auditor.pdf',
+        'judul' => 'Manual Book SINTAMU (Auditor)',
+        'path' => 'ami/manual_book_SINTAMU_auditor.pdf',
     ],
     [
         'judul' => 'Surat Tugas Asesor AMI',

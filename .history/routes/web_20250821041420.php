@@ -92,7 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/{id}/hapus-permanen/', [InstrumenProdiController::class, 'destroyPermanent'])->name('hapus_permanen');
             Route::get('/indikator/{indikatorId}/kriteria', [InstrumenProdiController::class, 'getKriteriaByIndikator'])->name('getKriteriaByIndikator');
             Route::get('/instrumen-prodi/{id}', [InstrumenProdiController::class, 'show'])->name('show');
-            
+
             // Test route untuk debug
             Route::get('/test-edit/{id}', function($id) {
                 return response()->json(['success' => true, 'message' => 'Test route working', 'id' => $id]);
@@ -295,7 +295,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{id}/detail', [LaporanHasilAuditController::class, 'show'])->name('detail');
             Route::get('/{id}/daftar_pertanyaan', [LaporanHasilAuditController::class, 'daftarPertanyaan'])->name('daftarPertanyaan');
             Route::get('/{id}/berita-acara', [LaporanHasilAuditController::class, 'beritaAcara'])->name('beritaAcara');
-            Route::get('/{id}/evaluasi-ami', [LaporanHasilAuditController::class, 'evaluasiAmi'])->name('evaluasiAmi');
+            Route::get('/{id}/evaluasi-ami', [LaporanHasilAuditController::class, 'evaluaSINTAMU'])->name('evaluaSINTAMU');
             Route::get('/{id}/laporan-ami', [LaporanHasilAuditController::class, 'laporanAmi'])->name('laporanAmi');
         });
 
@@ -376,8 +376,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::prefix('cetak')->group(function () {
                     Route::post('/berita-acara/{pengajuan}', [AuditorAuditController::class, 'beritaAcara'])->name('beritaAcara');
                     Route::get('/berita-acara/{pengajuan}/view', [AuditorAuditController::class, 'viewBeritaAcara'])->name('viewBeritaAcara');
-                    Route::post('/evaluasi/{pengajuan}', [AuditorAuditController::class, 'evaluasiAmi'])->name('evaluasiAmi');
-                    Route::get('/evaluasi/{pengajuan}/view', [AuditorAuditController::class, 'viewEvaluasiAmi'])->name('viewEvaluasiAmi');
+                    Route::post('/evaluasi/{pengajuan}', [AuditorAuditController::class, 'evaluaSINTAMU'])->name('evaluaSINTAMU');
+                    Route::get('/evaluasi/{pengajuan}/view', [AuditorAuditController::class, 'viewEvaluaSINTAMU'])->name('viewEvaluaSINTAMU');
                     Route::get('/daftar-pertanyaan/{pengajuan}', [AuditorAuditController::class, 'daftarPertanyaan'])->name('daftarPertanyaan');
                     Route::post('/laporan-ami/{pengajuan}', [AuditorAuditController::class, 'laporanAmi'])->name('laporanAmi');
                 });

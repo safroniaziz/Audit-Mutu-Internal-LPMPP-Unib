@@ -15,8 +15,8 @@ class DokumenAmiSeeder extends Seeder
         $files = [
             'Jadwal & Rundown AMI 2021.pdf',
             'Peraturan & Kode Etik Auditor AMI.pdf',
-            'Manual Book SIAMI (Auditee).pdf',
-            'Manual Book SIAMI (Auditor).pdf',
+            'Manual Book SINTAMU (Auditee).pdf',
+            'Manual Book SINTAMU (Auditor).pdf',
             'Surat Tugas Asesor AMI.pdf',
             'Surat Tugas Auditor AMI.pdf',
             'SK Auditor AMI 2021 - 2023.pdf',

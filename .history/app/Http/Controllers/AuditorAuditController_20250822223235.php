@@ -305,7 +305,7 @@ class AuditorAuditController extends Controller
 
             $pengajuanId = $request->pengajuan_id;
             $auditorId = Auth::user()->id;
-            
+
             // Log untuk debugging
             \Log::info('Submit Desk Evaluation', [
                 'pengajuan_id' => $pengajuanId,
@@ -333,7 +333,7 @@ class AuditorAuditController extends Controller
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                     ]);
-                    
+
                     Log::info('Created new evaluation', [
                         'evaluation_id' => $newEvaluation->id,
                         'ikss_auditee_id' => $ikssAuditeeId,
@@ -347,7 +347,7 @@ class AuditorAuditController extends Controller
                         'pertanyaan' => $request->pertanyaan[$ikssAuditeeId],
                         'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                     ]);
-                    
+
                     Log::info('Updated existing evaluation', [
                         'evaluation_id' => $existingEvaluation->id,
                         'ikss_auditee_id' => $ikssAuditeeId,
@@ -835,7 +835,7 @@ class AuditorAuditController extends Controller
         return $pdf->stream('Berita_Acara_Audit.pdf');
     }
 
-    public function evaluasiAmi(Request $request, PengajuanAmi $pengajuan)
+    public function evaluaSINTAMU(Request $request, PengajuanAmi $pengajuan)
     {
         $validator = Validator::make($request->all(), [
             'nilai' => 'required|array',
@@ -928,13 +928,13 @@ class AuditorAuditController extends Controller
         }
     }
 
-    public function downloadEvaluasiAmi(PengajuanAmi $pengajuan)
+    public function downloadEvaluaSINTAMU(PengajuanAmi $pengajuan)
     {
         $pdf_path = storage_path('app/public/temp/evaluasi_ami_' . $pengajuan->id . '.pdf');
         return response()->download($pdf_path, 'Evaluasi_Ami.pdf')->deleteFileAfterSend(true);
     }
 
-    public function viewEvaluasiAmi(PengajuanAmi $pengajuan)
+    public function viewEvaluaSINTAMU(PengajuanAmi $pengajuan)
     {
         // Get evaluasi data for PDF
         $evaluasis = Evaluasi::where('jenis_evaluasi', 'auditor')->get();
