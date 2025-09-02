@@ -34,16 +34,20 @@
                             </span>
                         </p>
                         <p>
-                            <strong>Jadwal input data oleh auditee akan berakhir pada</strong>
-                            <span class="fw-semibold text-danger">
+                            <strong>Jadwal input data oleh auditee:</strong>
+                            <span class="fw-semibold text-primary">
                                 @if ($jadwalData)
-
-                                    {{ \Carbon\Carbon::parse($jadwalData->tanggal_akhir)->format('d F Y').' pukul '.\Carbon\Carbon::parse($jadwalData->tanggal_akhir)->format('H:i') }}
+                                    @if ($jadwalData->waktu_mulai && $jadwalData->waktu_selesai)
+                                        {{ \Carbon\Carbon::parse($jadwalData->waktu_mulai)->format('d F Y') }} - {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('d F Y') }}
+                                    @elseif ($jadwalData->waktu_selesai)
+                                        Berakhir pada {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('d F Y') }} pukul {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('H:i') }}
+                                    @else
+                                        Data tidak tersedia
+                                    @endif
                                 @else
                                     Data tidak tersedia
                                 @endif
                             </span>
-                            WIB.
                         </p>
                     </div>
                 </div>

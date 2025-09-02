@@ -7,7 +7,7 @@
         <div class="card-header cursor-pointer">
             <div class="card-title m-0">
                 <h3 class="fw-semibold m-0 text-primary d-flex align-items-center gap-2">
-                    👋 Selamat Datang, <span class="fw-bold">{{ Auth::user()->name }}</span>
+                    👋 Selamat Datang Kaprodi, <span class="fw-bold">{{ Auth::user()->name }}</span>
                 </h3>
                 </div>
         </div>
@@ -34,21 +34,25 @@
                             </span>
                         </p>
                         <p>
-                            <strong>Jadwal input data oleh auditee akan berakhir pada</strong>
-                            <span class="fw-semibold text-danger">
+                            <strong>Jadwal input data oleh auditee:</strong>
+                            <span class="fw-semibold text-primary">
                                 @if ($jadwalData)
-
-                                    {{ \Carbon\Carbon::parse($jadwalData->tanggal_akhir)->format('d F Y').' pukul '.\Carbon\Carbon::parse($jadwalData->tanggal_akhir)->format('H:i') }}
+                                    @if ($jadwalData->waktu_mulai && $jadwalData->waktu_selesai)
+                                        {{ \Carbon\Carbon::parse($jadwalData->waktu_mulai)->format('d F Y') }} - {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('d F Y') }}
+                                    @elseif ($jadwalData->waktu_selesai)
+                                        Berakhir pada {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('d F Y') }} pukul {{ \Carbon\Carbon::parse($jadwalData->waktu_selesai)->format('H:i') }}
+                                    @else
+                                        Data tidak tersedia
+                                    @endif
                                 @else
                                     Data tidak tersedia
                                 @endif
                             </span>
-                            WIB.
                         </p>
                     </div>
                 </div>
                 <div class="ms-auto">
-                    <a href="{{ route('auditee.pengajuanAmi') }}" class="btn btn-sm btn-success px-4">Ajukan Permohonan</a>
+                    <a href="{{ route('auditee.pengajuanAmi') }}" class="btn btn-sm btn btn-sm btn-primary px-4"><i class="fas fa-arrow-right me-2"></i> Ajukan Permohonan</a>
                 </div>
             </div>
         </div>
