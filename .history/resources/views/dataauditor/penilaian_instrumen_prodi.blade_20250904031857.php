@@ -1147,7 +1147,7 @@
                 }).then(() => {
                     // Update the current kriteria step to completed
                     updateKriteriaStepStatus(currentKriteriaId, true);
-
+                    
                     // Update progress bar and counter
                     updateProgressBar();
                 });
@@ -1334,9 +1334,6 @@
                         }).then(() => {
                             // Update kriteria step status without reload
                             updateKriteriaStepStatus(currentKriteriaId, true);
-
-                            // Update progress bar and counter
-                            updateProgressBar();
 
                             // Navigate to next kriteria immediately
                             forceNavigateToKriteria(nextKriteriaId);
@@ -1583,9 +1580,6 @@
                             // Update kriteria step status
                             updateKriteriaStepStatus(currentKriteriaId, true);
 
-                            // Update progress bar and counter
-                            updateProgressBar();
-
                             // Show completion status and update UI
                             showCompletionStatus();
                         });
@@ -1634,9 +1628,9 @@
                 uniqueNames.add(name);
             }
         });
-
+        
         totalInstrumen = uniqueNames.size;
-
+        
         // Count completed by checking each unique group
         uniqueNames.forEach(name => {
             if ($(`input[name="${name}"]:checked`).length > 0) {
@@ -1654,16 +1648,16 @@
         const statusElement = $('.text-gray-600').filter(function() {
             return $(this).text().includes('Status:');
         });
-
+        
         if (statusElement.length > 0) {
             statusElement.html(`Status: <strong>${completedInstrumen} dari ${totalInstrumen}</strong> instrumen telah dinilai.`);
         }
-
+        
         // Update description
         const descElement = $('.text-gray-700').filter(function() {
             return $(this).text().includes('Silakan lengkapi');
         });
-
+        
         if (descElement.length > 0) {
             if (completedInstrumen === totalInstrumen && totalInstrumen > 0) {
                 descElement.text('Semua instrumen telah dinilai. Anda dapat melanjutkan ke tahap berikutnya.');

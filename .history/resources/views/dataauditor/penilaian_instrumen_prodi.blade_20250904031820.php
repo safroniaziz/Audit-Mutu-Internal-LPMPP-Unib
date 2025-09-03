@@ -1147,7 +1147,7 @@
                 }).then(() => {
                     // Update the current kriteria step to completed
                     updateKriteriaStepStatus(currentKriteriaId, true);
-
+                    
                     // Update progress bar and counter
                     updateProgressBar();
                 });
@@ -1334,9 +1334,6 @@
                         }).then(() => {
                             // Update kriteria step status without reload
                             updateKriteriaStepStatus(currentKriteriaId, true);
-
-                            // Update progress bar and counter
-                            updateProgressBar();
 
                             // Navigate to next kriteria immediately
                             forceNavigateToKriteria(nextKriteriaId);
@@ -1583,9 +1580,6 @@
                             // Update kriteria step status
                             updateKriteriaStepStatus(currentKriteriaId, true);
 
-                            // Update progress bar and counter
-                            updateProgressBar();
-
                             // Show completion status and update UI
                             showCompletionStatus();
                         });
@@ -1618,59 +1612,6 @@
                 });
             }
         });
-    }
-
-    // Function to update progress bar and counter after successful submission
-    function updateProgressBar() {
-        // Count total and completed instrumen
-        let totalInstrumen = 0;
-        let completedInstrumen = 0;
-
-        // Get all unique radio button groups
-        const uniqueNames = new Set();
-        $('input[type="radio"][name^="nilai["]').each(function() {
-            const name = $(this).attr('name');
-            if (name) {
-                uniqueNames.add(name);
-            }
-        });
-
-        totalInstrumen = uniqueNames.size;
-
-        // Count completed by checking each unique group
-        uniqueNames.forEach(name => {
-            if ($(`input[name="${name}"]:checked`).length > 0) {
-                completedInstrumen++;
-            }
-        });
-
-        // Calculate percentage
-        const progressPercentage = totalInstrumen > 0 ? (completedInstrumen / totalInstrumen) * 100 : 0;
-
-        // Update progress bar
-        $('.progress-bar').css('width', `${progressPercentage}%`).attr('aria-valuenow', progressPercentage);
-
-        // Update status text - find the element that contains "Status: X dari Y instrumen"
-        const statusElement = $('.text-gray-600').filter(function() {
-            return $(this).text().includes('Status:');
-        });
-
-        if (statusElement.length > 0) {
-            statusElement.html(`Status: <strong>${completedInstrumen} dari ${totalInstrumen}</strong> instrumen telah dinilai.`);
-        }
-
-        // Update description
-        const descElement = $('.text-gray-700').filter(function() {
-            return $(this).text().includes('Silakan lengkapi');
-        });
-
-        if (descElement.length > 0) {
-            if (completedInstrumen === totalInstrumen && totalInstrumen > 0) {
-                descElement.text('Semua instrumen telah dinilai. Anda dapat melanjutkan ke tahap berikutnya.');
-            } else {
-                descElement.text('Silakan lengkapi penilaian yang tersisa.');
-            }
-        }
     }
 </script>
 @endpush
