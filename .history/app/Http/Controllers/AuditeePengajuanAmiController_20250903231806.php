@@ -580,14 +580,6 @@ class AuditeePengajuanAmiController extends Controller
                     ->where('periode_id', $pengajuanAmi->periode_id)
                     ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
 
-        PerjanjianKinerja::where('auditee_id', $pengajuanAmi->auditee_id)
-                    ->where('periode_id', $pengajuanAmi->periode_id)
-                    ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
-
-        InstrumenProdiSubmission::where('unit_kerja_id', $pengajuanAmi->auditee_id)
-                    ->where('periode_id', $pengajuanAmi->periode_id)
-                    ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
-
 
         $uploadedFiles = [];
 

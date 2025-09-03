@@ -580,14 +580,6 @@ class AuditeePengajuanAmiController extends Controller
                     ->where('periode_id', $pengajuanAmi->periode_id)
                     ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
 
-        PerjanjianKinerja::where('auditee_id', $pengajuanAmi->auditee_id)
-                    ->where('periode_id', $pengajuanAmi->periode_id)
-                    ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
-
-        InstrumenProdiSubmission::where('unit_kerja_id', $pengajuanAmi->auditee_id)
-                    ->where('periode_id', $pengajuanAmi->periode_id)
-                    ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
-
 
         $uploadedFiles = [];
 
@@ -868,10 +860,24 @@ class AuditeePengajuanAmiController extends Controller
                 ->whereNotNull('rencana')
                 ->count();
 
-            // If all instrumen are completed, just log completion
+            // If all instrumen are completed, update existing PengajuanAmi record
             if ($totalInstrumen === $completedInstrumen) {
-                // All instrumen prodi completed - no PengajuanAmi created yet
-                // PengajuanAmi will be created later when siklus is uploaded
+                // Get existing PengajuanAmi that was created during siklus upload
+                $pengajuanAmi = PengajuanAmi::where('auditee_id', $unitKerjaId)
+                    ->where('periode_id', $periodeId)
+                    ->first();
+
+                if ($pengajuanAmi) {
+                    // Update perjanjian kinerja with existing pengajuan_ami_id
+                    PerjanjianKinerja::where('auditee_id', $unitKerjaId)
+                        ->where('periode_id', $periodeId)
+                        ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
+
+                    // Update pengajuan_ami_id for all ikss_auditee records
+                    IkssAuditee::where('auditee_id', $unitKerjaId)
+                        ->where('periode_id', $periodeId)
+                        ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
+                }
             }
 
             DB::commit();

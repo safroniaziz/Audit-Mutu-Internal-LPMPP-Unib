@@ -465,12 +465,40 @@
                                                                 <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
                                                                     <div class="d-flex align-items-center">
                                                                         <div class="fs-6 fw-normal">
-                                                                            {{ Auth::user()->unitKerja && Auth::user()->unitKerja->website ? Auth::user()->unitKerja->website : 'Belum diisi' }}
+                                                                            {{ Auth::user()->unitKerja->nama_ketua ?? 'N/A' }}
                                                                         </div>
                                                                     </div>
                                                                     <!--end::Number-->
                                                                     <!--end::Label-->
-                                                                    <div class="fw-semibold fs-6 text-gray-500">Website</div>
+                                                                    <div class="fw-semibold fs-6 text-gray-500">Nama Ketua</div>
+                                                                    <!--end::Label-->
+                                                                </div>
+                                                                <!--end::Stat-->
+
+                                                                <!--begin::Stat-->
+                                                                <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="fs-6 fw-normal">
+                                                                            {{ Auth::user()->unitKerja->nip_ketua ?? 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <!--end::Number-->
+                                                                    <!--end::Label-->
+                                                                    <div class="fw-semibold fs-6 text-gray-500">NIP Ketua</div>
+                                                                    <!--end::Label-->
+                                                                </div>
+                                                                <!--end::Stat-->
+
+                                                                <!--begin::Stat-->
+                                                                <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="fs-6 fw-normal">
+                                                                            {{ Auth::user()->unitKerja->jenjang ?? 'N/A' }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <!--end::Number-->
+                                                                    <!--end::Label-->
+                                                                    <div class="fw-semibold fs-6 text-gray-500">Jenjang</div>
                                                                     <!--end::Label-->
                                                                 </div>
                                                                 <!--end::Stat-->
@@ -500,9 +528,6 @@
                                                             </div>
                                                         </div>
                                                         <!--end::Progress-->
-
-
-
                                                     </div>
                                                     <!--end::Stats-->
                                                 </div>

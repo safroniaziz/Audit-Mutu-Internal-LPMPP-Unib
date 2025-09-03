@@ -83,7 +83,7 @@
                 <!--begin::Card header-->
 
                 <!--begin::Card body-->
-                <form id="kt_account_profile_details_form_2" class="form" method="POST" action="{{ route('auditee.pengajuanAmi.lengkapiProfil') }}" enctype="multipart/form-data">
+                <form id="kt_account_profile_details_form_2" class="form" method="POST" action="{{ route('auditor.updateProfile') }}" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="card-body border-top p-9">
@@ -93,9 +93,9 @@
                             $completionPercentage = $user->getProfileCompletionPercentage();
                         @endphp
 
-                        <div class="alert alert-info d-flex align-items-center p-5 mb-6">
+                        <div class="alert alert-danger d-flex align-items-center p-5 mb-6">
                             <!--begin::Icon-->
-                            <i class="ki-duotone ki-information fs-2hx text-info me-4">
+                            <i class="ki-duotone ki-information fs-2hx text-danger me-4">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                                 <span class="path3"></span>
@@ -104,8 +104,8 @@
 
                             <!--begin::Content-->
                             <div class="d-flex flex-column">
-                                <h4 class="mb-1 text-info">Informasi</h4>
-                                <span class="fw-semibold">Anda dapat mengubah data profil di bawah ini. Pastikan data yang diisi akurat dan sesuai dengan kondisi terkini.</span>
+                                <h4 class="mb-1 text-danger">Perhatian</h4>
+                                <span class="fw-semibold">Untuk mengubah data profil, silakan hubungi admin SIAMI di LPMPP. Perubahan tidak dapat dilakukan secara langsung oleh auditor untuk menjaga keakuratan data.</span>
                             </div>
                             <!--end::Content-->
                         </div>
@@ -223,33 +223,6 @@
                             <!--end::Input group-->
 
                         </div>
-
-                        <!--begin::Actions-->
-                        <div class="card-footer d-flex justify-content-end py-6 px-9">
-                            <div class="d-flex">
-                                <button type="button" class="btn btn-light me-3" onclick="resetForm()">
-                                    <i class="ki-duotone ki-arrow-left fs-2 me-1">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                    Reset
-                                </button>
-                                <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">
-                                    <span class="indicator-label">
-                                        <i class="ki-duotone ki-check fs-2 me-1">
-                                            <span class="path1"></span>
-                                            <span class="path2"></span>
-                                        </i>
-                                        Simpan Perubahan
-                                    </span>
-                                    <span class="indicator-progress">
-                                        Mohon tunggu... <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <!--end::Actions-->
-
                     </div>
                 </form>
                 <!--end::Card body-->
@@ -524,109 +497,5 @@
                 });
             }
         });
-
-                // Handle form submission with AJAX
-        $('#kt_account_profile_details_form_2').on('submit', function(e) {
-            e.preventDefault();
-
-            const form = $(this);
-            const submitBtn = $('#kt_account_profile_details_submit');
-            const formData = new FormData(this);
-
-            // Show confirmation dialog
-            Swal.fire({
-                title: 'Konfirmasi Update Profil',
-                text: 'Apakah Anda yakin ingin menyimpan perubahan data profil?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Simpan!',
-                cancelButtonText: 'Batal',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading state
-                    submitBtn.attr('data-kt-indicator', 'on');
-
-                    $.ajax({
-                        url: form.attr('action'),
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            if (response.success) {
-                                // Show success message with SweetAlert
-                                Swal.fire({
-                                    title: 'Berhasil!',
-                                    text: response.message,
-                                    icon: 'success',
-                                    confirmButtonColor: '#28a745',
-                                    confirmButtonText: 'OK'
-                                }).then(() => {
-                                    // Reload page after user click OK
-                                    location.reload();
-                                });
-                            } else {
-                                // Show error message with SweetAlert
-                                Swal.fire({
-                                    title: 'Error!',
-                                    text: response.message || 'Terjadi kesalahan saat menyimpan data',
-                                    icon: 'error',
-                                    confirmButtonColor: '#dc3545',
-                                    confirmButtonText: 'OK'
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            let errorMessage = 'Terjadi kesalahan saat menyimpan data';
-
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            }
-
-                            // Show error message with SweetAlert
-                            Swal.fire({
-                                title: 'Error!',
-                                text: errorMessage,
-                                icon: 'error',
-                                confirmButtonColor: '#dc3545',
-                                confirmButtonText: 'OK'
-                            });
-                        },
-                        complete: function() {
-                            // Hide loading state
-                            submitBtn.removeAttr('data-kt-indicator');
-                        }
-                    });
-                }
-            });
-        });
-
-        // Reset form function
-        function resetForm() {
-            Swal.fire({
-                title: 'Konfirmasi Reset',
-                text: 'Apakah Anda yakin ingin mereset form ke nilai awal?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ffc107',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Reset!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#kt_account_profile_details_form_2')[0].reset();
-                    Swal.fire({
-                        title: 'Berhasil!',
-                        text: 'Form telah direset ke nilai awal',
-                        icon: 'success',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
-        }
     </script>
 @endpush

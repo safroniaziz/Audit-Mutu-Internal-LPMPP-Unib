@@ -528,11 +528,11 @@
                 // Handle form submission with AJAX
         $('#kt_account_profile_details_form_2').on('submit', function(e) {
             e.preventDefault();
-
+            
             const form = $(this);
             const submitBtn = $('#kt_account_profile_details_submit');
             const formData = new FormData(this);
-
+            
             // Show confirmation dialog
             Swal.fire({
                 title: 'Konfirmasi Update Profil',
@@ -548,7 +548,7 @@
                 if (result.isConfirmed) {
                     // Show loading state
                     submitBtn.attr('data-kt-indicator', 'on');
-
+                    
                     $.ajax({
                         url: form.attr('action'),
                         type: 'POST',
@@ -581,11 +581,11 @@
                         },
                         error: function(xhr, status, error) {
                             let errorMessage = 'Terjadi kesalahan saat menyimpan data';
-
+                            
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
-
+                            
                             // Show error message with SweetAlert
                             Swal.fire({
                                 title: 'Error!',

@@ -576,14 +576,17 @@ class AuditeePengajuanAmiController extends Controller
             ]
         );
 
+        // Update pengajuan_ami_id for all related models
         IkssAuditee::where('auditee_id', $pengajuanAmi->auditee_id)
                     ->where('periode_id', $pengajuanAmi->periode_id)
                     ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
 
+        // Update perjanjian kinerja with pengajuan_ami_id
         PerjanjianKinerja::where('auditee_id', $pengajuanAmi->auditee_id)
                     ->where('periode_id', $pengajuanAmi->periode_id)
                     ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
 
+        // Update instrumen prodi submissions with pengajuan_ami_id
         InstrumenProdiSubmission::where('unit_kerja_id', $pengajuanAmi->auditee_id)
                     ->where('periode_id', $pengajuanAmi->periode_id)
                     ->update(['pengajuan_ami_id' => $pengajuanAmi->id]);
