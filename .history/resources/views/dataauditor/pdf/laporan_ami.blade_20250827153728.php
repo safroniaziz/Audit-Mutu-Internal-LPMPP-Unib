@@ -573,7 +573,7 @@
 
         <div class="section-title" style="margin-top: 20px !important;">V. TEMUAN AUDIT</div>
 
-        <p style="font-weight: bold; font-size:14px; color:#00447c;">1. Ketidak Sesuaian</p>
+        <p style="font-weight: bold; font-size:14px; color:#00447c;">1. Ketidaksesuaian</p>
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
             <thead>
                 <tr>

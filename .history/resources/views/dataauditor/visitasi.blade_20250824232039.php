@@ -87,7 +87,7 @@
     uasort($ikssCompletionStatus, function($a, $b) {
         $kodeA = $a['satuan_standar']->kode_satuan;
         $kodeB = $b['satuan_standar']->kode_satuan;
-        
+
         // Extract group number from SS code (e.g., "SS 1.1" -> 1, "SS 2.1" -> 2)
         if (preg_match('/SS\s*(\d+)\.\d+/', $kodeA, $matchesA) && preg_match('/SS\s*(\d+)\.\d+/', $kodeB, $matchesB)) {
             $groupA = intval($matchesA[1]);
@@ -108,7 +108,7 @@
 
     // Determine active step - should be first incomplete step in ordered sequence or first step if none completed
     $activeStep = null;
-    
+
     // First, try to find the first incomplete step in the ordered sequence
     foreach ($orderedSsIds as $ssId) {
         if (isset($ikssCompletionStatus[$ssId]) && !$ikssCompletionStatus[$ssId]['is_completed']) {
@@ -116,7 +116,7 @@
             break;
         }
     }
-    
+
     // If no incomplete step found, use the first step in ordered sequence
     if (!$activeStep) {
         $activeStep = $orderedSsIds[0] ?? array_key_first($ikssCompletionStatus);
@@ -555,7 +555,7 @@
 
                                                         <div class="mb-4">
                                                             <div class="mt-3">
-                                                                <h6>Ketidak Sesuaian <span class="text-danger">*</span></h6>
+                                                                <h6>Ketidaksesuaian <span class="text-danger">*</span></h6>
                                                                 <select class="form-select @error('ketidak_sesuaian.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="ketidak_sesuaian[{{ $ikssAuditee->id }}]"
                                                                         {{ ($hasEvaluation || $setuju) ? 'disabled' : '' }}
@@ -658,7 +658,7 @@
     <script>
         // Pass ordered SS IDs from PHP to JavaScript
         const orderedSsIds = @json($orderedSsIds);
-        
+
         $(document).ready(function() {
             // Initial setup - ensure only first section is visible
             initializeWizard();

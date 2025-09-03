@@ -555,7 +555,7 @@
 
                                                         <div class="mb-4">
                                                             <div class="mt-3">
-                                                                <h6>Ketidak Sesuaian <span class="text-danger">*</span></h6>
+                                                                <h6>Ketidaksesuaian <span class="text-danger">*</span></h6>
                                                                 <select class="form-select @error('ketidak_sesuaian.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="ketidak_sesuaian[{{ $ikssAuditee->id }}]"
                                                                         {{ ($hasEvaluation || $setuju) ? 'disabled' : '' }}
