@@ -1264,29 +1264,6 @@
             return false;
         }
 
-        // Validate catatan minimal 10 karakter
-        let invalidCatatanCount = 0;
-        $(`#instrumen-group-${currentKriteriaId} textarea[name^="catatan["]`).each(function() {
-            const catatan = $(this).val().trim();
-            if (catatan.length > 0 && catatan.length < 10) {
-                invalidCatatanCount++;
-                $(this).addClass('is-invalid');
-            } else {
-                $(this).removeClass('is-invalid');
-            }
-        });
-
-        if (invalidCatatanCount > 0) {
-            Swal.fire({
-                icon: 'warning',
-                title: '⚠️ Catatan Visitasi Tidak Valid',
-                text: `Ada ${invalidCatatanCount} catatan yang kurang dari 10 karakter. Silakan lengkapi atau kosongkan catatan tersebut.`,
-                confirmButtonText: 'Mengerti',
-                confirmButtonColor: '#6C757D'
-            });
-            return false;
-        }
-
         return true;
     }
 
