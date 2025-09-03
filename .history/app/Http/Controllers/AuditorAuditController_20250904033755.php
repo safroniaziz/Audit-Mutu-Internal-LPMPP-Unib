@@ -1099,7 +1099,7 @@ class AuditorAuditController extends Controller
     {
         // Load the related periode
         $pengajuan->load('periodeAktif');
-
+        
         // Generate PDF with existing catatan visitasi
         $data = [
             'pengajuan' => $pengajuan,
