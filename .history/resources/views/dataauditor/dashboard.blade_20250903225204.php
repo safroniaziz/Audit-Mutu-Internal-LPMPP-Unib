@@ -157,9 +157,31 @@
 
 
 
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Jenjang</label>
+                                <div class="col-lg-8 fv-row">
+                                    <select name="jenjang" aria-label="pilih jenjang" data-control="select2" data-placeholder="Pilih Jenjang..." class="form-select form-select form-select-lg fw-semibold">
+                                        <option value="">Pilih Jenjang...</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "D2" ? 'selected' : '' }} value="D2">D2</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "D3" ? 'selected' : '' }} value="D3">D3</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "D4" ? 'selected' : '' }} value="D4">D4</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "S1" ? 'selected' : '' }} value="S1">S1</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "S2" ? 'selected' : '' }} value="S2">S2</option>
+                                        <option {{ Auth::user()->unitKerja && Auth::user()->unitKerja->jenjang == "S3" ? 'selected' : '' }} value="S3">S3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!--end::Input group-->
 
-
-
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Website</label>
+                                <div class="col-lg-8">
+                                    <input type="text" name="website" class="form-control form-control-lg form-control" placeholder="Website" value="{{ Auth::user()->unitKerja ? Auth::user()->unitKerja->website : '' }}" />
+                                </div>
+                            </div>
+                            <!--end::Input group-->
 
                             <!--begin::Input group-->
                             <div class="row mb-6">
@@ -170,7 +192,14 @@
                             </div>
                             <!--end::Input group-->
 
-
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">No HP</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" name="no_hp" class="form-control form-control-lg form-control" placeholder="No HP" value="{{ Auth::user()->unitKerja ? Auth::user()->unitKerja->no_hp : '-' }}" />
+                                </div>
+                            </div>
+                            <!--end::Input group-->
                         </div>
                     </div>
                 </form>

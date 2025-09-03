@@ -35,7 +35,8 @@ class PenugasanAuditorController extends Controller
 
             // Hapus data InstrumenProdi yang terkait
             InstrumenProdiNilai::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-            InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
+            // InstrumenProdiSubmission tidak memiliki pengajuan_ami_id, jadi tidak perlu dihapus
+            // InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
 
             DB::commit();
 

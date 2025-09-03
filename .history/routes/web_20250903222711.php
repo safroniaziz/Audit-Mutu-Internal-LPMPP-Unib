@@ -60,8 +60,22 @@ Route::get('/file-viewer', function (Request $request) {
 
 Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('auditee.pengajuanAmi.lengkapiProfil');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::middleware('role:Administrator')->group(function () {
+    Route::middleware(['auth', 'verified'])->group(function () {
+        // Test middleware role dengan logging
+        Route::middleware('role:Administrator')->group(function () {
+            // Log middleware role
+            Route::get('/test-role-middleware', function() {
+                \Illuminate\Support\Facades\Log::info('Role middleware berhasil diakses', [
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+                ]);
+                
+                return response()->json([
+                    'message' => 'Role middleware berhasil diakses',
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+                ]);
+            });
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::prefix('unit-kerja')->name('unitKerja.')->group(function () {
@@ -219,9 +233,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/save-penugasan-auditor', [PenugasanAuditorController::class, 'savePenugasanAuditor']);
             Route::post('/update-penugasan-auditor', [PenugasanAuditorController::class, 'updatePenugasanAuditor']);
             Route::delete('/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('delete');
-        });
 
-        // Route delete di luar middleware role untuk testing
+            // Test route untuk debugging
+            Route::get('/test-debug', function() {
+                return response()->json([
+                    'message' => 'Test route berhasil diakses',
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+                ]);
+            });
+
+            // Test DELETE route untuk debugging
+            Route::delete('/test-delete', function() {
+                return response()->json([
+                    'message' => 'Test DELETE route berhasil diakses',
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+                ]);
+            });
+        });
 
         Route::prefix('activity-log')->name('activityLog.')->group(function () {
             Route::get('/get-activities', [ActivityLogController::class, 'getActivities'])->name('getActivities');

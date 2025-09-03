@@ -59,6 +59,7 @@ Route::get('/file-viewer', function (Request $request) {
 })->name('file.viewer');
 
 Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('auditee.pengajuanAmi.lengkapiProfil');
+Route::delete('/penugasan-auditor/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('penugasanAuditor.delete');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:Administrator')->group(function () {
@@ -218,7 +219,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/check-audit-activities/{id}', [PenugasanAuditorController::class, 'checkAuditActivities']);
             Route::post('/save-penugasan-auditor', [PenugasanAuditorController::class, 'savePenugasanAuditor']);
             Route::post('/update-penugasan-auditor', [PenugasanAuditorController::class, 'updatePenugasanAuditor']);
-            Route::delete('/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('delete');
         });
 
         // Route delete di luar middleware role untuk testing

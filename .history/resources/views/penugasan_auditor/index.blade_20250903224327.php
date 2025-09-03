@@ -223,8 +223,9 @@
                                         {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
                                     </button>
                                     @if ($penugasanAuditor->is_disetujui == false)
+                                    dd($penugasanAuditor->)
                                     <button type="button" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
-                                            onclick="deletePenugasanAuditor('{{ $penugasanAuditor->id }}')">
+                                            onclick="deletePenugasanAuditor('{{ $penugasanAuditor->pengajuan_ami_id }}')">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                     @endif
@@ -1004,6 +1005,9 @@
         });
 
         function deletePenugasanAuditor(pengajuan_ami_id) {
+            // Debug: console.log parameter
+            console.log('Parameter pengajuan_ami_id:', pengajuan_ami_id);
+            console.log('URL yang akan dipanggil:', '/penugasan-auditor/delete/' + pengajuan_ami_id);
 
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -1016,9 +1020,10 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    console.log('User mengkonfirmasi delete, memanggil AJAX...');
                     $.ajax({
                         url: '/penugasan-auditor/delete/' + pengajuan_ami_id,
-                        type: 'DELETE',
+                        type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'
                         },

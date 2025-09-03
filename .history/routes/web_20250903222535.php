@@ -61,6 +61,15 @@ Route::get('/file-viewer', function (Request $request) {
 Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('auditee.pengajuanAmi.lengkapiProfil');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Test route untuk debugging - di luar middleware role
+    Route::get('/test-no-role', function() {
+        return response()->json([
+            'message' => 'Test route tanpa role berhasil diakses',
+            'user_id' => \Illuminate\Support\Facades\Auth::id(),
+            'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+        ]);
+    });
+    
     Route::middleware('role:Administrator')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -219,9 +228,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/save-penugasan-auditor', [PenugasanAuditorController::class, 'savePenugasanAuditor']);
             Route::post('/update-penugasan-auditor', [PenugasanAuditorController::class, 'updatePenugasanAuditor']);
             Route::delete('/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('delete');
+            
+            // Test route untuk debugging
+            Route::get('/test-debug', function() {
+                return response()->json([
+                    'message' => 'Test route berhasil diakses',
+                    'user_id' => \Illuminate\Support\Facades\Auth::id(),
+                    'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+                ]);
+            });
         });
-
-        // Route delete di luar middleware role untuk testing
 
         Route::prefix('activity-log')->name('activityLog.')->group(function () {
             Route::get('/get-activities', [ActivityLogController::class, 'getActivities'])->name('getActivities');

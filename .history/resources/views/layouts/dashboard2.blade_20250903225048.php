@@ -460,7 +460,20 @@
                                                                     <!--end::Label-->
                                                                 </div>
                                                                 <!--end::Stat-->
-
+                                                                <!--begin::Stat-->
+                                                                <div class="border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3">
+                                                                    <!--begin::Number-->
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="fs-6 fw-normal {{ Auth::user()->unitKerja && Auth::user()->unitKerja->no_hp ? '' : 'text-danger' }}">
+                                                                            {{ Auth::user()->unitKerja && Auth::user()->unitKerja->no_hp ? Auth::user()->unitKerja->no_hp : 'belum dilengkapi' }}
+                                                                        </div>
+                                                                    </div>
+                                                                    <!--end::Number-->
+                                                                    <!--begin::Label-->
+                                                                    <div class="fw-semibold fs-6 text-gray-500">Kontak</div>
+                                                                    <!--end::Label-->
+                                                                </div>
+                                                                <!--end::Stat-->
                                                             </div>
                                                             <!--end::Stats-->
                                                         </div>

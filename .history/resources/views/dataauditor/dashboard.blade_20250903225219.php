@@ -159,7 +159,14 @@
 
 
 
-
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">Website</label>
+                                <div class="col-lg-8">
+                                    <input type="text" name="website" class="form-control form-control-lg form-control" placeholder="Website" value="{{ Auth::user()->unitKerja ? Auth::user()->unitKerja->website : '' }}" />
+                                </div>
+                            </div>
+                            <!--end::Input group-->
 
                             <!--begin::Input group-->
                             <div class="row mb-6">
@@ -170,7 +177,14 @@
                             </div>
                             <!--end::Input group-->
 
-
+                            <!--begin::Input group-->
+                            <div class="row mb-6">
+                                <label class="col-lg-4 col-form-label required fw-semibold fs-6">No HP</label>
+                                <div class="col-lg-8 fv-row">
+                                    <input type="text" name="no_hp" class="form-control form-control-lg form-control" placeholder="No HP" value="{{ Auth::user()->unitKerja ? Auth::user()->unitKerja->no_hp : '-' }}" />
+                                </div>
+                            </div>
+                            <!--end::Input group-->
                         </div>
                     </div>
                 </form>

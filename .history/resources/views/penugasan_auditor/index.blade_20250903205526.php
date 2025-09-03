@@ -215,20 +215,12 @@
                                         </span>
                                     @endif
                                 </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-sm btn-primary flex-grow-1"
-                                            data-bs-toggle="modal" data-bs-target="#modalPenugasanAuditor"
-                                            onclick="setPenugasanId('{{ $penugasanAuditor->id }}')">
-                                        <i class="fas fa-user-plus me-1"></i>
-                                        {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
-                                    </button>
-                                    @if ($penugasanAuditor->is_disetujui == false)
-                                    <button type="button" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
-                                            onclick="deletePenugasanAuditor('{{ $penugasanAuditor->id }}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                    @endif
-                                </div>
+                                <button type="button" class="btn btn-sm btn-primary w-100"
+                                        data-bs-toggle="modal" data-bs-target="#modalPenugasanAuditor"
+                                        onclick="setPenugasanId('{{ $penugasanAuditor->id }}')">
+                                    <i class="fas fa-user-plus me-1"></i>
+                                    {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
+                                </button>
                             </div>
                             <!--end::Footer-->
                         </div>
@@ -502,7 +494,7 @@
                                             <i class="fas fa-user-plus me-1"></i>
                                             ${auditors.length > 0 ? 'Edit' : 'Assign'}
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger"
+                                        <button type="button" class="btn btn-sm btn-danger" 
                                                 onclick="deletePenugasanAuditor('${penugasanAuditor.pengajuan_ami_id}')"
                                                 id="delete-btn-${penugasanAuditor.pengajuan_ami_id}">
                                             <i class="fas fa-trash-alt"></i>
@@ -1004,10 +996,9 @@
         });
 
         function deletePenugasanAuditor(pengajuan_ami_id) {
-
             Swal.fire({
                 title: 'Apakah Anda yakin?',
-                text: "Semua data terkait pengajuan AMI ini akan dihapus (termasuk penugasan auditor, kuisioner jawaban, IKSS auditee, perjanjian kinerja, dan instrumen prodi)!",
+                text: "Semua penugasan auditor untuk pengajuan AMI ini akan dihapus!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -1017,7 +1008,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/penugasan-auditor/delete/' + pengajuan_ami_id,
+                        url: `{{ route('penugasanAuditor.delete', '') }}/${pengajuan_ami_id}`,
                         type: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'

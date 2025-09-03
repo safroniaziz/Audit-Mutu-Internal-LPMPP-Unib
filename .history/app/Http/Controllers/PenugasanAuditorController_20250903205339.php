@@ -8,11 +8,6 @@ use App\Models\User;
 use App\Models\IkssAuditeeNilai;
 use App\Models\IkssAuditeeVisitasi;
 use App\Models\EvaluasiSubmission;
-use App\Models\KuisionerJawaban;
-use App\Models\IkssAuditee;
-use App\Models\PerjanjianKinerja;
-use App\Models\InstrumenProdiNilai;
-use App\Models\InstrumenProdiSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -26,32 +21,25 @@ class PenugasanAuditorController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            // Hapus semua data terkait pengajuan_ami_id
+            
+            // Hapus semua penugasan auditor dengan pengajuan_ami_id yang sama
             PenugasanAuditor::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-            KuisionerJawaban::where('pengajuan_id', $pengajuan_ami_id)->delete(); // Kolom yang benar: pengajuan_id
-            IkssAuditee::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-            PerjanjianKinerja::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-
-            // Hapus data InstrumenProdi yang terkait
-            InstrumenProdiNilai::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-            InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-
+            
             DB::commit();
-
+            
             activity()
                 ->causedBy(Auth::user())
-                ->log('Menghapus semua data terkait pengajuan AMI ID: ' . $pengajuan_ami_id);
-
+                ->log('Menghapus penugasan auditor untuk pengajuan AMI ID: ' . $pengajuan_ami_id);
+            
             return response()->json([
                 'success' => true,
-                'message' => 'Semua data terkait pengajuan AMI berhasil dihapus'
+                'message' => 'Penugasan auditor berhasil dihapus'
             ]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+                'message' => 'Gagal menghapus penugasan auditor: ' . $e->getMessage()
             ], 500);
         }
     }

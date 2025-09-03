@@ -1016,9 +1016,10 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    console.log('User mengkonfirmasi delete, memanggil AJAX...');
                     $.ajax({
                         url: '/penugasan-auditor/delete/' + pengajuan_ami_id,
-                        type: 'DELETE',
+                        type: 'POST',
                         data: {
                             _token: '{{ csrf_token() }}'
                         },

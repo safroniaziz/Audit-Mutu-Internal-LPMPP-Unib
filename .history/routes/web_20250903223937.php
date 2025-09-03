@@ -59,6 +59,14 @@ Route::get('/file-viewer', function (Request $request) {
 })->name('file.viewer');
 
 Route::put('/lengkapiProfil', [AuditeePengajuanAmiController::class, 'lengkapiProfil'])->name('auditee.pengajuanAmi.lengkapiProfil');
+Route::post('/penugasan-auditor/delete/{pengajuan_ami_id}', function($pengajuan_ami_id) {
+    return response()->json([
+        'success' => true,
+        'message' => 'Test delete berhasil dengan ID: ' . $pengajuan_ami_id,
+        'user_id' => \Illuminate\Support\Facades\Auth::id(),
+        'user_roles' => \Illuminate\Support\Facades\Auth::user()->roles->pluck('name')->toArray()
+    ]);
+})->name('penugasanAuditor.delete');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:Administrator')->group(function () {
@@ -218,7 +226,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/check-audit-activities/{id}', [PenugasanAuditorController::class, 'checkAuditActivities']);
             Route::post('/save-penugasan-auditor', [PenugasanAuditorController::class, 'savePenugasanAuditor']);
             Route::post('/update-penugasan-auditor', [PenugasanAuditorController::class, 'updatePenugasanAuditor']);
-            Route::delete('/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('delete');
         });
 
         // Route delete di luar middleware role untuk testing

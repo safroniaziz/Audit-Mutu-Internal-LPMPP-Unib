@@ -24,12 +24,19 @@ class PenugasanAuditorController extends Controller
 {
     public function deletePenugasanAuditor($pengajuan_ami_id)
     {
+        // Debug logging
+        \Illuminate\Support\Facades\Log::info('deletePenugasanAuditor method called', [
+            'pengajuan_ami_id' => $pengajuan_ami_id,
+            'user_id' => Auth::id(),
+            'user_roles' => Auth::user()->roles->pluck('name')->toArray()
+        ]);
+        
         try {
             DB::beginTransaction();
 
             // Hapus semua data terkait pengajuan_ami_id
             PenugasanAuditor::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
-            KuisionerJawaban::where('pengajuan_id', $pengajuan_ami_id)->delete(); // Kolom yang benar: pengajuan_id
+            KuisionerJawaban::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
             IkssAuditee::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
             PerjanjianKinerja::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
 

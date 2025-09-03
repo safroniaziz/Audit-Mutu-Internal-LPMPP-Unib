@@ -221,8 +221,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('/delete/{pengajuan_ami_id}', [PenugasanAuditorController::class, 'deletePenugasanAuditor'])->name('delete');
         });
 
-        // Route delete di luar middleware role untuk testing
-
         Route::prefix('activity-log')->name('activityLog.')->group(function () {
             Route::get('/get-activities', [ActivityLogController::class, 'getActivities'])->name('getActivities');
         });

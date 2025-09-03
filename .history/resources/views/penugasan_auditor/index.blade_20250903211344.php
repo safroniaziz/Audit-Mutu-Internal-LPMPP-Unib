@@ -222,12 +222,10 @@
                                         <i class="fas fa-user-plus me-1"></i>
                                         {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
                                     </button>
-                                    @if ($penugasanAuditor->is_disetujui == false)
-                                    <button type="button" class="btn btn-sm btn-danger d-flex align-items-center justify-content-center"
-                                            onclick="deletePenugasanAuditor('{{ $penugasanAuditor->id }}')">
+                                    <button type="button" class="btn btn-sm btn-danger"
+                                            onclick="deletePenugasanAuditor('{{ $penugasanAuditor->pengajuan_ami_id }}')">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
-                                    @endif
                                 </div>
                             </div>
                             <!--end::Footer-->
@@ -1004,7 +1002,6 @@
         });
 
         function deletePenugasanAuditor(pengajuan_ami_id) {
-
             Swal.fire({
                 title: 'Apakah Anda yakin?',
                 text: "Semua data terkait pengajuan AMI ini akan dihapus (termasuk penugasan auditor, kuisioner jawaban, IKSS auditee, perjanjian kinerja, dan instrumen prodi)!",
@@ -1017,7 +1014,7 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/penugasan-auditor/delete/' + pengajuan_ami_id,
+                        url: `{{ route('penugasanAuditor.delete', '') }}/${pengajuan_ami_id}`,
                         type: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
