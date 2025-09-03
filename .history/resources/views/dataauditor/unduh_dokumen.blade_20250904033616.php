@@ -403,7 +403,7 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="catatan_visitasi" class="form-label fw-bold">Tuliskan catatan Visitasi disini (minimal 10 karakter)</label>
+                            <label for="catatan_visitasi" class="form-label fw-bold">Tuliskan catatan Visitasi disini *</label>
                             <textarea class="form-control" id="catatan_visitasi" name="catatan_visitasi" rows="5" placeholder="Isi catatan visitasi disini...">{{ $pengajuan->catatan_visitasi ?? '' }}</textarea>
                         </div>
                     </div>
