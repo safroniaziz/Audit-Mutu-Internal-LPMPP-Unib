@@ -311,6 +311,11 @@
                         </div>
                     </div>
                 </div>
+                <!-- Debug info -->
+                <div class="alert alert-warning">
+                    <strong>Debug:</strong> pengajuanAmiExists = {{ $pengajuanAmiExists ? 'true' : 'false' }},
+                    sudahMengisi = {{ $sudahMengisi ? 'true' : 'false' }}
+                </div>
             @endif
 
             <div class="alert {{ $semuaInstrumenDiisi ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10">

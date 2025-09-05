@@ -289,38 +289,6 @@
         cursor: not-allowed;
         opacity: 0.6;
     }
-
-    /* Styling untuk list di dalam table */
-    .table td ul {
-        margin: 0;
-        padding-left: 1.5rem;
-        list-style-type: disc;
-    }
-
-    .table td li {
-        margin-bottom: 0.5rem;
-        line-height: 1.5;
-    }
-
-    .table td ul ul {
-        margin-top: 0.25rem;
-        padding-left: 1rem;
-        list-style-type: circle;
-    }
-
-    /* Form disabled styling */
-    .form-disabled {
-        position: relative;
-        opacity: 0.85;
-        pointer-events: none;
-    }
-
-    .form-disabled input,
-    .form-disabled textarea,
-    .form-disabled select,
-    .form-disabled button {
-        cursor: not-allowed;
-    }
 </style>
 @endpush
 
@@ -349,23 +317,6 @@
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
                                     Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, dan Pengisian Instrumen) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
-                    <div class="me-4">
-                        <i class="bi bi-lock-fill fs-2 text-warning"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="fw-bold text-dark mb-2">🔒 Data Sudah Dikunci</h4>
-                        <div class="fs-6 text-gray-700">
-                            <p class="mt-2">
-                                <strong>Informasi:</strong>
-                                <span class="fw-semibold text-warning">
-                                    Data pengisian instrumen prodi tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
                                 </span>
                             </p>
                         </div>
@@ -577,7 +528,7 @@
                         @foreach($groupedData as $indikatorData)
                             @foreach($indikatorData['kriterias'] as $kriteriaId => $kriteriaData)
                                 @if($kriteriaId == $kriteria['id'])
-                                    <form class="kriteria-form{{ $pengajuanAmiExists ? ' form-disabled' : '' }}" data-kriteria-id="{{ $kriteriaId }}" method="POST" enctype="multipart/form-data">
+                                    <form class="kriteria-form" data-kriteria-id="{{ $kriteriaId }}" method="POST" enctype="multipart/form-data">
                                         @csrf
                                         @foreach($kriteriaData['instrumens'] as $instrumenProdi)
                                             <div class="card card-bordered shadow-sm mb-10">
@@ -645,7 +596,7 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Uraian/Isian</td>
-                                                                    <td>{!! $instrumenProdi->uraian !!}</td>
+                                                                    <td>{{ $instrumenProdi->uraian }}</td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Akar Penyebab</td>

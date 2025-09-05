@@ -292,26 +292,13 @@
 
                 // Update status sudah mengisi hanya jika semua instrumen telah diisi
                 $semuaInstrumenDiisi = ($totalInstrumen > 0 && $totalDiisi == $totalInstrumen);
-            @endphp
 
-            @if(!$pengajuanAmiExists)
-                <div class="alert alert-info d-flex align-items-start p-5 mb-10">
-                    <div class="me-4">
-                        <i class="bi bi-info-circle-fill fs-2 text-info"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="fw-bold text-dark mb-2">📝 Mode Editing Aktif</h4>
-                        <div class="fs-6 text-gray-700">
-                            <p class="mt-2">
-                                <strong>Informasi:</strong>
-                                <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            @endif
+                // Debug information
+                error_log("=== Overall Stats ===");
+                error_log("Total Instrumen: " . $totalInstrumen);
+                error_log("Total Diisi: " . $totalDiisi);
+                error_log("Per SS Stats: " . json_encode($ssInstrumenCounts, JSON_PRETTY_PRINT));
+            @endphp
 
             <div class="alert {{ $semuaInstrumenDiisi ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10">
                 <div class="me-4">
@@ -362,29 +349,9 @@
                 <h2 class="fw-bold text-dark me-5">📋 Indikator Kinerja Sasaran Strategis (IKSS)</h2>
             </div>
 
-            <form id="formPemilihanIkss" action="{{ route('auditee.pengajuanAmi.saveIkss') }}" method="POST" {{ $pengajuanAmiExists ? 'class=form-disabled' : '' }}>
+            <form id="formPemilihanIkss" action="{{ route('auditee.pengajuanAmi.saveIkss') }}" method="POST" {{ $semuaInstrumenDiisi ? 'class=form-disabled' : '' }}>
                 @csrf
                 <input type="hidden" name="auditee_id" value="{{ Auth::user()->unit_kerja_id }}">
-
-                <!-- Status Form Information -->
-                @if($pengajuanAmiExists)
-                    <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
-                        <div class="me-4">
-                            <i class="bi bi-lock-fill fs-2 text-warning"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h4 class="fw-bold text-dark mb-2">🔒 Data Sudah Dikunci</h4>
-                            <div class="fs-6 text-gray-700">
-                                <p class="mt-2">
-                                    <strong>Informasi:</strong>
-                                    <span class="fw-semibold text-warning">
-                                        Data IKSS tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
 
                 <!-- Wizard Navigation -->
                 <div class="wizard-nav mb-5">

@@ -292,6 +292,12 @@
 
                 // Update status sudah mengisi hanya jika semua instrumen telah diisi
                 $semuaInstrumenDiisi = ($totalInstrumen > 0 && $totalDiisi == $totalInstrumen);
+
+                // Debug information
+                error_log("=== Overall Stats ===");
+                error_log("Total Instrumen: " . $totalInstrumen);
+                error_log("Total Diisi: " . $totalDiisi);
+                error_log("Per SS Stats: " . json_encode($ssInstrumenCounts, JSON_PRETTY_PRINT));
             @endphp
 
             @if(!$pengajuanAmiExists)
@@ -310,6 +316,11 @@
                             </p>
                         </div>
                     </div>
+                </div>
+                <!-- Debug info -->
+                <div class="alert alert-warning">
+                    <strong>Debug:</strong> pengajuanAmiExists = {{ $pengajuanAmiExists ? 'true' : 'false' }},
+                    sudahMengisi = {{ $sudahMengisi ? 'true' : 'false' }}
                 </div>
             @endif
 

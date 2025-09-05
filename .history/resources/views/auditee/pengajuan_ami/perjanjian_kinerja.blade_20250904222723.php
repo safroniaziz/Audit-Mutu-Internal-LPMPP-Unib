@@ -161,25 +161,6 @@
             </div>
         </div>
         <div class="card-body border-top p-9">
-            @if(!$pengajuanAmiExists)
-                <div class="alert alert-info d-flex align-items-start p-5 mb-10">
-                    <div class="me-4">
-                        <i class="bi bi-info-circle-fill fs-2 text-info"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="fw-bold text-dark mb-2">📝 Mode Editing Aktif</h4>
-                        <div class="fs-6 text-gray-700">
-                            <p class="mt-2">
-                                <strong>Informasi:</strong>
-                                <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui dokumen Perjanjian Kinerja karena belum ada pengajuan AMI yang disubmit untuk periode ini. Setelah pengajuan AMI disubmit, data tidak dapat diubah lagi.
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
             <div class="alert {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'alert-info' : 'alert-info' }} d-flex align-items-start p-5 mb-10 position-relative">
                 <div class="me-4">
                     <i class="bi {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'bi-check-circle-fill fs-2 text-success' : 'bi-info-circle-fill fs-2 text-primary' }}"></i>

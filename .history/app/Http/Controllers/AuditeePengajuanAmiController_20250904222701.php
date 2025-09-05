@@ -551,7 +551,6 @@ class AuditeePengajuanAmiController extends Controller
     }
 
     public function unggahSiklus(){
-        $unitKerjaId = Auth::user()->unit_kerja_id;
         $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
         // Jika tidak ada periode aktif, redirect dengan pesan error
@@ -559,12 +558,7 @@ class AuditeePengajuanAmiController extends Controller
             return redirect()->back()->with('error', 'Tidak ada periode aktif ditemukan.');
         }
 
-        // Check if there's already a submitted pengajuan_ami for this auditee in current period
-        $pengajuanAmiExists = PengajuanAmi::where('auditee_id', $unitKerjaId)
-                    ->where('periode_id', $periodeAktif->id)
-                    ->exists();
-
-        $siklus = PengajuanAmi::with(['siklus'])->where('auditee_id', $unitKerjaId)
+        $siklus = PengajuanAmi::with(['siklus'])->where('auditee_id',Auth::user()->unit_kerja_id)
                             ->where('periode_id', $periodeAktif->id)
                             ->first();
 
@@ -580,7 +574,6 @@ class AuditeePengajuanAmiController extends Controller
 
         return view('auditee/pengajuan_ami/unggah_siklus',[
             'siklus'  =>  $siklus,
-            'pengajuanAmiExists' => $pengajuanAmiExists,
         ]);
     }
 
@@ -930,11 +923,6 @@ class AuditeePengajuanAmiController extends Controller
         $unitKerjaId = Auth::user()->unit_kerja_id;
         $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
 
-        // Check if there's already a submitted pengajuan_ami for this auditee in current period
-        $pengajuanAmiExists = PengajuanAmi::where('auditee_id', $unitKerjaId)
-                    ->where('periode_id', $periodeAktif->id)
-                    ->exists();
-
         // Get IndikatorInstrumen for this Prodi with proper eager loading
         $indikatorInstrumens = IndikatorInstrumen::with([
             'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $periodeAktif) {
@@ -969,8 +957,7 @@ class AuditeePengajuanAmiController extends Controller
 
         return view('auditee.pengajuan_ami.pengisian_instrumen_prodi', [
             'indikatorInstrumens' => $indikatorInstrumens,
-            'unitKerjaId' => $unitKerjaId,
-            'pengajuanAmiExists' => $pengajuanAmiExists
+            'unitKerjaId' => $unitKerjaId
         ]);
     }
 

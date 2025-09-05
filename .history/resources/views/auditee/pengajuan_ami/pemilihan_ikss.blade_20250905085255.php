@@ -292,6 +292,12 @@
 
                 // Update status sudah mengisi hanya jika semua instrumen telah diisi
                 $semuaInstrumenDiisi = ($totalInstrumen > 0 && $totalDiisi == $totalInstrumen);
+
+                // Debug information
+                error_log("=== Overall Stats ===");
+                error_log("Total Instrumen: " . $totalInstrumen);
+                error_log("Total Diisi: " . $totalDiisi);
+                error_log("Per SS Stats: " . json_encode($ssInstrumenCounts, JSON_PRETTY_PRINT));
             @endphp
 
             @if(!$pengajuanAmiExists)
@@ -310,6 +316,11 @@
                             </p>
                         </div>
                     </div>
+                </div>
+                <!-- Debug info -->
+                <div class="alert alert-warning">
+                    <strong>Debug:</strong> pengajuanAmiExists = {{ $pengajuanAmiExists ? 'true' : 'false' }}, 
+                    sudahMengisi = {{ $sudahMengisi ? 'true' : 'false' }}
                 </div>
             @endif
 
@@ -365,25 +376,12 @@
             <form id="formPemilihanIkss" action="{{ route('auditee.pengajuanAmi.saveIkss') }}" method="POST" {{ $pengajuanAmiExists ? 'class=form-disabled' : '' }}>
                 @csrf
                 <input type="hidden" name="auditee_id" value="{{ Auth::user()->unit_kerja_id }}">
-
-                <!-- Status Form Information -->
+                
+                <!-- Debug: Form class debug -->
                 @if($pengajuanAmiExists)
-                    <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
-                        <div class="me-4">
-                            <i class="bi bi-lock-fill fs-2 text-warning"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <h4 class="fw-bold text-dark mb-2">🔒 Data Sudah Dikunci</h4>
-                            <div class="fs-6 text-gray-700">
-                                <p class="mt-2">
-                                    <strong>Informasi:</strong>
-                                    <span class="fw-semibold text-warning">
-                                        Data IKSS tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="alert alert-danger">Form is DISABLED because pengajuanAmiExists = true</div>
+                @else
+                    <div class="alert alert-success">Form is ENABLED because pengajuanAmiExists = false</div>
                 @endif
 
                 <!-- Wizard Navigation -->

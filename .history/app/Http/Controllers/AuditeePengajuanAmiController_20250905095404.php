@@ -580,7 +580,6 @@ class AuditeePengajuanAmiController extends Controller
 
         return view('auditee/pengajuan_ami/unggah_siklus',[
             'siklus'  =>  $siklus,
-            'pengajuanAmiExists' => $pengajuanAmiExists,
         ]);
     }
 

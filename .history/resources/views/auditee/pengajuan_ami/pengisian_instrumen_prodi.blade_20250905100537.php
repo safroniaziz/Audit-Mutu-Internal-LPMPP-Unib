@@ -354,23 +354,6 @@
                         </div>
                     </div>
                 </div>
-            @else
-                <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
-                    <div class="me-4">
-                        <i class="bi bi-lock-fill fs-2 text-warning"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="fw-bold text-dark mb-2">🔒 Data Sudah Dikunci</h4>
-                        <div class="fs-6 text-gray-700">
-                            <p class="mt-2">
-                                <strong>Informasi:</strong>
-                                <span class="fw-semibold text-warning">
-                                    Data pengisian instrumen prodi tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
             @endif
 
             <div class="alert {{ $isAllCompleted ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10 position-relative">
