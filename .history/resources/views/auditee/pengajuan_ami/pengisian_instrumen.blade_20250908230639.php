@@ -793,33 +793,6 @@
             console.log('Submitting form for SS:', currentStepId);
             console.log('Form action:', $form.attr('action'));
 
-            var formData = new FormData($form[0]);
-
-            // Check data size before sending
-            let totalSize = 0;
-            for (let pair of formData.entries()) {
-                if (pair[1] instanceof File) {
-                    totalSize += pair[1].size;
-                } else if (typeof pair[1] === 'string') {
-                    totalSize += new Blob([pair[1]]).size;
-                }
-            }
-
-            // Convert to KB
-            let sizeInKB = totalSize / 1024;
-            console.log('Total data size:', sizeInKB.toFixed(2), 'KB');
-
-            // Check if data exceeds 450KB limit
-            if (sizeInKB > 450) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Data Terlalu Besar',
-                    text: `Ukuran data saat ini: ${sizeInKB.toFixed(2)} KB. Maksimal yang diizinkan: 450 KB. Silakan kurangi jumlah data atau file yang diupload.`,
-                    confirmButtonText: 'OK'
-                });
-                return;
-            }
-
             Swal.fire({
                 title: 'Menyimpan Data',
                 text: 'Mohon tunggu...',
@@ -828,6 +801,8 @@
                     Swal.showLoading();
                 }
             });
+
+            var formData = new FormData($form[0]);
 
             // Log form data entries
             for (var pair of formData.entries()) {
@@ -882,7 +857,7 @@
 
                     let errorMessage = 'Terjadi kesalahan saat menyimpan data.';
                     let errorTitle = 'Gagal!';
-
+                    
                     // Handle specific HTTP status codes
                     if (xhr.status === 413) {
                         errorTitle = 'Data Terlalu Besar';

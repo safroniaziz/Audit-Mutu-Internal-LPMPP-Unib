@@ -794,7 +794,7 @@
             console.log('Form action:', $form.attr('action'));
 
             var formData = new FormData($form[0]);
-
+            
             // Check data size before sending
             let totalSize = 0;
             for (let pair of formData.entries()) {
@@ -804,11 +804,11 @@
                     totalSize += new Blob([pair[1]]).size;
                 }
             }
-
+            
             // Convert to KB
             let sizeInKB = totalSize / 1024;
             console.log('Total data size:', sizeInKB.toFixed(2), 'KB');
-
+            
             // Check if data exceeds 450KB limit
             if (sizeInKB > 450) {
                 Swal.fire({
@@ -882,7 +882,7 @@
 
                     let errorMessage = 'Terjadi kesalahan saat menyimpan data.';
                     let errorTitle = 'Gagal!';
-
+                    
                     // Handle specific HTTP status codes
                     if (xhr.status === 413) {
                         errorTitle = 'Data Terlalu Besar';
