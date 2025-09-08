@@ -1086,6 +1086,8 @@ class AuditeePengajuanAmiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in submitInstrumenProdi: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
 
             return response()->json([
                 'success' => false,

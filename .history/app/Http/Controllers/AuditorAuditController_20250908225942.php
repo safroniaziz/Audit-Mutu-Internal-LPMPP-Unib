@@ -341,8 +341,26 @@ class AuditorAuditController extends Controller
                             'nilai' => $request->nilai[$ikssAuditeeId] ?? null
                         ]);
 
+                        Log::info('Updated existing evaluation', [
+                            'evaluation_id' => $existingEvaluation->id,
+                            'ikss_auditee_id' => $ikssAuditeeId,
+                            'old_data' => $oldData,
+                            'new_data' => $existingEvaluation->fresh()->toArray()
+                        ]);
                     }
                 } catch (\Exception $e) {
+                    Log::error('Error processing IKSS', [
+                        'ikss_auditee_id' => $ikssAuditeeId,
+                        'error' => $e->getMessage(),
+                        'deskripsi_exists' => isset($request->deskripsi[$ikssAuditeeId]),
+                        'pertanyaan_exists' => isset($request->pertanyaan[$ikssAuditeeId]),
+                        'nilai_exists' => isset($request->nilai[$ikssAuditeeId]),
+                        'available_keys' => [
+                            'deskripsi' => array_keys($request->deskripsi ?? []),
+                            'pertanyaan' => array_keys($request->pertanyaan ?? []),
+                            'nilai' => array_keys($request->nilai ?? [])
+                        ]
+                    ]);
                     throw $e;
                 }
             }
@@ -601,6 +619,12 @@ class AuditorAuditController extends Controller
 
     public function submitPenilaianInstrumenProdi(Request $request, PengajuanAmi $pengajuan)
     {
+        // Debug: Log the incoming request data
+        Log::info('Penilaian Instrumen Prodi Request Data:', [
+            'all_data' => $request->all(),
+            'nilai_data' => $request->nilai,
+            'catatan_data' => $request->catatan
+        ]);
 
         $validator = Validator::make($request->all(), [
             'nilai' => 'required|array',
@@ -631,6 +655,13 @@ class AuditorAuditController extends Controller
             DB::beginTransaction();
 
             foreach ($request->nilai as $instrumenProdiId => $nilai) {
+                // Debug: Log each nilai being saved
+                Log::info('Saving nilai:', [
+                    'instrumen_prodi_id' => $instrumenProdiId,
+                    'nilai' => $nilai,
+                    'nilai_type' => gettype($nilai),
+                    'catatan' => $request->catatan[$instrumenProdiId] ?? null
+                ]);
 
                 InstrumenProdiNilai::updateOrCreate(
                     [
@@ -699,6 +730,7 @@ class AuditorAuditController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Error approving penilaian prodi: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat menyetujui penilaian.'
@@ -893,6 +925,14 @@ class AuditorAuditController extends Controller
             }
         }
 
+        // Debug: Log data untuk troubleshooting
+        Log::info('Data Debug', [
+            'pengajuan_id' => $pengajuan->id,
+            'total_kuisioner_jawaban' => $jawabanKuisioner->count(),
+            'total_instrumen_prodi_nilai' => $instrumenProdiNilai->count(),
+            'kuisioner_data' => $jawabanKuisioner->toArray(),
+            'instrumen_prodi_data' => $instrumenProdiNilai->toArray()
+        ]);
 
         $kuisioners = Kuisioner::with(['opsis'])->get();
 
@@ -976,6 +1016,12 @@ class AuditorAuditController extends Controller
 
     public function beritaAcara(Request $request, PengajuanAmi $pengajuan)
     {
+        // Debug logging
+        \Illuminate\Support\Facades\Log::info('BeritaAcara method called', [
+            'pengajuan_id' => $pengajuan->id,
+            'request_data' => $request->all(),
+            'user_id' => Auth::id()
+        ]);
 
         // Validate request
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
@@ -987,6 +1033,11 @@ class AuditorAuditController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::error('Validation failed in beritaAcara', [
+                'pengajuan_id' => $pengajuan->id,
+                'errors' => $validator->errors()->toArray(),
+                'input' => $request->all()
+            ]);
 
             return response()->json([
                 'success' => false,
@@ -1001,6 +1052,10 @@ class AuditorAuditController extends Controller
                 'catatan_visitasi' => $request->catatan_visitasi
             ]);
 
+            \Illuminate\Support\Facades\Log::info('Catatan visitasi saved successfully', [
+                'pengajuan_id' => $pengajuan->id,
+                'catatan_visitasi' => $request->catatan_visitasi
+            ]);
 
             // Return JSON response for AJAX
             return response()->json([
@@ -1009,6 +1064,11 @@ class AuditorAuditController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in beritaAcara method', [
+                'pengajuan_id' => $pengajuan->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'success' => false,

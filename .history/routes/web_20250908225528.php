@@ -355,9 +355,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/submit-instrumen-prodi/{instrumen_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenProdi'])->name('pengajuanAmi.submitInstrumenProdi');
 
             Route::get('/unggah_siklus', [AuditeePengajuanAmiController::class, 'unggahSiklus'])->name('pengajuanAmi.unggahSiklus');
-            Route::post('/submit-all-siklus', [AuditeePengajuanAmiController::class, 'submitAllSiklus'])->name('submitAllSiklus');
+            Route::post('/submit-all-siklus', [AuditeePengajuanAmiController::class, 'submitAllSiklus'])->name('submitAllSiklus')->middleware('request.size.limit');
 
-            Route::post('/upload-files', [AuditeePengajuanAmiController::class, 'uploadFiles'])->name('uploadFiles');
+            Route::post('/upload-files', [AuditeePengajuanAmiController::class, 'uploadFiles'])->name('uploadFiles')->middleware('request.size.limit');
             Route::delete('/file/{id}', [AuditeePengajuanAmiController::class, 'destroy'])->name('file.delete');
 
             Route::prefix('laporan')->name('laporan.')->group(function () {
@@ -368,7 +368,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
                 // Evaluasi Routes
                 Route::get('/{id}/evaluasi', [AuditeeLaporanAmiController::class, 'evaluasiForm'])->name('evaluasi.form');
-                Route::post('/{id}/evaluasi', [AuditeeLaporanAmiController::class, 'evaluasi'])->name('evaluasi.store');
+                Route::post('/{id}/evaluasi', [AuditeeLaporanAmiController::class, 'evaluasi'])->name('evaluasi.store')->middleware('request.size.limit');
             });
 
             // Password Routes
@@ -388,20 +388,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::get('/perjanjian_kinerja/{pengajuan}', [AuditorAuditController::class, 'perjanjianKinerja'])->name('perjanjianKinerja');
 
                 Route::get('/desk_evaluation/{pengajuan}', [AuditorAuditController::class, 'deskEvaluation'])->name('deskEvaluation');
-                Route::post('/desk-evaluation', [AuditorAuditController::class, 'submitDeskEvaluation'])->name('submitDeskEvaluation');
+                Route::post('/desk-evaluation', [AuditorAuditController::class, 'submitDeskEvaluation'])->name('submitDeskEvaluation')->middleware('request.size.limit');
                 Route::post('/desk-evaluation/{pengajuan}/approve', [AuditorAuditController::class, 'approveDeskEvaluation'])->name('approveDeskEvaluation');
 
                 Route::get('/visitasi/{pengajuan}', [AuditorAuditController::class, 'visitasi'])->name('visitasi');
-                Route::post('/visitasi', [AuditorAuditController::class, 'submitVisitasi'])->name('submitVisitasi');
+                Route::post('/visitasi', [AuditorAuditController::class, 'submitVisitasi'])->name('submitVisitasi')->middleware('request.size.limit');
                 Route::post('/visitasi/{pengajuan}/approve', [AuditorAuditController::class, 'approveVisitasi'])->name('approveVisitasi');
 
                     Route::get('/penilaian_instrumen_prodi/{pengajuan}', [AuditorAuditController::class, 'penilaianInstrumenProdi'])->name('penilaianInstrumenProdi');
-    Route::post('/penilaian_instrumen_prodi/{pengajuan}/submit', [AuditorAuditController::class, 'submitPenilaianInstrumenProdi'])->name('submitPenilaianInstrumenProdi');
+    Route::post('/penilaian_instrumen_prodi/{pengajuan}/submit', [AuditorAuditController::class, 'submitPenilaianInstrumenProdi'])->name('submitPenilaianInstrumenProdi')->middleware('request.size.limit');
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/approve', [AuditorAuditController::class, 'approvePenilaianProdi'])->name('approvePenilaianProdi');
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/save-active-kriteria', [AuditorAuditController::class, 'saveActiveKriteria'])->name('saveActiveKriteria');
 
                 Route::get('/unduh_dokumen/{pengajuan}', [AuditorAuditController::class, 'unduhDokumen'])->name('unduhDokumen');
-                Route::post('/save-kuisioner/{pengajuan}', [AuditorAuditController::class, 'saveKuisioner'])->name('saveKuisioner');
+                Route::post('/save-kuisioner/{pengajuan}', [AuditorAuditController::class, 'saveKuisioner'])->name('saveKuisioner')->middleware('request.size.limit');
                 Route::prefix('cetak')->group(function () {
                     Route::post('/berita-acara/{pengajuan}', [AuditorAuditController::class, 'beritaAcara'])->name('beritaAcara');
                     Route::get('/berita-acara/{pengajuan}/view', [AuditorAuditController::class, 'viewBeritaAcara'])->name('viewBeritaAcara');

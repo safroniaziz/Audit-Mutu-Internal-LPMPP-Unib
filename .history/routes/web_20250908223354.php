@@ -49,7 +49,7 @@ Route::get('/', function () {
 
 // Override login route untuk redirect ke maintenance
 Route::get('/login', function () {
-    return redirect()->route('login');
+    return redirect()->route('maintenance');
 })->name('login');
 
 // Route untuk file viewer

@@ -45,12 +45,6 @@ class AuditeePengajuanAmiController extends Controller
 
     public function lengkapiProfil(Request $request)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         // Validasi input
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
@@ -226,12 +220,6 @@ class AuditeePengajuanAmiController extends Controller
 
     public function saveIkss(Request $request)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         // Validasi input
         $validator = Validator::make($request->all(), [
             'auditee_id' => 'required|exists:unit_kerjas,id',
@@ -301,12 +289,6 @@ class AuditeePengajuanAmiController extends Controller
      */
     public function saveIkssSS(Request $request)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         try {
             DB::beginTransaction();
 
@@ -729,12 +711,6 @@ class AuditeePengajuanAmiController extends Controller
 
     public function uploadPerjanjianKinerja(Request $request)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         $request->validate([
             'file_perjanjian' => 'required|file|mimes:pdf|max:10240',
         ], [
@@ -838,12 +814,6 @@ class AuditeePengajuanAmiController extends Controller
 
     public function submitInstrumenSS(Request $request, $ss_id)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         $unitKerjaId = Auth::user()->unit_kerja_id;
         $periodeId = $request->periode_id;
 
@@ -997,6 +967,16 @@ class AuditeePengajuanAmiController extends Controller
                     // Load submission with proper filtering
                     $instrumenProdi->submission = $instrumenProdi->submissionForUnitAndPeriode($unitKerjaId, $periodeAktif->id)->first();
 
+                    // Debug: Log what data is being loaded
+                    \Log::info("InstrumenProdi ID: {$instrumenProdi->id}", [
+                        'submission_loaded' => $instrumenProdi->submission ? 'YES' : 'NO',
+                        'submission_data' => $instrumenProdi->submission ? [
+                            'id' => $instrumenProdi->submission->id,
+                            'realisasi' => $instrumenProdi->submission->realisasi,
+                            'periode_id' => $instrumenProdi->submission->periode_id,
+                            'unit_kerja_id' => $instrumenProdi->submission->unit_kerja_id
+                        ] : null
+                    ]);
                 }
             }
         }
@@ -1010,12 +990,6 @@ class AuditeePengajuanAmiController extends Controller
 
     public function submitInstrumenProdi(Request $request, $kriteria_id)
     {
-        // Validasi ukuran request maksimal 450KB
-        $sizeValidation = $this->validateRequestSize($request);
-        if ($sizeValidation) {
-            return $sizeValidation;
-        }
-
         try {
             DB::beginTransaction();
 
@@ -1026,6 +1000,15 @@ class AuditeePengajuanAmiController extends Controller
             // Get all instrumen IDs from the form
             $instrumenIds = $request->input('instrumen_ids', []);
 
+            // Log the received data for debugging
+            Log::info('Received form data:', [
+                'instrumen_ids' => $instrumenIds,
+                'realisasi' => $request->input('realisasi', []),
+                'url_sumber' => $request->input('url_sumber', []),
+                'akar_penyebab' => $request->input('akar_penyebab', []),
+                'rencana_perbaikan' => $request->input('rencana_perbaikan', []),
+                'files' => $request->hasFile('dokumen') ? array_keys($request->file('dokumen')) : []
+            ]);
 
             // Get all InstrumenProdi records for the given kriteria and instrumen IDs
             $instrumenProdis = InstrumenProdi::whereIn('id', $instrumenIds)
@@ -1086,6 +1069,8 @@ class AuditeePengajuanAmiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in submitInstrumenProdi: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
 
             return response()->json([
                 'success' => false,

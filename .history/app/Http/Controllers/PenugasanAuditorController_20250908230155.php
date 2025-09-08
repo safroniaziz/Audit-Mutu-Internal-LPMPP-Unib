@@ -356,6 +356,10 @@ class PenugasanAuditorController extends Controller
                 'auditor_activities' => $auditorActivities
             ]);
         } catch (\Exception $e) {
+            Log::error('Error checking audit activities:', [
+                'pengajuan_id' => $pengajuanId,
+                'error' => $e->getMessage()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengecek aktivitas audit'

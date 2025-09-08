@@ -987,6 +987,11 @@ class AuditorAuditController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Illuminate\Support\Facades\Log::error('Validation failed in beritaAcara', [
+                'pengajuan_id' => $pengajuan->id,
+                'errors' => $validator->errors()->toArray(),
+                'input' => $request->all()
+            ]);
 
             return response()->json([
                 'success' => false,
@@ -1001,6 +1006,10 @@ class AuditorAuditController extends Controller
                 'catatan_visitasi' => $request->catatan_visitasi
             ]);
 
+            \Illuminate\Support\Facades\Log::info('Catatan visitasi saved successfully', [
+                'pengajuan_id' => $pengajuan->id,
+                'catatan_visitasi' => $request->catatan_visitasi
+            ]);
 
             // Return JSON response for AJAX
             return response()->json([
@@ -1009,6 +1018,11 @@ class AuditorAuditController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in beritaAcara method', [
+                'pengajuan_id' => $pengajuan->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'success' => false,

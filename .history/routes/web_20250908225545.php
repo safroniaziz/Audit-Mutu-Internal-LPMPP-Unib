@@ -396,12 +396,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('/visitasi/{pengajuan}/approve', [AuditorAuditController::class, 'approveVisitasi'])->name('approveVisitasi');
 
                     Route::get('/penilaian_instrumen_prodi/{pengajuan}', [AuditorAuditController::class, 'penilaianInstrumenProdi'])->name('penilaianInstrumenProdi');
-    Route::post('/penilaian_instrumen_prodi/{pengajuan}/submit', [AuditorAuditController::class, 'submitPenilaianInstrumenProdi'])->name('submitPenilaianInstrumenProdi');
+    Route::post('/penilaian_instrumen_prodi/{pengajuan}/submit', [AuditorAuditController::class, 'submitPenilaianInstrumenProdi'])->name('submitPenilaianInstrumenProdi')->middleware('request.size.limit');
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/approve', [AuditorAuditController::class, 'approvePenilaianProdi'])->name('approvePenilaianProdi');
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/save-active-kriteria', [AuditorAuditController::class, 'saveActiveKriteria'])->name('saveActiveKriteria');
 
                 Route::get('/unduh_dokumen/{pengajuan}', [AuditorAuditController::class, 'unduhDokumen'])->name('unduhDokumen');
-                Route::post('/save-kuisioner/{pengajuan}', [AuditorAuditController::class, 'saveKuisioner'])->name('saveKuisioner');
+                Route::post('/save-kuisioner/{pengajuan}', [AuditorAuditController::class, 'saveKuisioner'])->name('saveKuisioner')->middleware('request.size.limit');
                 Route::prefix('cetak')->group(function () {
                     Route::post('/berita-acara/{pengajuan}', [AuditorAuditController::class, 'beritaAcara'])->name('beritaAcara');
                     Route::get('/berita-acara/{pengajuan}/view', [AuditorAuditController::class, 'viewBeritaAcara'])->name('viewBeritaAcara');

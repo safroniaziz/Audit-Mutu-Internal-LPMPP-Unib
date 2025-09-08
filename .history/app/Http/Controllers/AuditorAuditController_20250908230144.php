@@ -1009,6 +1009,11 @@ class AuditorAuditController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in beritaAcara method', [
+                'pengajuan_id' => $pengajuan->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'success' => false,

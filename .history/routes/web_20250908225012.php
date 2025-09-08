@@ -348,11 +348,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/save-ikss-ss', [AuditeePengajuanAmiController::class, 'saveIkssSS'])->name('pengajuanAmi.saveIkssSS');
 
             Route::get('/pengisian_instrumen', [AuditeePengajuanAmiController::class, 'pengisianInstrumen'])->name('pengajuanAmi.pengisianInstrumen');
-            Route::post('/submit-all-instrumen', [AuditeePengajuanAmiController::class, 'submitAllInstrumen'])->name('submitAllInstrumen');
-            Route::post('/submit-instrumen-ss/{ss_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenSS'])->name('pengajuanAmi.submitInstrumenSS');
+            Route::post('/submit-all-instrumen', [AuditeePengajuanAmiController::class, 'submitAllInstrumen'])->name('submitAllInstrumen')->middleware('request.size.limit');
+            Route::post('/submit-instrumen-ss/{ss_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenSS'])->name('pengajuanAmi.submitInstrumenSS')->middleware('request.size.limit');
 
             Route::get('/pengisian_instrumen_prodi', [AuditeePengajuanAmiController::class, 'pengisianInstrumenProdi'])->name('pengajuanAmi.pengisianInstrumenProdi');
-            Route::post('/submit-instrumen-prodi/{instrumen_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenProdi'])->name('pengajuanAmi.submitInstrumenProdi');
+            Route::post('/submit-instrumen-prodi/{instrumen_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenProdi'])->name('pengajuanAmi.submitInstrumenProdi')->middleware('request.size.limit');
 
             Route::get('/unggah_siklus', [AuditeePengajuanAmiController::class, 'unggahSiklus'])->name('pengajuanAmi.unggahSiklus');
             Route::post('/submit-all-siklus', [AuditeePengajuanAmiController::class, 'submitAllSiklus'])->name('submitAllSiklus');

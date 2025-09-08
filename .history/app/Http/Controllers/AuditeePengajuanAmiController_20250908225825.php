@@ -997,6 +997,16 @@ class AuditeePengajuanAmiController extends Controller
                     // Load submission with proper filtering
                     $instrumenProdi->submission = $instrumenProdi->submissionForUnitAndPeriode($unitKerjaId, $periodeAktif->id)->first();
 
+                    // Debug: Log what data is being loaded
+                    \Log::info("InstrumenProdi ID: {$instrumenProdi->id}", [
+                        'submission_loaded' => $instrumenProdi->submission ? 'YES' : 'NO',
+                        'submission_data' => $instrumenProdi->submission ? [
+                            'id' => $instrumenProdi->submission->id,
+                            'realisasi' => $instrumenProdi->submission->realisasi,
+                            'periode_id' => $instrumenProdi->submission->periode_id,
+                            'unit_kerja_id' => $instrumenProdi->submission->unit_kerja_id
+                        ] : null
+                    ]);
                 }
             }
         }
@@ -1026,6 +1036,15 @@ class AuditeePengajuanAmiController extends Controller
             // Get all instrumen IDs from the form
             $instrumenIds = $request->input('instrumen_ids', []);
 
+            // Log the received data for debugging
+            Log::info('Received form data:', [
+                'instrumen_ids' => $instrumenIds,
+                'realisasi' => $request->input('realisasi', []),
+                'url_sumber' => $request->input('url_sumber', []),
+                'akar_penyebab' => $request->input('akar_penyebab', []),
+                'rencana_perbaikan' => $request->input('rencana_perbaikan', []),
+                'files' => $request->hasFile('dokumen') ? array_keys($request->file('dokumen')) : []
+            ]);
 
             // Get all InstrumenProdi records for the given kriteria and instrumen IDs
             $instrumenProdis = InstrumenProdi::whereIn('id', $instrumenIds)
@@ -1086,6 +1105,8 @@ class AuditeePengajuanAmiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in submitInstrumenProdi: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
