@@ -41,7 +41,7 @@ use App\Http\Controllers\PasswordController;
 use Illuminate\Http\Request;
 
 // Route untuk halaman maintenance
-// Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance');
+Route::get('/login', [MaintenanceController::class, 'index'])->name('maintenance');
 
 Route::get('/', function () {
     return redirect()->route('login');
