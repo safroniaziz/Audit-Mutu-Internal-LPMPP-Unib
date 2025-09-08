@@ -47,11 +47,6 @@ Route::get('/', function () {
     return redirect()->route('maintenance');
 });
 
-// Override login route untuk redirect ke maintenance
-Route::get('/login', function () {
-    return redirect()->route('maintenance');
-})->name('login');
-
 // Route untuk file viewer
 Route::get('/file-viewer', function (Request $request) {
     $url = $request->get('url');

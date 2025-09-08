@@ -40,17 +40,9 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\PasswordController;
 use Illuminate\Http\Request;
 
-// Route untuk halaman maintenance
-Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance');
-
 Route::get('/', function () {
-    return redirect()->route('maintenance');
+    return redirect()->route('login');
 });
-
-// Override login route untuk redirect ke maintenance
-Route::get('/login', function () {
-    return redirect()->route('maintenance');
-})->name('login');
 
 // Route untuk file viewer
 Route::get('/file-viewer', function (Request $request) {
