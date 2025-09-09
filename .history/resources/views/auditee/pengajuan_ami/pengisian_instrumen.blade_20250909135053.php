@@ -620,26 +620,6 @@
                 }
             });
 
-            // Function to refresh CSRF token
-            function refreshCSRFToken() {
-                $.get('/csrf-token', function(data) {
-                    $('meta[name="csrf-token"]').attr('content', data.token);
-                    $('input[name="_token"]').val(data.token);
-                    
-                    // Update AJAX setup with new token
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': data.token
-                        }
-                    });
-                }).fail(function() {
-                    console.log('Failed to refresh CSRF token');
-                });
-            }
-
-            // Refresh CSRF token every 30 minutes
-            setInterval(refreshCSRFToken, 30 * 60 * 1000);
-
             // Handle form submission untuk setiap SS
             $('.form-ss').on('submit', function(e) {
                 e.preventDefault();
