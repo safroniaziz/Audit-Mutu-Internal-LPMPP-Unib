@@ -1052,6 +1052,11 @@ class AuditeePengajuanAmiController extends Controller
                     throw new \Exception("Realisasi harus berupa angka");
                 }
 
+                // Validate realisasi tidak boleh melebihi target
+                if ($realisasi > $instrumenProdi->target) {
+                    throw new \Exception("Realisasi tidak boleh melebihi target ({$instrumenProdi->target})");
+                }
+
                 $submissionData = [
                     'realisasi' => $realisasi,
                     'akar_penyebab' => $akarPenyebab,
