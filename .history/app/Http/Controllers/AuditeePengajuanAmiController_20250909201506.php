@@ -348,13 +348,27 @@ class AuditeePengajuanAmiController extends Controller
                         ->first();
 
                     if ($ikssAuditee) {
+                        // Special logging for unit kerja ID 22 (S3 Linguistik Terapan)
+                        if ($auditeeId == 22) {
+                            Log::info("Unit 22 - Updating instrumen {$instrumenId}: old value = {$ikssAuditee->status_target}, new value = {$value}");
+                        }
+                        
                         // Update existing record
                         $ikssAuditee->update([
                             'status_target' => $value,
                             'status' => false, // Default status
                             'updated_at' => now()
                         ]);
+                        
+                        if ($auditeeId == 22) {
+                            Log::info("Unit 22 - After update instrumen {$instrumenId}: current value = {$ikssAuditee->fresh()->status_target}");
+                        }
                     } else {
+                        // Special logging for unit kerja ID 22 (S3 Linguistik Terapan)
+                        if ($auditeeId == 22) {
+                            Log::info("Unit 22 - Creating new instrumen {$instrumenId} with value = {$value}");
+                        }
+                        
                         // Create new record
                         IkssAuditee::create([
                             'auditee_id' => $auditeeId,
@@ -489,7 +503,7 @@ class AuditeePengajuanAmiController extends Controller
             'instrumen_ids' => 'required|array',
             'instrumen_ids.*' => 'exists:instrumen_iksses,id',
             'realisasi' => 'required|array',
-            'realisasi.*' => 'required|numeric|min:0',
+            'realisasi.*' => 'required|string',
             'uraian.*' => 'required|string',
             'akar_penyebab.*' => 'required|string',
             'rencana_perbaikan.*' => 'required|string',
@@ -502,8 +516,6 @@ class AuditeePengajuanAmiController extends Controller
             'instrumen_ids.required' => 'Instrumen harus dipilih.',
             'instrumen_ids.*.exists' => 'Instrumen tidak ditemukan.',
             'realisasi.*.required' => 'Realisasi wajib diisi.',
-            'realisasi.*.numeric' => 'Realisasi harus berupa angka.',
-            'realisasi.*.min' => 'Realisasi tidak boleh kurang dari 0.',
             'uraian.*.required' => 'Uraian wajib diisi.',
             'akar_penyebab.*.required' => 'Akar penyebab wajib diisi.',
             'rencana_perbaikan.*.required' => 'Rencana perbaikan wajib diisi.',
@@ -521,22 +533,6 @@ class AuditeePengajuanAmiController extends Controller
             ], 422);
         }
 
-        // Validasi tambahan: realisasi tidak boleh melebihi target
-        foreach ($instrumenIds as $instrumenId) {
-            $instrumen = \App\Models\InstrumenIkss::find($instrumenId);
-            if ($instrumen) {
-                $realisasi = $request->input('realisasi.' . $instrumenId);
-                if ($realisasi > $instrumen->target) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Realisasi untuk instrumen '{$instrumen->nama_instrumen}' tidak boleh melebihi target ({$instrumen->target})",
-                        'errors' => [
-                            'realisasi.' . $instrumenId => ["Realisasi tidak boleh melebihi target ({$instrumen->target})"]
-                        ]
-                    ], 422);
-                }
-            }
-        }
 
         DB::beginTransaction();
         try {
@@ -887,7 +883,7 @@ class AuditeePengajuanAmiController extends Controller
             'periode_id' => 'required|exists:periode_aktifs,id',
             'ss_id' => 'required|exists:satuan_standars,id',
             'realisasi' => 'required|array',
-            'realisasi.*' => 'required|numeric|min:0',
+            'realisasi.*' => 'required|string',
             'akar_penyebab' => 'required|array',
             'akar_penyebab.*' => 'required|string',
             'rencana_perbaikan' => 'required|array',
@@ -901,8 +897,6 @@ class AuditeePengajuanAmiController extends Controller
             'ss_id.required' => 'Sasaran Strategis harus dipilih.',
             'ss_id.exists' => 'Sasaran Strategis tidak valid.',
             'realisasi.*.required' => 'Realisasi wajib diisi.',
-            'realisasi.*.numeric' => 'Realisasi harus berupa angka.',
-            'realisasi.*.min' => 'Realisasi tidak boleh kurang dari 0.',
             'akar_penyebab.*.required' => 'Akar penyebab wajib diisi.',
             'rencana_perbaikan.*.required' => 'Rencana perbaikan wajib diisi.',
             'bukti_file.*.file' => 'File bukti harus berupa file.',
@@ -917,23 +911,6 @@ class AuditeePengajuanAmiController extends Controller
                 'message' => 'Validasi gagal',
                 'errors' => $validator->errors()
             ], 422);
-        }
-
-        // Validasi tambahan: realisasi tidak boleh melebihi target
-        foreach ($instrumenIds as $instrumenId) {
-            $instrumen = \App\Models\InstrumenIkss::find($instrumenId);
-            if ($instrumen) {
-                $realisasi = $request->input('realisasi.' . $instrumenId);
-                if ($realisasi > $instrumen->target) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Realisasi untuk instrumen '{$instrumen->nama_instrumen}' tidak boleh melebihi target ({$instrumen->target})",
-                        'errors' => [
-                            'realisasi.' . $instrumenId => ["Realisasi tidak boleh melebihi target ({$instrumen->target})"]
-                        ]
-                    ], 422);
-                }
-            }
         }
 
         DB::beginTransaction();
@@ -1084,11 +1061,6 @@ class AuditeePengajuanAmiController extends Controller
                 // Validate realisasi is numeric
                 if (!is_numeric($realisasi)) {
                     throw new \Exception("Realisasi harus berupa angka");
-                }
-
-                // Validate realisasi tidak boleh melebihi target
-                if ($realisasi > $instrumenProdi->target) {
-                    throw new \Exception("Realisasi tidak boleh melebihi target ({$instrumenProdi->target})");
                 }
 
                 $submissionData = [

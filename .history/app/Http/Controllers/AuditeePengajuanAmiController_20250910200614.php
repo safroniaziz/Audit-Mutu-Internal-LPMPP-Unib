@@ -919,23 +919,6 @@ class AuditeePengajuanAmiController extends Controller
             ], 422);
         }
 
-        // Validasi tambahan: realisasi tidak boleh melebihi target
-        foreach ($instrumenIds as $instrumenId) {
-            $instrumen = \App\Models\InstrumenIkss::find($instrumenId);
-            if ($instrumen) {
-                $realisasi = $request->input('realisasi.' . $instrumenId);
-                if ($realisasi > $instrumen->target) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Realisasi untuk instrumen '{$instrumen->nama_instrumen}' tidak boleh melebihi target ({$instrumen->target})",
-                        'errors' => [
-                            'realisasi.' . $instrumenId => ["Realisasi tidak boleh melebihi target ({$instrumen->target})"]
-                        ]
-                    ], 422);
-                }
-            }
-        }
-
         DB::beginTransaction();
         try {
             foreach ($instrumenIds as $instrumenId) {

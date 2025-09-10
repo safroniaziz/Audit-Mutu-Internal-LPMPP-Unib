@@ -629,7 +629,7 @@
                 $.get('/csrf-token', function(data) {
                     $('meta[name="csrf-token"]').attr('content', data.token);
                     $('input[name="_token"]').val(data.token);
-
+                    
                     // Update AJAX setup with new token
                     $.ajaxSetup({
                         headers: {
@@ -911,7 +911,7 @@
                     if (xhr.status === 419) {
                         errorTitle = 'Session Expired';
                         errorMessage = 'Session Anda telah berakhir. Halaman akan di-refresh untuk memperbarui token keamanan.';
-
+                        
                         Swal.fire({
                             icon: 'warning',
                             title: errorTitle,
