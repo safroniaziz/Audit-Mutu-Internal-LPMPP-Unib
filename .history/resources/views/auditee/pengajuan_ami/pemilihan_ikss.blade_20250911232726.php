@@ -623,7 +623,7 @@
                     } else if (missingRequired) {
                         message = "Harap pilih 'Ya' untuk semua IKSS wajib sebelum melanjutkan.";
                     } else if (missingOptional) {
-                        message = "Harap pilih semua  IKSS opsional sebelum melanjutkan.";
+                        message = "Harap pilih semua IKSS opsional sebelum melanjutkan.";
                     }
 
                     Swal.fire({
