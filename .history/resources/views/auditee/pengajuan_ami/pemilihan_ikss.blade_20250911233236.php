@@ -455,26 +455,23 @@
 
                                             @foreach ($indikator->instrumen as $instrumen)
                                                 @php
-                                                    $isWajibAndApplicable = $instrumen->is_wajib == 1;
+                                                    $isWajibAndApplicable = $instrumen->is_wajib == 1 &&
+                                                        ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang);
                                                 @endphp
-                                                <div class="d-flex align-items-start border {{ $isWajibAndApplicable ? 'border-danger border-2' : 'border-dashed border-gray-300' }} rounded px-6 py-4 mb-3 position-relative {{ $isWajibAndApplicable ? 'bg-light-danger' : '' }}" data-is-wajib="{{ $isWajibAndApplicable ? '1' : '0' }}">
-                                                    @if ($isWajibAndApplicable)
-                                                        <div class="badge badge-danger fw-bold fs-7" style="position: absolute; top: -8px; right: 10px; z-index: 10;">
-                                                            <i class="fas fa-exclamation-triangle me-1"></i>WAJIB DIISI
-                                                        </div>
-                                                    @endif
+                                                <div class="d-flex align-items-start border border-dashed border-gray-300 rounded px-6 py-4 mb-3" data-is-wajib="{{ $isWajibAndApplicable ? '1' : '0' }}">
                                                     <div class="flex-grow-1">
                                                         <div class="fs-6 fw-bold text-gray-900 mb-1">
                                                             {{ $loop->iteration }}. {!! strip_tags($instrumen->indikator, '<strong><em><u><span>') !!}
-                                                            @if ($instrumen->is_wajib == 1)
+                                                            @if ($instrumen->is_wajib == 1 && ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang))
                                                                 <span class="badge badge-danger fs-8 ms-2">WAJIB</span>
                                                             @endif
                                                         </div>
                                                         @if ($instrumen->is_wajib == 1)
-                                                            <div class="alert alert-danger py-2 px-3 mb-3 fs-7">
-                                                                <i class="fas fa-exclamation-circle me-2"></i>
-                                                                <strong>INSTRUMEN WAJIB:</strong> Instrumen ini bersifat wajib dan harus dipilih "Ya". Radio button "Tidak" telah dinonaktifkan.
-                                                            </div>
+                                                            @if ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang)
+                                                                <div class="text-danger fw-semibold mb-2">
+                                                                    * Instrumen ini bersifat wajib dan sudah dipilih secara otomatis.
+                                                                </div>
+                                                            @endif
                                                         @endif
                                                         <div class="fs-7 text-muted">
                                                             <div><strong>Sumber:</strong> {!! $instrumen->sumber !!}</div>
@@ -482,6 +479,10 @@
                                                         </div>
                                                     </div>
                                                     <div class="d-flex gap-4 flex-wrap mt-3" style="max-width: 400px;">
+                                                        @php
+                                                            $isWajibAndApplicable = $instrumen->is_wajib == 1 &&
+                                                                ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang);
+                                                        @endphp
                                                         <div class="form-check">
                                                             <input
                                                                 class="form-check-input"
@@ -599,7 +600,7 @@
                 let missingOptional = false;
 
                 currentContent.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
-                    const isWajib = group.getAttribute('data-is-wajib') === '1';
+                    const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
 
@@ -626,7 +627,7 @@
                     } else if (missingRequired) {
                         message = "Harap pilih 'Ya' untuk semua IKSS wajib sebelum melanjutkan.";
                     } else if (missingOptional) {
-                        message = "Harap pilih semua IKSS opsional sebelum melanjutkan.";
+                        message = "Harap pilih semua  IKSS opsional sebelum melanjutkan.";
                     }
 
                     Swal.fire({
@@ -653,7 +654,7 @@
 
                 currentContent.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     totalInstruments++;
-                    const isWajib = group.getAttribute('data-is-wajib') === '1';
+                    const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
 
                     if (isWajib) {
@@ -759,7 +760,7 @@
 
                 content.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     totalInstruments++;
-                    const isWajib = group.getAttribute('data-is-wajib') === '1';
+                    const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const instrumenId = radioName?.replace('pilihan_', '');
 

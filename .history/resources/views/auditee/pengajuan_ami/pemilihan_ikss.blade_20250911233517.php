@@ -471,9 +471,8 @@
                                                             @endif
                                                         </div>
                                                         @if ($instrumen->is_wajib == 1)
-                                                            <div class="alert alert-danger py-2 px-3 mb-3 fs-7">
-                                                                <i class="fas fa-exclamation-circle me-2"></i>
-                                                                <strong>INSTRUMEN WAJIB:</strong> Instrumen ini bersifat wajib dan harus dipilih "Ya". Radio button "Tidak" telah dinonaktifkan.
+                                                            <div class="text-danger fw-semibold mb-2">
+                                                                * Instrumen ini bersifat wajib dan sudah dipilih secara otomatis.
                                                             </div>
                                                         @endif
                                                         <div class="fs-7 text-muted">
