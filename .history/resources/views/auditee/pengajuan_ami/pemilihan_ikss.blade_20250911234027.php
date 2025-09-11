@@ -497,6 +497,7 @@
                                                                 id="tidak_{{ $instrumen->id }}"
                                                                 value="0"
                                                                 {{ (isset($dataTerpilih) && isset($dataTerpilih['pilihan_'.$instrumen->id]) && $dataTerpilih['pilihan_'.$instrumen->id] == 0) ? 'checked' : '' }}
+                                                                {{ $isWajibAndApplicable ? 'disabled' : '' }}
                                                             >
                                                             <label class="form-check-label" for="tidak_{{ $instrumen->id }}">Tidak</label>
                                                         </div>

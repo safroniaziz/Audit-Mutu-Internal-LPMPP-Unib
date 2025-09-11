@@ -466,10 +466,14 @@
                                                     <div class="flex-grow-1">
                                                         <div class="fs-6 fw-bold text-gray-900 mb-1">
                                                             {{ $loop->iteration }}. {!! strip_tags($instrumen->indikator, '<strong><em><u><span>') !!}
+                                                            @if ($instrumen->is_wajib == 1)
+                                                                <span class="badge badge-danger fs-8 ms-2">WAJIB</span>
+                                                            @endif
                                                         </div>
                                                         @if ($instrumen->is_wajib == 1)
-                                                            <div class="text-warning fw-semibold mb-2 fs-7">
-                                                                <i class="fas fa-info-circle me-1"></i>Instrumen wajib - harus dipilih "Ya"
+                                                            <div class="alert alert-danger py-2 px-3 mb-3 fs-7">
+                                                                <i class="fas fa-exclamation-circle me-2"></i>
+                                                                <strong>INSTRUMEN WAJIB:</strong> Instrumen ini bersifat wajib dan harus dipilih "Ya". Radio button "Tidak" telah dinonaktifkan.
                                                             </div>
                                                         @endif
                                                         <div class="fs-7 text-muted">
@@ -486,6 +490,7 @@
                                                                 id="ya_{{ $instrumen->id }}"
                                                                 value="1"
                                                                 {{ $isWajibAndApplicable || (isset($dataTerpilih) && isset($dataTerpilih['pilihan_'.$instrumen->id]) && $dataTerpilih['pilihan_'.$instrumen->id] == 1) ? 'checked' : '' }}
+                                                                {{ $isWajibAndApplicable ? 'disabled' : '' }}
                                                             >
                                                             <label class="form-check-label" for="ya_{{ $instrumen->id }}">Ya</label>
                                                         </div>
@@ -497,6 +502,7 @@
                                                                 id="tidak_{{ $instrumen->id }}"
                                                                 value="0"
                                                                 {{ (isset($dataTerpilih) && isset($dataTerpilih['pilihan_'.$instrumen->id]) && $dataTerpilih['pilihan_'.$instrumen->id] == 0) ? 'checked' : '' }}
+                                                                {{ $isWajibAndApplicable ? 'disabled' : '' }}
                                                             >
                                                             <label class="form-check-label" for="tidak_{{ $instrumen->id }}">Tidak</label>
                                                         </div>
