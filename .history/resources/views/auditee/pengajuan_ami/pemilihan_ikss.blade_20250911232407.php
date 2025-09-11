@@ -599,7 +599,7 @@
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
-
+                    
                     if (isWajib) {
                         // For mandatory instruments, check if "Ya" (value="1") is selected
                         const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
@@ -625,7 +625,7 @@
                     } else if (missingOptional) {
                         message = "Harap pilih semua IKSS opsional sebelum melanjutkan.";
                     }
-
+                    
                     Swal.fire({
                         text: message,
                         icon: "warning",
@@ -652,7 +652,7 @@
                     totalInstruments++;
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
-
+                    
                     if (isWajib) {
                         // For mandatory instruments, check if "Ya" (value="1") is selected
                         const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);

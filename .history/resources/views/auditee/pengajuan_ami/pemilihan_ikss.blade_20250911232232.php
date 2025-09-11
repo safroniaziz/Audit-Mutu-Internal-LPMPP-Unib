@@ -458,9 +458,6 @@
                                                     <div class="flex-grow-1">
                                                         <div class="fs-6 fw-bold text-gray-900 mb-1">
                                                             {{ $loop->iteration }}. {!! strip_tags($instrumen->indikator, '<strong><em><u><span>') !!}
-                                                            @if ($instrumen->is_wajib == 1 && ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang))
-                                                                <span class="badge badge-danger fs-8 ms-2">WAJIB</span>
-                                                            @endif
                                                         </div>
                                                         @if ($instrumen->is_wajib == 1)
                                                             @if ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang)
@@ -592,42 +589,21 @@
             function validateCurrentStep() {
                 const currentContent = document.querySelector(`.wizard-content[data-step="${currentStep}"]`);
                 let allSelected = true;
-                let missingRequired = false;
-                let missingOptional = false;
 
                 currentContent.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
-                    const radioName = group.querySelector('input[type="radio"]')?.name;
-                    const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
-
-                    if (isWajib) {
-                        // For mandatory instruments, check if "Ya" (value="1") is selected
-                        const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
-                        if (!yaRadio || !yaRadio.checked) {
-                            allSelected = false;
-                            missingRequired = true;
-                        }
-                    } else {
-                        // For optional instruments, check if any option is selected
+                    if (!isWajib) {
+                        const radioName = group.querySelector('input[type="radio"]')?.name;
+                        const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
                         if (!checkedRadio) {
                             allSelected = false;
-                            missingOptional = true;
                         }
                     }
                 });
 
                 if (!allSelected) {
-                    let message = "";
-                    if (missingRequired && missingOptional) {
-                        message = "Harap pilih 'Ya' untuk semua IKSS wajib dan pilih semua IKSS opsional sebelum melanjutkan.";
-                    } else if (missingRequired) {
-                        message = "Harap pilih 'Ya' untuk semua IKSS wajib sebelum melanjutkan.";
-                    } else if (missingOptional) {
-                        message = "Harap pilih semua IKSS opsional sebelum melanjutkan.";
-                    }
-
                     Swal.fire({
-                        text: message,
+                        text: "Harap pilih semua instrumen sebelum melanjutkan.",
                         icon: "warning",
                         buttonsStyling: false,
                         confirmButtonText: "OK",
@@ -653,17 +629,8 @@
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
 
-                    if (isWajib) {
-                        // For mandatory instruments, check if "Ya" (value="1") is selected
-                        const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
-                        if (yaRadio && yaRadio.checked) {
-                            selectedInstruments++;
-                        }
-                    } else {
-                        // For optional instruments, check if any option is selected
-                        if (radioName && group.querySelector(`input[name="${radioName}"]:checked`)) {
-                            selectedInstruments++;
-                        }
+                    if (isWajib || (radioName && group.querySelector(`input[name="${radioName}"]:checked`))) {
+                        selectedInstruments++;
                     }
                 });
 
@@ -764,17 +731,13 @@
                         const isInDatabase = dataTerpilih.hasOwnProperty(`pilihan_${instrumenId}`);
 
                         if (isWajib) {
-                            // For mandatory instruments, check if saved in database with value = 1 (Ya)
-                            if (!isInDatabase || dataTerpilih[`pilihan_${instrumenId}`] != 1) {
+                            if (!isInDatabase) {
                                 allSavedInDatabase = false;
                             } else {
                                 selectedInstruments++;
                             }
-                        } else {
-                            // For optional instruments, just check if saved in database
-                            if (isInDatabase) {
-                                selectedInstruments++;
-                            }
+                        } else if (isInDatabase) {
+                            selectedInstruments++;
                         }
                     }
                 });

@@ -458,9 +458,6 @@
                                                     <div class="flex-grow-1">
                                                         <div class="fs-6 fw-bold text-gray-900 mb-1">
                                                             {{ $loop->iteration }}. {!! strip_tags($instrumen->indikator, '<strong><em><u><span>') !!}
-                                                            @if ($instrumen->is_wajib == 1 && ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang))
-                                                                <span class="badge badge-danger fs-8 ms-2">WAJIB</span>
-                                                            @endif
                                                         </div>
                                                         @if ($instrumen->is_wajib == 1)
                                                             @if ($instrumen->jenjang == 'Semua' || $instrumen->jenjang == optional(Auth::user()->unitKerja)->jenjang)
@@ -599,7 +596,7 @@
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
-
+                    
                     if (isWajib) {
                         // For mandatory instruments, check if "Ya" (value="1") is selected
                         const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
@@ -625,7 +622,7 @@
                     } else if (missingOptional) {
                         message = "Harap pilih semua IKSS opsional sebelum melanjutkan.";
                     }
-
+                    
                     Swal.fire({
                         text: message,
                         icon: "warning",
@@ -652,7 +649,7 @@
                     totalInstruments++;
                     const isWajib = group.querySelector('input[type="hidden"][name^="pilihan_"]') !== null;
                     const radioName = group.querySelector('input[type="radio"]')?.name;
-
+                    
                     if (isWajib) {
                         // For mandatory instruments, check if "Ya" (value="1") is selected
                         const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
@@ -764,17 +761,13 @@
                         const isInDatabase = dataTerpilih.hasOwnProperty(`pilihan_${instrumenId}`);
 
                         if (isWajib) {
-                            // For mandatory instruments, check if saved in database with value = 1 (Ya)
-                            if (!isInDatabase || dataTerpilih[`pilihan_${instrumenId}`] != 1) {
+                            if (!isInDatabase) {
                                 allSavedInDatabase = false;
                             } else {
                                 selectedInstruments++;
                             }
-                        } else {
-                            // For optional instruments, just check if saved in database
-                            if (isInDatabase) {
-                                selectedInstruments++;
-                            }
+                        } else if (isInDatabase) {
+                            selectedInstruments++;
                         }
                     }
                 });
