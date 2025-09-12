@@ -1743,10 +1743,16 @@
                                     window.location.href = '{{ route("auditee.pengajuanAmi.pemilihanIkss") }}';
                                 }
                             });
+
+                            // Mark as shown for today
+                            localStorage.setItem(alertShownKey, 'true');
                         } else {
                             console.error('SweetAlert2 is not loaded!');
                         }
                     }, 1000);
+                } else {
+                    console.log('Alert already shown today');
+                }
             });
         </script>
         @endif		<!--end::Custom Javascript-->
