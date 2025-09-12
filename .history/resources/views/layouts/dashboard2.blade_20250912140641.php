@@ -1666,64 +1666,6 @@
             });
         </script>
         @stack('scripts')
-
-        <!-- SweetAlert untuk Informasi IKSS Baru -->
-        @if(Auth::check() && Auth::user()->role == 'auditee')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Check if user has seen this notification today
-                const alertShownKey = 'ikss_info_shown_' + new Date().toDateString();
-                const hasSeenAlert = localStorage.getItem(alertShownKey);
-
-                if (!hasSeenAlert) {
-                    // Show SweetAlert after a short delay
-                    setTimeout(function() {
-                        Swal.fire({
-                            title: '<strong>📢 Informasi: Tambahan IKSS Terbaru</strong>',
-                            html: `
-                                <div class="text-start">
-                                    <h5 class="mb-3 text-primary">
-                                        <i class="fas fa-list-alt me-2"></i>Daftar IKSS Baru:
-                                    </h5>
-                                    <div class="list-group mb-3">
-                                        <div class="list-group-item">
-                                            <strong>IKSS 1.4.3</strong> - Langganan Jurnal Online
-                                        </div>
-                                        <div class="list-group-item">
-                                            <strong>IKSS 1.5.1</strong> - Tes TOEFL
-                                        </div>
-                                        <div class="list-group-item">
-                                            <strong>IKSS 1.5.2</strong> - Mahasiswa Berprestasi
-                                        </div>
-                                        <div class="list-group-item">
-                                            <strong>IKSS 1.5.5</strong> - Student Mobility Program
-                                        </div>
-                                    </div>
-                                    <p class="text-muted mb-0">Silakan pilih IKSS yang relevan dengan unit kerja Anda.</p>
-                                </div>
-                            `,
-                            icon: 'info',
-                            width: '600px',
-                            showCancelButton: true,
-                            confirmButtonText: '<i class="fas fa-arrow-right me-2"></i>Ke Halaman Pemilihan IKSS',
-                            cancelButtonText: '<i class="fas fa-times me-2"></i>Tutup',
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#6c757d'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Redirect to IKSS selection page
-                                window.location.href = '{{ route("auditee.pengajuanAmi.pemilihanIkss") }}';
-                            }
-                        });
-
-                        // Mark as shown for today
-                        localStorage.setItem(alertShownKey, 'true');
-                    }, 1500);
-                }
-            });
-        </script>
-        @endif
-
 		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
 	</body>
