@@ -1676,11 +1676,11 @@
             document.addEventListener('DOMContentLoaded', function() {
                 console.log('DOM loaded, checking for IKSS alert...');
                 console.log('User role:', '{{ Auth::user()->role ?? "no user" }}');
-
+                
                 // Check if user has seen this notification today
                 const alertShownKey = 'ikss_info_shown_' + new Date().toDateString();
                 const hasSeenAlert = localStorage.getItem(alertShownKey);
-
+                
                 console.log('Alert key:', alertShownKey);
                 console.log('Has seen alert:', hasSeenAlert);
 
