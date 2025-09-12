@@ -576,7 +576,7 @@
                 currentContent.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const checkedRadio = group.querySelector(`input[name="${radioName}"]:checked`);
-
+                    
                     // All instruments are optional now, just check if any option is selected
                     if (!checkedRadio) {
                         allSelected = false;
@@ -608,11 +608,20 @@
 
                 currentContent.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     totalInstruments++;
+                    const isWajib = group.getAttribute('data-is-wajib') === '1';
                     const radioName = group.querySelector('input[type="radio"]')?.name;
 
-                    // All instruments are optional, just check if any option is selected
-                    if (radioName && group.querySelector(`input[name="${radioName}"]:checked`)) {
-                        selectedInstruments++;
+                    if (isWajib) {
+                        // For mandatory instruments, check if "Ya" (value="1") is selected
+                        const yaRadio = group.querySelector(`input[name="${radioName}"][value="1"]`);
+                        if (yaRadio && yaRadio.checked) {
+                            selectedInstruments++;
+                        }
+                    } else {
+                        // For optional instruments, check if any option is selected
+                        if (radioName && group.querySelector(`input[name="${radioName}"]:checked`)) {
+                            selectedInstruments++;
+                        }
                     }
                 });
 
@@ -705,15 +714,25 @@
 
                 content.querySelectorAll('.d-flex.align-items-start.border').forEach(group => {
                     totalInstruments++;
+                    const isWajib = group.getAttribute('data-is-wajib') === '1';
                     const radioName = group.querySelector('input[type="radio"]')?.name;
                     const instrumenId = radioName?.replace('pilihan_', '');
 
                     if (instrumenId) {
                         const isInDatabase = dataTerpilih.hasOwnProperty(`pilihan_${instrumenId}`);
 
-                        // All instruments are optional, just check if saved in database
-                        if (isInDatabase) {
-                            selectedInstruments++;
+                        if (isWajib) {
+                            // For mandatory instruments, check if saved in database with value = 1 (Ya)
+                            if (!isInDatabase || dataTerpilih[`pilihan_${instrumenId}`] != 1) {
+                                allSavedInDatabase = false;
+                            } else {
+                                selectedInstruments++;
+                            }
+                        } else {
+                            // For optional instruments, just check if saved in database
+                            if (isInDatabase) {
+                                selectedInstruments++;
+                            }
                         }
                     }
                 });
