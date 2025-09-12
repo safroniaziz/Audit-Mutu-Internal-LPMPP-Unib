@@ -1692,7 +1692,7 @@
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-plus-circle me-2"></i>IKSS Baru yang Ditambahkan:
                             </h5>
-
+                            
                             <div class="accordion" id="ikssAccordion">
                                 <!-- IKSS 1.4.3 -->
                                 <div class="accordion-item">
@@ -1822,13 +1822,13 @@
                     // Check if user has seen this modal today
                     const modalShownKey = 'ikss_info_modal_shown_' + new Date().toDateString();
                     const hasSeenModal = localStorage.getItem(modalShownKey);
-
+                    
                     if (!hasSeenModal) {
                         // Show modal after a short delay
                         setTimeout(function() {
                             const modal = new bootstrap.Modal(document.getElementById('ikssNewInfoModal'));
                             modal.show();
-
+                            
                             // Mark as shown for today
                             localStorage.setItem(modalShownKey, 'true');
                         }, 1000);

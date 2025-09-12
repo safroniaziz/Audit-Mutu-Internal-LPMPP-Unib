@@ -1692,7 +1692,7 @@
                             <h5 class="text-primary mb-3">
                                 <i class="fas fa-plus-circle me-2"></i>IKSS Baru yang Ditambahkan:
                             </h5>
-
+                            
                             <div class="accordion" id="ikssAccordion">
                                 <!-- IKSS 1.4.3 -->
                                 <div class="accordion-item">
@@ -1706,74 +1706,111 @@
                                             <p><strong>Pertanyaan:</strong> Berapa Persentase Prodi yang berlangganan jurnal online?</p>
                                             <p><strong>Target:</strong> 100%</p>
                                             <p><strong>Sumber:</strong> Laporan program studi tentang langganan jurnal online</p>
+                                            <p><strong>Penilaian:</strong></p>
+                                            <ul class="mb-0">
+                                                <li>4 = 100% Program studi berlangganan jurnal online</li>
+                                                <li>3 = 75% Program studi berlangganan jurnal online</li>
+                                                <li>2 = 50% Program studi berlangganan jurnal online</li>
+                                                <li>1 = 25% Program studi berlangganan jurnal online</li>
+                                                <li>0 = Tidak terdapat Program studi yang berlangganan jurnal online</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- IKSS 1.5.1 -->
+                                <!-- IKSS 1.5.1 - Tes TOEFL -->
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ikss151">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ikss151a">
                                             <strong>IKSS 1.5.1 - Pelaksanaan Tes TOEFL Untuk Mahasiswa</strong>
                                         </button>
                                     </h2>
-                                    <div id="ikss151" class="accordion-collapse collapse" data-bs-parent="#ikssAccordion">
+                                    <div id="ikss151a" class="accordion-collapse collapse" data-bs-parent="#ikssAccordion">
                                         <div class="accordion-body">
                                             <p><strong>Pertanyaan:</strong> Berapa Jumlah Pelaksanaan Tes TOEFL untuk mahasiswa yang dilaksanakan oleh fakultas/UPT Bahasa?</p>
                                             <p><strong>Target:</strong> 4</p>
                                             <p><strong>Sumber:</strong> Laporan hasil tes TOEFL mahasiswa untuk setiap periode/tahun</p>
+                                            <p><strong>Penilaian:</strong></p>
+                                            <ul class="mb-0">
+                                                <li>4 = Terdapat 4 atau lebih Pelaksanaan Tes TOEFL Untuk Mahasiswa</li>
+                                                <li>3 = Terdapat 3 Pelaksanaan Tes TOEFL Untuk Mahasiswa</li>
+                                                <li>2 = Terdapat 2 Pelaksanaan Tes TOEFL Untuk Mahasiswa</li>
+                                                <li>1 = Terdapat 1 Pelaksanaan Tes TOEFL Untuk Mahasiswa</li>
+                                                <li>0 = Tidak terdapat Pelaksanaan Tes TOEFL Untuk Mahasiswa</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- IKSS 1.5.2 - Group -->
+                                <!-- IKSS 1.5.1 - Workshop TOEFL -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ikss151b">
+                                            <strong>IKSS 1.5.1 - Workshop TOEFL Bagi Mahasiswa</strong>
+                                        </button>
+                                    </h2>
+                                    <div id="ikss151b" class="accordion-collapse collapse" data-bs-parent="#ikssAccordion">
+                                        <div class="accordion-body">
+                                            <p><strong>Pertanyaan:</strong> Berapa Jumlah Kegiatan workshop TOEFL bagi mahasiswa yang dilakukan fakultas/UPT Bahasa?</p>
+                                            <p><strong>Target:</strong> 1</p>
+                                            <p><strong>Sumber:</strong> Laporan fakultas/UPT Bahasa mengenai workshop TOEFL bagi mahasiswa</p>
+                                            <p><strong>Penilaian:</strong></p>
+                                            <ul class="mb-0">
+                                                <li>4 = Terdapat 1 atau lebih kegiatan Workshop TOEFL Bagi Mahasiswa</li>
+                                                <li>0 = Tidak terdapat kegiatan Workshop TOEFL Bagi Mahasiswa</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- IKSS 1.5.2 - Reward Mahasiswa -->
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ikss152">
-                                            <strong>IKSS 1.5.2 - Program Mahasiswa Berprestasi (4 Instrumen)</strong>
+                                            <strong>IKSS 1.5.2 - Program Mahasiswa Berprestasi</strong>
                                         </button>
                                     </h2>
                                     <div id="ikss152" class="accordion-collapse collapse" data-bs-parent="#ikssAccordion">
                                         <div class="accordion-body">
-                                            <div class="list-group list-group-flush">
-                                                <div class="list-group-item px-0">
-                                                    <strong>1. Pemberian Reward Mahasiswa Berprestasi</strong><br>
-                                                    <small class="text-muted">Berapa Persentase Mahasiswa Berprestasi yang mendapatkan reward dari fakultas?</small>
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
+                                                    <strong>Pemberian Reward Mahasiswa Berprestasi:</strong><br>
+                                                    Berapa Persentase Mahasiswa Berprestasi yang mendapatkan reward dari fakultas?
                                                 </div>
-                                                <div class="list-group-item px-0">
-                                                    <strong>2. Pengadaan Fasilitas Penunjang Prestasi Mahasiswa</strong><br>
-                                                    <small class="text-muted">Berapa Jumlah Pengadaan Fasilitas Penunjang Prestasi Mahasiswa yang dilaksanakan oleh Fakultas?</small>
+                                                <div class="col-12 mb-3">
+                                                    <strong>Pengadaan Fasilitas Penunjang Prestasi:</strong><br>
+                                                    Berapa Jumlah Pengadaan Fasilitas Penunjang Prestasi Mahasiswa yang dilaksanakan?
                                                 </div>
-                                                <div class="list-group-item px-0">
-                                                    <strong>3. Pemeliharaan Fasilitas Penunjang Mahasiswa Berprestasi</strong><br>
-                                                    <small class="text-muted">Berapa Jumlah Pemeliharaan Fasilitas Penunjang Mahasiswa Berprestasi yang dilakukan fakultas?</small>
+                                                <div class="col-12 mb-3">
+                                                    <strong>Pemeliharaan Fasilitas:</strong><br>
+                                                    Berapa Jumlah Pemeliharaan Fasilitas Penunjang Mahasiswa Berprestasi?
                                                 </div>
-                                                <div class="list-group-item px-0">
-                                                    <strong>4. Pemilihan Pengurus UKM/Ormawa</strong><br>
-                                                    <small class="text-muted">Berapa Jumlah Kegiatan Pemilihan Pengurus UKM/Ormawa?</small>
+                                                <div class="col-12">
+                                                    <strong>Pemilihan Pengurus UKM/Ormawa:</strong><br>
+                                                    Berapa Jumlah Kegiatan Pemilihan Pengurus UKM/Ormawa?
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- IKSS 1.5.5 - Group -->
+                                <!-- IKSS 1.5.5 - Student Mobility -->
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#ikss155">
-                                            <strong>IKSS 1.5.5 - Student Mobility Program (2 Instrumen)</strong>
+                                            <strong>IKSS 1.5.5 - Student Mobility Program</strong>
                                         </button>
                                     </h2>
                                     <div id="ikss155" class="accordion-collapse collapse" data-bs-parent="#ikssAccordion">
                                         <div class="accordion-body">
-                                            <div class="list-group list-group-flush">
-                                                <div class="list-group-item px-0">
-                                                    <strong>1. Pelaksanaan Sosialisasi Dan Diseminasi Student Mobility Program</strong><br>
-                                                    <small class="text-muted">Berapa Jumlah Kegiatan Sosialisasi dan Diseminasi Student Mobility Program yang dilaksanakan oleh Fakultas?</small>
+                                            <div class="row">
+                                                <div class="col-12 mb-3">
+                                                    <strong>Sosialisasi dan Diseminasi:</strong><br>
+                                                    Berapa Jumlah Kegiatan Sosialisasi dan Diseminasi Student Mobility Program yang dilaksanakan oleh Fakultas?
                                                 </div>
-                                                <div class="list-group-item px-0">
-                                                    <strong>2. Pemberangkatan Mahasiswa Mengikuti Student Mobility Program</strong><br>
-                                                    <small class="text-muted">Berapa Jumlah Kegiatan pemberangkatan mahasiswa mengikuti student mobility program yang dilaksanakan fakultas?</small>
+                                                <div class="col-12">
+                                                    <strong>Pemberangkatan Mahasiswa:</strong><br>
+                                                    Berapa Jumlah Kegiatan pemberangkatan mahasiswa mengikuti student mobility program yang dilaksanakan fakultas?
                                                 </div>
                                             </div>
                                         </div>
@@ -1822,13 +1859,13 @@
                     // Check if user has seen this modal today
                     const modalShownKey = 'ikss_info_modal_shown_' + new Date().toDateString();
                     const hasSeenModal = localStorage.getItem(modalShownKey);
-
+                    
                     if (!hasSeenModal) {
                         // Show modal after a short delay
                         setTimeout(function() {
                             const modal = new bootstrap.Modal(document.getElementById('ikssNewInfoModal'));
                             modal.show();
-
+                            
                             // Mark as shown for today
                             localStorage.setItem(modalShownKey, 'true');
                         }, 1000);
