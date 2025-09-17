@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
 use Spatie\Activitylog\ActivityLogger;
 
 class PenugasanAuditorController extends Controller
@@ -46,13 +45,10 @@ class PenugasanAuditorController extends Controller
             PerjanjianKinerja::where('pengajuan_ami_id', $pengajuan_ami_id)
                              ->update(['pengajuan_ami_id' => null]);
 
-            // Untuk InstrumenProdiSubmission, handle jika kolom belum ada
-            try {
+            // Untuk InstrumenProdiSubmission, hanya update jika kolom ada
+            if (\Schema::hasColumn('instrumen_prodi_submissions', 'pengajuan_ami_id')) {
                 InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)
                                         ->update(['pengajuan_ami_id' => null]);
-            } catch (\Exception $e) {
-                // Kolom pengajuan_ami_id belum ada di tabel ini, skip
-                Log::info('InstrumenProdiSubmission: pengajuan_ami_id column not found, skipping update');
             }
 
             // Hapus file siklus yang diupload (soft delete karena tightly coupled)
