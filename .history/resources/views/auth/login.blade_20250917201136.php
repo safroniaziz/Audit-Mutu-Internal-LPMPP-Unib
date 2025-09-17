@@ -529,31 +529,6 @@
                 <!-- Content -->
                 <div class="relative z-10 flex flex-col h-full justify-between">
                     <div>
-                        <!-- Pengumuman AMI -->
-                        <div class="bg-white bg-opacity-15 backdrop-blur-sm border-l-4 border-orange-400 p-5 rounded-lg shadow-lg mb-6" data-aos="fade-left" data-aos-delay="200">
-                            <div class="flex items-start">
-                                <div class="bg-orange-400 rounded-full p-2 mr-4 text-white flex-shrink-0">
-                                    <i class="fas fa-bullhorn text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white mb-2 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-2"></i>
-                                        PENGUMUMAN PENTING
-                                    </h3>
-                                    <div class="space-y-2 text-blue-100">
-                                        <p class="font-semibold text-orange-200">📅 Perpanjangan Waktu Pengisian AMI:</p>
-                                        <p class="ml-4">• Pengisian AMI diperpanjang sampai dengan <strong class="text-white">21 September 2025</strong></p>
-                                        <p class="font-semibold mt-3 text-orange-200">🔍 Jadwal Desk Evaluasi:</p>
-                                        <p class="ml-4">• Desk Evaluasi dilaksanakan pada <strong class="text-white">18-26 September 2025</strong></p>
-                                    </div>
-                                    <div class="mt-3 text-sm text-blue-100 bg-white bg-opacity-10 p-2 rounded border-l-2 border-orange-300">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Mohon segera melengkapi data AMI Anda sebelum batas waktu yang ditentukan.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <h2 class="text-3xl font-bold mb-5">Dokumen Terkait</h2>
                         <div class="documents-container" data-aos="fade-up" data-aos-delay="300">
                             <div class="space-y-2 max-h-[550px] overflow-y-auto pr-2" id="documents-list">
