@@ -222,10 +222,10 @@
                                         <i class="fas fa-user-plus me-1"></i>
                                         {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
                                     </button>
-                                    @if ($penugasanAuditor->is_disetujui == false && $penugasanAuditor->auditors->count() == 0)
+                                    @if ($penugasanAuditor->is_disetujui == false)
                                     <button type="button" class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
                                             onclick="resetPenugasanAuditor('{{ $penugasanAuditor->id }}')"
-                                            title="Reset pengajuan AMI - mengembalikan auditee ke status belum mengajukan">
+                                            title="Reset pengajuan AMI - mengembalikan auditee ke status awal">
                                         <i class="fas fa-undo"></i>
                                     </button>
                                     @endif
@@ -503,14 +503,12 @@
                                             <i class="fas fa-user-plus me-1"></i>
                                             ${auditors.length > 0 ? 'Edit' : 'Assign'}
                                         </button>
-                                        ${auditors.length == 0 && penugasanAuditor.is_disetujui == 0 ? `
                                         <button type="button" class="btn btn-sm btn-warning"
                                                 onclick="resetPenugasanAuditor('${penugasanAuditor.pengajuan_ami_id}')"
                                                 id="reset-btn-${penugasanAuditor.pengajuan_ami_id}"
-                                                title="Reset pengajuan AMI - mengembalikan ke status belum mengajukan">
+                                                title="Reset pengajuan AMI">
                                             <i class="fas fa-undo"></i>
                                         </button>
-                                        ` : ''}
                                     </div>
                                 </div>
                                 <!--end::Footer-->

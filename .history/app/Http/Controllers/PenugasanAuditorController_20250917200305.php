@@ -30,7 +30,7 @@ class PenugasanAuditorController extends Controller
 
             // Cek apakah sudah ada penugasan auditor
             $penugasanCount = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan_ami_id)->count();
-
+            
             if ($penugasanCount > 0) {
                 return response()->json([
                     'success' => false,
@@ -41,10 +41,10 @@ class PenugasanAuditorController extends Controller
             // Reset pengajuan_ami_id ke null untuk semua data terkait
             IkssAuditee::where('pengajuan_ami_id', $pengajuan_ami_id)
                        ->update(['pengajuan_ami_id' => null]);
-
+            
             PerjanjianKinerja::where('pengajuan_ami_id', $pengajuan_ami_id)
                              ->update(['pengajuan_ami_id' => null]);
-
+            
             InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)
                                     ->update(['pengajuan_ami_id' => null]);
 

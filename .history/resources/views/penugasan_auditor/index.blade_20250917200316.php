@@ -503,14 +503,12 @@
                                             <i class="fas fa-user-plus me-1"></i>
                                             ${auditors.length > 0 ? 'Edit' : 'Assign'}
                                         </button>
-                                        ${auditors.length == 0 && penugasanAuditor.is_disetujui == 0 ? `
                                         <button type="button" class="btn btn-sm btn-warning"
                                                 onclick="resetPenugasanAuditor('${penugasanAuditor.pengajuan_ami_id}')"
                                                 id="reset-btn-${penugasanAuditor.pengajuan_ami_id}"
-                                                title="Reset pengajuan AMI - mengembalikan ke status belum mengajukan">
+                                                title="Reset pengajuan AMI">
                                             <i class="fas fa-undo"></i>
                                         </button>
-                                        ` : ''}
                                     </div>
                                 </div>
                                 <!--end::Footer-->

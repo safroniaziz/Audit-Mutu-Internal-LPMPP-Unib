@@ -222,10 +222,10 @@
                                         <i class="fas fa-user-plus me-1"></i>
                                         {{ $penugasanAuditor->auditors->count() > 0 ? 'Edit' : 'Assign' }}
                                     </button>
-                                    @if ($penugasanAuditor->is_disetujui == false && $penugasanAuditor->auditors->count() == 0)
+                                    @if ($penugasanAuditor->is_disetujui == false)
                                     <button type="button" class="btn btn-sm btn-warning d-flex align-items-center justify-content-center"
                                             onclick="resetPenugasanAuditor('{{ $penugasanAuditor->id }}')"
-                                            title="Reset pengajuan AMI - mengembalikan auditee ke status belum mengajukan">
+                                            title="Reset pengajuan AMI - mengembalikan auditee ke status awal">
                                         <i class="fas fa-undo"></i>
                                     </button>
                                     @endif
@@ -503,14 +503,11 @@
                                             <i class="fas fa-user-plus me-1"></i>
                                             ${auditors.length > 0 ? 'Edit' : 'Assign'}
                                         </button>
-                                        ${auditors.length == 0 && penugasanAuditor.is_disetujui == 0 ? `
-                                        <button type="button" class="btn btn-sm btn-warning"
-                                                onclick="resetPenugasanAuditor('${penugasanAuditor.pengajuan_ami_id}')"
-                                                id="reset-btn-${penugasanAuditor.pengajuan_ami_id}"
-                                                title="Reset pengajuan AMI - mengembalikan ke status belum mengajukan">
-                                            <i class="fas fa-undo"></i>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                                onclick="deletePenugasanAuditor('${penugasanAuditor.pengajuan_ami_id}')"
+                                                id="delete-btn-${penugasanAuditor.pengajuan_ami_id}">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
-                                        ` : ''}
                                     </div>
                                 </div>
                                 <!--end::Footer-->
@@ -1007,21 +1004,21 @@
             }
         });
 
-        function resetPenugasanAuditor(pengajuan_ami_id) {
+        function deletePenugasanAuditor(pengajuan_ami_id) {
 
             Swal.fire({
-                title: 'Reset Pengajuan AMI?',
-                text: "Data pengajuan akan direset dan auditee dapat memulai ulang proses dari awal. Data IKSS, Perjanjian Kinerja, dan Instrumen Prodi akan dikembalikan ke status awal (tidak terhapus permanen).",
+                title: 'Apakah Anda yakin?',
+                text: "Semua data terkait pengajuan AMI ini akan dihapus (termasuk penugasan auditor, kuisioner jawaban, IKSS auditee, perjanjian kinerja, dan instrumen prodi)!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#f39c12',
+                confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, Reset!',
+                confirmButtonText: 'Ya, hapus!',
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: '/penugasan-auditor/reset/' + pengajuan_ami_id,
+                        url: '/penugasan-auditor/delete/' + pengajuan_ami_id,
                         type: 'DELETE',
                         data: {
                             _token: '{{ csrf_token() }}'
@@ -1029,7 +1026,7 @@
                         success: function(response) {
                             if(response.success) {
                                 Swal.fire(
-                                    'Berhasil Reset!',
+                                    'Terhapus!',
                                     response.message,
                                     'success'
                                 ).then(() => {
@@ -1046,7 +1043,7 @@
                         error: function(xhr) {
                             Swal.fire(
                                 'Error!',
-                                'Terjadi kesalahan saat reset data.',
+                                'Terjadi kesalahan saat menghapus data.',
                                 'error'
                             );
                         }

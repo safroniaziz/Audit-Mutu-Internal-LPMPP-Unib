@@ -28,42 +28,40 @@ class PenugasanAuditorController extends Controller
         try {
             DB::beginTransaction();
 
-            // Cek apakah sudah ada penugasan auditor
-            $penugasanCount = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan_ami_id)->count();
-
-            if ($penugasanCount > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tidak dapat reset pengajuan yang sudah memiliki penugasan auditor.'
-                ], 422);
-            }
-
             // Reset pengajuan_ami_id ke null untuk semua data terkait
             IkssAuditee::where('pengajuan_ami_id', $pengajuan_ami_id)
                        ->update(['pengajuan_ami_id' => null]);
-
+            
             PerjanjianKinerja::where('pengajuan_ami_id', $pengajuan_ami_id)
                              ->update(['pengajuan_ami_id' => null]);
-
+            
             InstrumenProdiSubmission::where('pengajuan_ami_id', $pengajuan_ami_id)
                                     ->update(['pengajuan_ami_id' => null]);
 
-            // Update file siklus yang diupload - set pengajuan_ami_id ke null
-            SiklusPengajuanAmi::where('pengajuan_ami_id', $pengajuan_ami_id)
-                              ->update(['pengajuan_ami_id' => null]);
+            // Hapus penugasan auditor
+            PenugasanAuditor::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
+            
+            // Hapus kuisioner jawaban
+            KuisionerJawaban::where('pengajuan_id', $pengajuan_ami_id)->delete();
+            
+            // Hapus file siklus yang diupload
+            SiklusPengajuanAmi::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
 
-            // Hapus pengajuan AMI itu sendiri (karena sudah tidak ada data yang terkait)
+            // Hapus instrumen prodi nilai
+            InstrumenProdiNilai::where('pengajuan_ami_id', $pengajuan_ami_id)->delete();
+
+            // Terakhir, hapus pengajuan AMI itu sendiri
             PengajuanAmi::where('id', $pengajuan_ami_id)->delete();
 
             DB::commit();
 
             activity()
                 ->causedBy(Auth::user())
-                ->log('Reset pengajuan AMI ID: ' . $pengajuan_ami_id . ' - Data auditee dikembalikan ke status belum mengajukan');
+                ->log('Reset pengajuan AMI ID: ' . $pengajuan_ami_id . ' - Data IKSS, Perjanjian Kinerja, dan Instrumen Prodi dikembalikan ke status awal');
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pengajuan AMI berhasil direset. Auditee dapat memulai ulang proses pengajuan.'
+                'message' => 'Data pengajuan AMI berhasil direset. Auditee dapat memulai ulang proses pengajuan.'
             ]);
         } catch (\Exception $e) {
             DB::rollback();
