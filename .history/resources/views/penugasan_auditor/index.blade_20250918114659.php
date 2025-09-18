@@ -170,7 +170,7 @@
                                             return $auditor->auditor !== null;
                                         });
                                     @endphp
-
+                                    
                                     @if($validAuditors->count() > 0)
                                         @foreach ($validAuditors as $auditor)
                                             <div class="d-flex align-items-center mb-2">

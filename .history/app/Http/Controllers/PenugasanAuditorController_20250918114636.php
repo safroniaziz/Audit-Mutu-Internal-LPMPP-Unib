@@ -273,29 +273,48 @@ class PenugasanAuditorController extends Controller
                 'waktu' => $waktuVisitasi,
             ]);
 
-            // Delete ALL existing assignments for this pengajuan_ami_id first
-            PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->delete();
+            // Get existing assignments
+            $existingAssignments = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)
+                ->get()
+                ->keyBy('user_id');
 
-            // Create new assignments
+            // Prepare new auditor assignments
             $newAuditorAssignments = [
-                ['user_id' => $request->auditor1, 'role' => 'ketua'],
-                ['user_id' => $request->auditor2, 'role' => 'pendamping'],
+                $request->auditor1 => 'ketua',
+                $request->auditor2 => 'pendamping',
             ];
 
             if ($request->auditor3) {
-                $newAuditorAssignments[] = ['user_id' => $request->auditor3, 'role' => 'pendamping_kedua'];
+                $newAuditorAssignments[$request->auditor3] = 'pendamping_kedua';
             }
 
-            foreach ($newAuditorAssignments as $assignment) {
-                PenugasanAuditor::create([
-                    'pengajuan_ami_id' => $request->pengajuan_ami_id,
-                    'user_id' => $assignment['user_id'],
-                    'role' => $assignment['role'],
-                    'is_setuju' => false,
-                    'is_setuju_visitasi' => false,
-                    'is_setuju_indikator_prodi' => false,
-                ]);
+            // Update existing assignments or create new ones
+            foreach ($newAuditorAssignments as $auditorId => $role) {
+                $existingAssignment = $existingAssignments->get($auditorId);
+
+                if ($existingAssignment) {
+                    // Update existing assignment
+                    $existingAssignment->update([
+                        'role' => $role
+                    ]);
+                } else {
+                    // Create new assignment
+                    PenugasanAuditor::create([
+                        'pengajuan_ami_id' => $request->pengajuan_ami_id,
+                        'user_id' => $auditorId,
+                        'role' => $role,
+                        'is_setuju' => false,
+                        'is_setuju_visitasi' => false,
+                        'is_setuju_indikator_prodi' => false,
+                    ]);
+                }
             }
+
+            // Remove assignments for auditors who are no longer assigned
+            $assignedAuditorIds = array_keys($newAuditorAssignments);
+            PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)
+                ->whereNotIn('user_id', $assignedAuditorIds)
+                ->delete();
 
             DB::commit();
 
