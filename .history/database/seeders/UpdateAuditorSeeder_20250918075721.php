@@ -398,7 +398,7 @@ class UpdateAuditorSeeder extends Seeder
             // Hapus user yang memiliki email atau username yang sama dengan data baru
             $emails = array_column($auditorsData, 'email');
             $usernames = array_column($auditorsData, 'username');
-
+            
             User::whereIn('email', $emails)->orWhereIn('username', $usernames)->delete();
 
             // Pastikan role Auditor ada

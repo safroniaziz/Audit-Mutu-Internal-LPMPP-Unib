@@ -385,22 +385,6 @@ class UpdateAuditorSeeder extends Seeder
                 ]
             ];
 
-            // Hapus semua user dengan role Auditor
-            $auditorRole = Role::where('name', 'Auditor')->first();
-            if ($auditorRole) {
-                $auditorUsers = User::role('Auditor')->get();
-                foreach ($auditorUsers as $user) {
-                    $user->removeRole('Auditor');
-                    $user->delete();
-                }
-            }
-
-            // Hapus user yang memiliki email atau username yang sama dengan data baru
-            $emails = array_column($auditorsData, 'email');
-            $usernames = array_column($auditorsData, 'username');
-
-            User::whereIn('email', $emails)->orWhereIn('username', $usernames)->delete();
-
             // Pastikan role Auditor ada
             if (!$auditorRole) {
                 $auditorRole = Role::create(['name' => 'Auditor']);
