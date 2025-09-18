@@ -196,15 +196,13 @@ class PenugasanAuditorController extends Controller
             }
 
             DB::commit();
-            Log::info('SavePenugasanAuditor completed successfully', ['pengajuan_ami_id' => $request->pengajuan_ami_id, 'was_update' => $existingCount > 0]);
 
             // Log activity
             $pengajuan = PengajuanAmi::find($request->pengajuan_ami_id);
-            $activityMessage = $existingCount > 0 ? 'Penugasan auditor berhasil diperbarui' : 'Penugasan auditor baru berhasil dibuat';
             activity('penugasan_auditor')
                 ->causedBy(Auth::user())
                 ->performedOn($pengajuan)
-                ->log($activityMessage);
+                ->log('Penugasan auditor baru berhasil dibuat');
 
             return response()->json([
                 'success' => true,
@@ -275,11 +273,9 @@ class PenugasanAuditorController extends Controller
         }
     }
 
-    // DEPRECATED: Use savePenugasanAuditor instead - it handles both create and update
     public function updatePenugasanAuditor(Request $request)
     {
-        // Redirect to savePenugasanAuditor for unified handling
-        return $this->savePenugasanAuditor($request);
+        // Validate request data
         $validator = Validator::make($request->all(), [
             'pengajuan_ami_id' => 'required|exists:pengajuan_amis,id',
             'auditor1' => 'required|exists:users,id',
@@ -315,15 +311,15 @@ class PenugasanAuditorController extends Controller
 
             // Delete ALL existing assignments for this pengajuan_ami_id first (using raw delete to ensure complete removal)
             Log::info('About to delete assignments', ['pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+            
             try {
                 $deletedCount = DB::delete('DELETE FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Raw deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
                 // Verify deletion
                 $remainingCount = DB::select('SELECT COUNT(*) as count FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Remaining assignments after delete', ['count' => $remainingCount[0]->count, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
             } catch (\Exception $deleteError) {
                 Log::error('Error during delete', ['error' => $deleteError->getMessage(), 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
                 throw $deleteError;

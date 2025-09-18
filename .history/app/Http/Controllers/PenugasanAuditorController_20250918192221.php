@@ -315,15 +315,15 @@ class PenugasanAuditorController extends Controller
 
             // Delete ALL existing assignments for this pengajuan_ami_id first (using raw delete to ensure complete removal)
             Log::info('About to delete assignments', ['pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+            
             try {
                 $deletedCount = DB::delete('DELETE FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Raw deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
                 // Verify deletion
                 $remainingCount = DB::select('SELECT COUNT(*) as count FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Remaining assignments after delete', ['count' => $remainingCount[0]->count, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
             } catch (\Exception $deleteError) {
                 Log::error('Error during delete', ['error' => $deleteError->getMessage(), 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
                 throw $deleteError;

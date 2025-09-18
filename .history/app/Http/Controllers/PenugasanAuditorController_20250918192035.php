@@ -137,36 +137,13 @@ class PenugasanAuditorController extends Controller
         try {
             DB::beginTransaction();
 
-            Log::info('SavePenugasanAuditor started', [
-                'pengajuan_ami_id' => $request->pengajuan_ami_id,
-                'auditor1' => $request->auditor1,
-                'auditor2' => $request->auditor2,
-                'auditor3' => $request->auditor3
+            // Convert waktu_visitasi to database storage
+            $waktuVisitasi = $request->waktu_visitasi ? \Carbon\Carbon::parse($request->waktu_visitasi) : null;
+
+            PengajuanAmi::where('id', $request->pengajuan_ami_id)->update([
+                'waktu' => $waktuVisitasi,
+                'is_disetujui'  => true,
             ]);
-
-            // Check if assignments already exist
-            $existingCount = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->count();
-            Log::info('Existing assignments count', ['count' => $existingCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
-            // If assignments exist, delete them first (complete cleanup)
-            if ($existingCount > 0) {
-                Log::info('Deleting existing assignments');
-                $deletedCount = DB::delete('DELETE FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
-                Log::info('Deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-            }
-
-            // Update pengajuan_ami waktu visitasi only if provided
-            if ($request->waktu_visitasi) {
-                $waktuVisitasi = \Carbon\Carbon::parse($request->waktu_visitasi);
-                PengajuanAmi::where('id', $request->pengajuan_ami_id)->update([
-                    'waktu' => $waktuVisitasi,
-                    'is_disetujui' => true,
-                ]);
-            } else {
-                PengajuanAmi::where('id', $request->pengajuan_ami_id)->update([
-                    'is_disetujui' => true,
-                ]);
-            }
 
             // Create new auditor assignments
             $penugasanData = [
@@ -179,7 +156,7 @@ class PenugasanAuditorController extends Controller
             }
 
             foreach ($penugasanData as $data) {
-                $created = PenugasanAuditor::create([
+                PenugasanAuditor::create([
                     'pengajuan_ami_id' => $request->pengajuan_ami_id,
                     'user_id' => $data['auditor_id'],
                     'role' => $data['role'],
@@ -187,24 +164,16 @@ class PenugasanAuditorController extends Controller
                     'is_setuju_visitasi' => false,
                     'is_setuju_indikator_prodi' => false,
                 ]);
-                Log::info('Created assignment', [
-                    'id' => $created->id,
-                    'pengajuan_ami_id' => $request->pengajuan_ami_id,
-                    'user_id' => $data['auditor_id'],
-                    'role' => $data['role']
-                ]);
             }
 
             DB::commit();
-            Log::info('SavePenugasanAuditor completed successfully', ['pengajuan_ami_id' => $request->pengajuan_ami_id, 'was_update' => $existingCount > 0]);
 
             // Log activity
             $pengajuan = PengajuanAmi::find($request->pengajuan_ami_id);
-            $activityMessage = $existingCount > 0 ? 'Penugasan auditor berhasil diperbarui' : 'Penugasan auditor baru berhasil dibuat';
             activity('penugasan_auditor')
                 ->causedBy(Auth::user())
                 ->performedOn($pengajuan)
-                ->log($activityMessage);
+                ->log('Penugasan auditor baru berhasil dibuat');
 
             return response()->json([
                 'success' => true,
@@ -275,11 +244,9 @@ class PenugasanAuditorController extends Controller
         }
     }
 
-    // DEPRECATED: Use savePenugasanAuditor instead - it handles both create and update
     public function updatePenugasanAuditor(Request $request)
     {
-        // Redirect to savePenugasanAuditor for unified handling
-        return $this->savePenugasanAuditor($request);
+        // Validate request data
         $validator = Validator::make($request->all(), [
             'pengajuan_ami_id' => 'required|exists:pengajuan_amis,id',
             'auditor1' => 'required|exists:users,id',
@@ -315,15 +282,15 @@ class PenugasanAuditorController extends Controller
 
             // Delete ALL existing assignments for this pengajuan_ami_id first (using raw delete to ensure complete removal)
             Log::info('About to delete assignments', ['pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+            
             try {
                 $deletedCount = DB::delete('DELETE FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Raw deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
                 // Verify deletion
                 $remainingCount = DB::select('SELECT COUNT(*) as count FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
                 Log::info('Remaining assignments after delete', ['count' => $remainingCount[0]->count, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
-
+                
             } catch (\Exception $deleteError) {
                 Log::error('Error during delete', ['error' => $deleteError->getMessage(), 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
                 throw $deleteError;
