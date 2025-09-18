@@ -959,7 +959,7 @@
                     })
                     .then(data => {
                         console.log('Response data:', data);
-
+                        
                         // Reset button state
                         submitBtn.innerHTML = originalText;
                         submitBtn.disabled = false;
