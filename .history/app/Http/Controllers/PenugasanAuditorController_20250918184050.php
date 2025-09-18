@@ -280,9 +280,39 @@ class PenugasanAuditorController extends Controller
                 ]);
             }
 
-            // Delete ALL existing assignments for this pengajuan_ami_id first (using raw delete to ensure complete removal)
-            $deletedCount = DB::delete('DELETE FROM penugasan_auditors WHERE pengajuan_ami_id = ?', [$request->pengajuan_ami_id]);
-            Log::info('Raw deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
+            // Check existing assignments before delete
+            $existingBefore = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->get();
+            Log::info('Existing assignments before delete', [
+                'count' => $existingBefore->count(),
+                'pengajuan_ami_id' => $request->pengajuan_ami_id,
+                'assignments' => $existingBefore->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'user_id' => $item->user_id,
+                        'role' => $item->role,
+                        'deleted_at' => $item->deleted_at
+                    ];
+                })
+            ]);
+
+            // Delete ALL existing assignments for this pengajuan_ami_id first (force delete to avoid soft delete)
+            $deletedCount = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->forceDelete();
+            Log::info('Force deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
+
+            // Check if really deleted
+            $existingAfter = PenugasanAuditor::withTrashed()->where('pengajuan_ami_id', $request->pengajuan_ami_id)->get();
+            Log::info('Existing assignments after delete', [
+                'count' => $existingAfter->count(),
+                'pengajuan_ami_id' => $request->pengajuan_ami_id,
+                'assignments' => $existingAfter->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'user_id' => $item->user_id,
+                        'role' => $item->role,
+                        'deleted_at' => $item->deleted_at
+                    ];
+                })
+            ]);
 
             // Create new assignments
             $newAuditorAssignments = [
