@@ -390,7 +390,6 @@ class PenugasanAuditorController extends Controller
             'periodeAktif'
         ])
         ->withCount(['auditors'])
-        ->whereHas('auditors.auditor') // Only include penugasan with valid auditors
         ->orderBy('created_at', 'desc')
         ->withTrashed();
 
