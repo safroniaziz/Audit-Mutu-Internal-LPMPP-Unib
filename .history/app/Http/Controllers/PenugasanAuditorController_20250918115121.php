@@ -265,13 +265,6 @@ class PenugasanAuditorController extends Controller
         try {
             DB::beginTransaction();
 
-            Log::info('UpdatePenugasanAuditor started', [
-                'pengajuan_ami_id' => $request->pengajuan_ami_id,
-                'auditor1' => $request->auditor1,
-                'auditor2' => $request->auditor2,
-                'auditor3' => $request->auditor3
-            ]);
-
             // Update waktu visitasi only if provided (avoid null constraint violation)
             if ($request->waktu_visitasi) {
                 $waktuVisitasi = \Carbon\Carbon::parse($request->waktu_visitasi);
@@ -280,9 +273,8 @@ class PenugasanAuditorController extends Controller
                 ]);
             }
 
-            // Delete ALL existing assignments for this pengajuan_ami_id first (force delete to avoid soft delete)
-            $deletedCount = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->forceDelete();
-            Log::info('Force deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
+            // Delete ALL existing assignments for this pengajuan_ami_id first
+            PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->delete();
 
             // Create new assignments
             $newAuditorAssignments = [
@@ -295,7 +287,7 @@ class PenugasanAuditorController extends Controller
             }
 
             foreach ($newAuditorAssignments as $assignment) {
-                $created = PenugasanAuditor::create([
+                PenugasanAuditor::create([
                     'pengajuan_ami_id' => $request->pengajuan_ami_id,
                     'user_id' => $assignment['user_id'],
                     'role' => $assignment['role'],
@@ -303,16 +295,9 @@ class PenugasanAuditorController extends Controller
                     'is_setuju_visitasi' => false,
                     'is_setuju_indikator_prodi' => false,
                 ]);
-                Log::info('Created new assignment', [
-                    'id' => $created->id,
-                    'pengajuan_ami_id' => $request->pengajuan_ami_id,
-                    'user_id' => $assignment['user_id'],
-                    'role' => $assignment['role']
-                ]);
             }
 
             DB::commit();
-            Log::info('UpdatePenugasanAuditor completed successfully', ['pengajuan_ami_id' => $request->pengajuan_ami_id]);
 
             // Log activity
             $pengajuan = PengajuanAmi::find($request->pengajuan_ami_id);

@@ -265,7 +265,7 @@ class PenugasanAuditorController extends Controller
         try {
             DB::beginTransaction();
 
-            Log::info('UpdatePenugasanAuditor started', [
+            \Log::info('UpdatePenugasanAuditor started', [
                 'pengajuan_ami_id' => $request->pengajuan_ami_id,
                 'auditor1' => $request->auditor1,
                 'auditor2' => $request->auditor2,

@@ -265,7 +265,7 @@ class PenugasanAuditorController extends Controller
         try {
             DB::beginTransaction();
 
-            Log::info('UpdatePenugasanAuditor started', [
+            \Log::info('UpdatePenugasanAuditor started', [
                 'pengajuan_ami_id' => $request->pengajuan_ami_id,
                 'auditor1' => $request->auditor1,
                 'auditor2' => $request->auditor2,
@@ -280,9 +280,9 @@ class PenugasanAuditorController extends Controller
                 ]);
             }
 
-            // Delete ALL existing assignments for this pengajuan_ami_id first (force delete to avoid soft delete)
-            $deletedCount = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->forceDelete();
-            Log::info('Force deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
+            // Delete ALL existing assignments for this pengajuan_ami_id first
+            $deletedCount = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_ami_id)->delete();
+            \Log::info('Deleted existing assignments', ['count' => $deletedCount, 'pengajuan_ami_id' => $request->pengajuan_ami_id]);
 
             // Create new assignments
             $newAuditorAssignments = [
