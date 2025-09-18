@@ -398,7 +398,7 @@ class UpdateAuditorSeeder extends Seeder
             // Hapus SEMUA user yang memiliki email atau username yang sama dengan data baru
             $emails = array_column($auditorsData, 'email');
             $usernames = array_column($auditorsData, 'username');
-
+            
             // Hapus berdasarkan email
             User::whereIn('email', $emails)->forceDelete();
             // Hapus berdasarkan username
@@ -409,18 +409,23 @@ class UpdateAuditorSeeder extends Seeder
                 $auditorRole = Role::create(['name' => 'Auditor']);
             }
 
-            // Buat user auditor baru
+            // Buat atau update user auditor baru
             foreach ($auditorsData as $auditorData) {
-                $user = User::create([
-                    'name' => $auditorData['name'],
-                    'username' => $auditorData['username'],
-                    'email' => $auditorData['email'],
-                    'password' => Hash::make($auditorData['username']), // Password sama dengan username
-                    'email_verified_at' => now(),
-                ]);
+                $user = User::updateOrCreate(
+                    [
+                        'username' => $auditorData['username'] // Cari berdasarkan username
+                    ],
+                    [
+                        'name' => $auditorData['name'],
+                        'username' => $auditorData['username'],
+                        'email' => $auditorData['email'],
+                        'password' => Hash::make($auditorData['username']), // Password sama dengan username
+                        'email_verified_at' => now(),
+                    ]
+                );
 
-                // Assign role Auditor
-                $user->assignRole('Auditor');
+                // Hapus semua role yang ada dan assign role Auditor
+                $user->syncRoles(['Auditor']);
             }
 
             DB::commit();
