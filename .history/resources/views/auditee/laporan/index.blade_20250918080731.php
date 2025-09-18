@@ -183,7 +183,7 @@
                                                 @endif
                                             </div>
                                             <div class="d-flex flex-column flex-grow-1">
-                                                <span class="text-dark fw-bold">{{ $auditor->auditor ? $auditor->auditor->name : 'Auditor Tidak Diketahui' }}</span>
+                                                <span class="text-dark fw-bold">{{ $auditor->auditor->name }}</span>
                                                 <span class="text-muted fw-semibold">{{ str_replace('_', ' ', $auditor->role) }}</span>
                                             </div>
                                             <span class="badge {{ $statusClass }}">{{ $auditorStatus }}</span>

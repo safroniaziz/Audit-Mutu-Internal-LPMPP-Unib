@@ -216,7 +216,7 @@
 
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="symbol symbol-30px me-2">
-                                                @if($auditor->auditor->foto)
+                                                @if($auditor->auditor && $auditor->auditor->foto)
                                                     <img src="{{ Storage::url($auditor->auditor->foto) }}" alt="{{ $auditor->auditor->name }}" class="rounded-circle" />
                                                 @else
                                                     <span class="symbol-label bg-light-primary">
@@ -225,7 +225,7 @@
                                                 @endif
                                             </div>
                                             <div class="d-flex flex-column flex-grow-1">
-                                                <span class="text-dark fw-bold fs-7">{{ $auditor->auditor->name }}</span>
+                                                <span class="text-dark fw-bold fs-7">{{ $auditor->auditor ? $auditor->auditor->name : 'Auditor Tidak Diketahui' }}</span>
                                                 <span class="text-muted fw-semibold fs-8">{{ str_replace('_', ' ', $auditor->role) }}</span>
                                             </div>
                                             @if ($auditorCompleted)
@@ -556,45 +556,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         <div class="card-footer pt-0">
-                            <div class="d-flex gap-2">
-                                <a href="/laporan/${penugasanAuditor.id}/detail" class="btn btn-sm btn-primary flex-grow-1">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Detail
-                                </a>
-                                <div class="dropdown">
-                                    <button class="btn btn-sm btn-light-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-download me-1"></i>
-                                        Export
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item" href="/laporan/${penugasanAuditor.id}/daftar_pertanyaan" target="_blank">
-                                                <i class="fas fa-list me-2"></i>
-                                                Daftar Pertanyaan
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="/laporan/${penugasanAuditor.id}/berita-acara" target="_blank">
-                                                <i class="fas fa-file-contract me-2"></i>
-                                                Berita Acara
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="/laporan/${penugasanAuditor.id}/evaluasi-ami" target="_blank">
-                                                <i class="fas fa-clipboard-check me-2"></i>
-                                                Evaluasi AMI
-                                            </a>
-                                        </li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" href="/laporan/${penugasanAuditor.id}/laporan-ami" target="_blank">
-                                                <i class="fas fa-print me-2"></i>
-                                                Laporan AMI
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                            <a href="/laporan/${penugasanAuditor.id}/detail" class="btn btn-sm btn-primary w-100">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Detail
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -216,7 +216,7 @@
 
                                         <div class="d-flex align-items-center mb-2">
                                             <div class="symbol symbol-30px me-2">
-                                                @if($auditor->auditor->foto)
+                                                @if($auditor->auditor && $auditor->auditor->foto)
                                                     <img src="{{ Storage::url($auditor->auditor->foto) }}" alt="{{ $auditor->auditor->name }}" class="rounded-circle" />
                                                 @else
                                                     <span class="symbol-label bg-light-primary">
@@ -225,7 +225,7 @@
                                                 @endif
                                             </div>
                                             <div class="d-flex flex-column flex-grow-1">
-                                                <span class="text-dark fw-bold fs-7">{{ $auditor->auditor->name }}</span>
+                                                <span class="text-dark fw-bold fs-7">{{ $auditor->auditor ? $auditor->auditor->name : 'Auditor Tidak Diketahui' }}</span>
                                                 <span class="text-muted fw-semibold fs-8">{{ str_replace('_', ' ', $auditor->role) }}</span>
                                             </div>
                                             @if ($auditorCompleted)
