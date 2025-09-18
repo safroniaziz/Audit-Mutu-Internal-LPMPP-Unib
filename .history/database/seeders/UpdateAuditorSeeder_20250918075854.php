@@ -410,7 +410,7 @@ class UpdateAuditorSeeder extends Seeder
             foreach ($auditorsData as $auditorData) {
                 $user = User::updateOrCreate(
                     [
-                        'username' => $auditorData['username'] // Cari berdasarkan username
+                        'email' => $auditorData['email'] // Cari berdasarkan email
                     ],
                     [
                         'name' => $auditorData['name'],

@@ -408,21 +408,38 @@ class UpdateAuditorSeeder extends Seeder
 
             // Buat atau update user auditor baru
             foreach ($auditorsData as $auditorData) {
-                $user = User::updateOrCreate(
-                    [
-                        'username' => $auditorData['username'] // Cari berdasarkan username
-                    ],
-                    [
-                        'name' => $auditorData['name'],
-                        'username' => $auditorData['username'],
-                        'email' => $auditorData['email'],
-                        'password' => Hash::make($auditorData['username']), // Password sama dengan username
-                        'email_verified_at' => now(),
-                    ]
-                );
+                // Cek apakah email sudah ada
+                $originalEmail = $auditorData['email'];
+                $email = $originalEmail;
+                $counter = 1;
+                
+                while (User::where('email', $email)->exists()) {
+                    $counter++;
+                    // Tambahkan suffix counter sebelum @
+                    $emailParts = explode('@', $originalEmail);
+                    $email = $emailParts[0] . $counter . '@' . $emailParts[1];
+                }
+                
+                // Cek apakah username sudah ada
+                $originalUsername = $auditorData['username'];
+                $username = $originalUsername;
+                $usernameCounter = 1;
+                
+                while (User::where('username', $username)->exists()) {
+                    $usernameCounter++;
+                    $username = $originalUsername . $usernameCounter;
+                }
 
-                // Hapus semua role yang ada dan assign role Auditor
-                $user->syncRoles(['Auditor']);
+                $user = User::create([
+                    'name' => $auditorData['name'],
+                    'username' => $username,
+                    'email' => $email,
+                    'password' => Hash::make($auditorData['username']), // Password tetap menggunakan username asli
+                    'email_verified_at' => now(),
+                ]);
+
+                // Assign role Auditor
+                $user->assignRole('Auditor');
             }
 
             DB::commit();
