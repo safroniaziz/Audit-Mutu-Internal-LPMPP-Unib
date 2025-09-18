@@ -598,33 +598,25 @@
 
                 // Function to set the pengajuan_ami_id when opening the modal
         function setPenugasanId(id) {
-            console.log('🚀 setPenugasanId called with ID:', id);
             currentPenugasanId = id;
             document.getElementById('pengajuan_ami_id').value = id;
 
             // Check for audit activities first
-            console.log('⏳ Calling checkAuditActivities...');
             checkAuditActivities(id).then((auditorActivities) => {
-                console.log('🔄 checkAuditActivities resolved with:', auditorActivities);
-
                 if (auditorActivities) {
-                    console.log('⚠️ Found auditor activities - applying form restrictions');
                     // Apply selective form restrictions based on auditor activities
                     applySelectiveFormRestrictions(auditorActivities);
                 } else {
-                    console.log('✅ No auditor activities - enabling all form fields');
                     // Enable all form fields if no audit activities
                     enableAllFormFields();
                 }
 
-                console.log('📋 Loading auditor options...');
                 // Load auditor options when modal opens, then load existing assignments
                 Promise.all([
                     loadAuditors('auditor1'),
                     loadAuditors('auditor2'),
                     loadAuditors('auditor3')
                 ]).then(() => {
-                    console.log('📝 Loading existing assignments...');
                     // Load existing assignments after auditors are loaded
                     loadExistingAssignments(id);
                 });
@@ -633,32 +625,16 @@
 
         // Function to check for audit activities
         function checkAuditActivities(pengajuanId) {
-            console.log('🔍 Checking audit activities for pengajuan ID:', pengajuanId);
-
             return fetch(`/penugasan-auditor/check-audit-activities/${pengajuanId}`)
-                .then(response => {
-                    console.log('📡 checkAuditActivities response status:', response.status);
-                    console.log('📡 checkAuditActivities response ok:', response.ok);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('📊 checkAuditActivities response data:', data);
-
                     if (data.success) {
-                        console.log('✅ Found auditor activities:', data.auditor_activities);
                         return data.auditor_activities;
-                    } else {
-                        console.log('❌ checkAuditActivities failed:', data.message);
-                        return null;
                     }
+                    return null;
                 })
                 .catch(error => {
-                    console.error('💥 Error checking audit activities:', error);
+                    console.error('Error checking audit activities:', error);
                     return null;
                 });
         }
@@ -828,27 +804,16 @@
 
         // Function to load existing assignments
         function loadExistingAssignments(penugasanId) {
-            console.log('📥 Loading existing assignments for penugasan ID:', penugasanId);
-
             fetch(`/penugasan-auditor/get-existing-assignments/${penugasanId}`)
-                .then(response => {
-                    console.log('📡 loadExistingAssignments response status:', response.status);
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('📊 loadExistingAssignments response data:', data);
-
                     const submitBtn = document.getElementById('btnSimpanPenugasan');
 
                     if (data.success && data.assignments) {
-                        console.log('📋 Processing assignments:', data.assignments);
-
                         // Check if there are existing assignments
                         const hasExistingAssignments = (Array.isArray(data.assignments) && data.assignments.length > 0) ||
                             (typeof data.assignments === 'object' &&
                              (data.assignments.ketua || data.assignments.pendamping || data.assignments.pendamping_kedua));
-
-                        console.log('✅ Has existing assignments:', hasExistingAssignments);
 
                         if (hasExistingAssignments) {
                             // Change button text to indicate update operation

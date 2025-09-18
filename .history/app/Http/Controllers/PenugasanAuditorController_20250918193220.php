@@ -382,23 +382,31 @@ class PenugasanAuditorController extends Controller
             public function checkAuditActivities($pengajuanId)
     {
         try {
+            \Log::info("CheckAuditActivities called with pengajuanId: {$pengajuanId}");
+            
             // Get current auditor assignments
             $penugasan = PengajuanAmi::with(['auditors.auditor'])->find($pengajuanId);
-
+            
             if (!$penugasan) {
+                \Log::error("PengajuanAmi not found with ID: {$pengajuanId}");
                 return response()->json([
                     'success' => false,
                     'message' => 'Data pengajuan AMI tidak ditemukan'
                 ], 404);
             }
 
+            \Log::info("Found penugasan with " . $penugasan->auditors->count() . " auditors");
+
             $auditorActivities = [];
 
             foreach ($penugasan->auditors as $auditor) {
+                \Log::info("Processing auditor ID: {$auditor->user_id}, Role: {$auditor->role}");
+                
                 $auditorId = $auditor->user_id;
-
+                
                 // Check if auditor relationship exists
                 if (!$auditor->auditor) {
+                    \Log::warning("Auditor relationship is null for user_id: {$auditorId}");
                     continue; // Skip this auditor if relationship is null
                 }
 
@@ -422,11 +430,16 @@ class PenugasanAuditorController extends Controller
                 ];
             }
 
+            \Log::info("Returning auditor activities", $auditorActivities);
+
             return response()->json([
                 'success' => true,
                 'auditor_activities' => $auditorActivities
             ]);
         } catch (\Exception $e) {
+            \Log::error("Error in checkAuditActivities: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Terjadi kesalahan saat mengecek aktivitas audit: ' . $e->getMessage()

@@ -384,7 +384,7 @@ class PenugasanAuditorController extends Controller
         try {
             // Get current auditor assignments
             $penugasan = PengajuanAmi::with(['auditors.auditor'])->find($pengajuanId);
-
+            
             if (!$penugasan) {
                 return response()->json([
                     'success' => false,
@@ -396,7 +396,7 @@ class PenugasanAuditorController extends Controller
 
             foreach ($penugasan->auditors as $auditor) {
                 $auditorId = $auditor->user_id;
-
+                
                 // Check if auditor relationship exists
                 if (!$auditor->auditor) {
                     continue; // Skip this auditor if relationship is null

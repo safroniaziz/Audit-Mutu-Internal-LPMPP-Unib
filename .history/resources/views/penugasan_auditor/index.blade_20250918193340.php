@@ -606,7 +606,7 @@
             console.log('⏳ Calling checkAuditActivities...');
             checkAuditActivities(id).then((auditorActivities) => {
                 console.log('🔄 checkAuditActivities resolved with:', auditorActivities);
-
+                
                 if (auditorActivities) {
                     console.log('⚠️ Found auditor activities - applying form restrictions');
                     // Apply selective form restrictions based on auditor activities
@@ -634,21 +634,21 @@
         // Function to check for audit activities
         function checkAuditActivities(pengajuanId) {
             console.log('🔍 Checking audit activities for pengajuan ID:', pengajuanId);
-
+            
             return fetch(`/penugasan-auditor/check-audit-activities/${pengajuanId}`)
                 .then(response => {
                     console.log('📡 checkAuditActivities response status:', response.status);
                     console.log('📡 checkAuditActivities response ok:', response.ok);
-
+                    
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
-
+                    
                     return response.json();
                 })
                 .then(data => {
                     console.log('📊 checkAuditActivities response data:', data);
-
+                    
                     if (data.success) {
                         console.log('✅ Found auditor activities:', data.auditor_activities);
                         return data.auditor_activities;
@@ -829,7 +829,7 @@
         // Function to load existing assignments
         function loadExistingAssignments(penugasanId) {
             console.log('📥 Loading existing assignments for penugasan ID:', penugasanId);
-
+            
             fetch(`/penugasan-auditor/get-existing-assignments/${penugasanId}`)
                 .then(response => {
                     console.log('📡 loadExistingAssignments response status:', response.status);
@@ -837,12 +837,12 @@
                 })
                 .then(data => {
                     console.log('📊 loadExistingAssignments response data:', data);
-
+                    
                     const submitBtn = document.getElementById('btnSimpanPenugasan');
 
                     if (data.success && data.assignments) {
                         console.log('📋 Processing assignments:', data.assignments);
-
+                        
                         // Check if there are existing assignments
                         const hasExistingAssignments = (Array.isArray(data.assignments) && data.assignments.length > 0) ||
                             (typeof data.assignments === 'object' &&
