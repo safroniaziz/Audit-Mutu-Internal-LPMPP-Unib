@@ -291,7 +291,8 @@ class DashboardController extends Controller
             });
 
         // Top auditors berdasarkan jumlah penugasan
-        $topAuditors = PenugasanAuditor::with('auditor')
+        $topAuditors = PenugasanAuditor::with('auditor.roles')
+            ->whereHas('auditor') // Pastikan auditor ada
             ->selectRaw('user_id, COUNT(*) as total_assignments')
             ->groupBy('user_id')
             ->orderBy('total_assignments', 'desc')
@@ -299,10 +300,12 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'nama' => $item->auditor->name ?? 'Tidak diketahui',
-                    'email' => $item->auditor->email ?? '-',
+                    'nama' => $item->auditor ? $item->auditor->name : 'Tidak diketahui',
+                    'email' => $item->auditor ? $item->auditor->email : '-',
                     'total_penugasan' => $item->total_assignments,
-                    'role' => $item->auditor->roles->first()->name ?? 'Auditor'
+                    'role' => ($item->auditor && $item->auditor->roles && $item->auditor->roles->first())
+                            ? $item->auditor->roles->first()->name
+                            : 'Auditor'
                 ];
             });
 

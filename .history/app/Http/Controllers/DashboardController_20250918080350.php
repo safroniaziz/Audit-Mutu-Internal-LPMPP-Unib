@@ -44,13 +44,17 @@ class DashboardController extends Controller
         // Data untuk audit progress
         $auditProgress = $this->getAuditProgress();
 
+        // Data periode aktif
+        $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
+
         return view('dashboard', compact(
             'stats',
             'chartData',
             'recentActivities',
             'performanceMetrics',
             'topPerformers',
-            'auditProgress'
+            'auditProgress',
+            'periodeAktif'
         ));
     }
 
@@ -287,7 +291,8 @@ class DashboardController extends Controller
             });
 
         // Top auditors berdasarkan jumlah penugasan
-        $topAuditors = PenugasanAuditor::with('auditor')
+        $topAuditors = PenugasanAuditor::with('auditor.roles')
+            ->whereHas('auditor') // Pastikan auditor ada
             ->selectRaw('user_id, COUNT(*) as total_assignments')
             ->groupBy('user_id')
             ->orderBy('total_assignments', 'desc')
@@ -295,10 +300,12 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($item) {
                 return [
-                    'nama' => $item->auditor->name ?? 'Tidak diketahui',
-                    'email' => $item->auditor->email ?? '-',
+                    'nama' => $item->auditor ? $item->auditor->name : 'Tidak diketahui',
+                    'email' => $item->auditor ? $item->auditor->email : '-',
                     'total_penugasan' => $item->total_assignments,
-                    'role' => $item->auditor->roles->first()->name ?? 'Auditor'
+                    'role' => ($item->auditor && $item->auditor->roles && $item->auditor->roles->first()) 
+                            ? $item->auditor->roles->first()->name 
+                            : 'Auditor'
                 ];
             });
 
@@ -350,57 +357,44 @@ class DashboardController extends Controller
         $sudahSelesaiDiaudit = 0;
         $masihProsesAudit = 0;
 
-        Log::info('=== DEBUG PENGAJUAN STATUS ===');
-        Log::info('Total pengajuan belum disetujui: ' . $belumDisetujui);
-        Log::info('Total pengajuan sudah disetujui: ' . $approvedPengajuan->count());
-
         foreach ($approvedPengajuan as $pengajuan) {
-            // Hitung berapa auditor yang sudah menyelesaikan audit
+            // Hitung berapa auditor yang sudah menyelesaikan audit berdasarkan nilai IKSS
             $completedAuditors = 0;
             $totalAssignedAuditors = $pengajuan->auditors()->count();
 
-            \Log::info("Pengajuan ID: {$pengajuan->id}, Total Auditor: {$totalAssignedAuditors}");
-
             if ($totalAssignedAuditors > 0) {
+                // Ambil semua IKSS untuk pengajuan ini
+                $ikssAuditee = IkssAuditee::where('pengajuan_ami_id', $pengajuan->id)->get();
+
+                // Cek setiap auditor
                 foreach ($pengajuan->auditors as $penugasan) {
                     $auditorId = $penugasan->user_id;
+                    $hasNilai = false;
 
-                    // Cek apakah auditor sudah menyelesaikan evaluasi dan masukan
-                    $hasEvaluasi = EvaluasiSubmission::where('pengajuan_ami_id', $pengajuan->id)
-                        ->where('user_id', $auditorId)
-                        ->where('jenis', 'auditor')
-                        ->exists();
+                    // Cek apakah auditor sudah memberikan nilai untuk IKSS
+                    foreach ($ikssAuditee as $ikss) {
+                        if ($ikss->nilai()->where('auditor_id', $auditorId)->exists()) {
+                            $hasNilai = true;
+                            break;
+                        }
+                    }
 
-                    $hasMasukan = EvaluasiMasukan::where('pengajuan_ami_id', $pengajuan->id)
-                        ->where('user_id', $auditorId)
-                        ->exists();
-
-                    \Log::info("  Auditor ID: {$auditorId}, Has Evaluasi: " . ($hasEvaluasi ? 'Yes' : 'No') . ", Has Masukan: " . ($hasMasukan ? 'Yes' : 'No'));
-
-                    if ($hasEvaluasi && $hasMasukan) {
+                    if ($hasNilai) {
                         $completedAuditors++;
                     }
                 }
 
-                \Log::info("  Completed Auditors: {$completedAuditors}/{$totalAssignedAuditors}");
-
                 // Jika semua auditor sudah selesai, maka audit selesai
                 if ($completedAuditors == $totalAssignedAuditors) {
                     $sudahSelesaiDiaudit++;
-                    \Log::info("  → Kategori: Selesai Diaudit");
                 } else {
                     $masihProsesAudit++;
-                    \Log::info("  → Kategori: Masih Proses Audit");
                 }
             } else {
                 // Jika belum ada auditor yang ditugaskan, masuk ke kategori masih proses
                 $masihProsesAudit++;
-                \Log::info("  → Kategori: Masih Proses Audit (No auditors assigned)");
             }
         }
-
-        \Log::info("Final Count - Belum Disetujui: {$belumDisetujui}, Selesai Diaudit: {$sudahSelesaiDiaudit}, Masih Proses: {$masihProsesAudit}");
-        \Log::info('=== END DEBUG ===');
 
         return [
             'belum_disetujui' => $belumDisetujui,

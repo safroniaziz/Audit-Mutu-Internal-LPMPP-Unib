@@ -390,7 +390,7 @@ class UpdateAuditorSeeder extends Seeder
             if ($auditorRole) {
                 // Ambil semua user yang memiliki role Auditor
                 $auditorUsers = User::role('Auditor')->get();
-
+                
                 // Hapus user-user tersebut (tidak hapus role)
                 foreach ($auditorUsers as $user) {
                     $user->delete();

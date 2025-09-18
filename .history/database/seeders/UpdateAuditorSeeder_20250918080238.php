@@ -388,13 +388,19 @@ class UpdateAuditorSeeder extends Seeder
             // Hapus semua user dengan role Auditor
             $auditorRole = Role::where('name', 'Auditor')->first();
             if ($auditorRole) {
-                // Ambil semua user yang memiliki role Auditor
-                $auditorUsers = User::role('Auditor')->get();
-
-                // Hapus user-user tersebut (tidak hapus role)
-                foreach ($auditorUsers as $user) {
-                    $user->delete();
-                }
+                // Hapus relasi role terlebih dahulu
+                DB::table('model_has_roles')
+                    ->where('role_id', $auditorRole->id)
+                    ->where('model_type', 'App\\Models\\User')
+                    ->delete();
+                
+                // Hapus user yang memiliki role auditor
+                $auditorUserIds = DB::table('model_has_roles')
+                    ->where('role_id', $auditorRole->id)
+                    ->where('model_type', 'App\\Models\\User')
+                    ->pluck('model_id');
+                
+                User::whereIn('id', $auditorUserIds)->delete();
             }
 
             // Hapus SEMUA user yang memiliki email atau username yang sama dengan data baru
@@ -413,22 +419,16 @@ class UpdateAuditorSeeder extends Seeder
 
             // Buat user auditor baru
             foreach ($auditorsData as $auditorData) {
-                try {
-                    $user = User::create([
-                        'name' => $auditorData['name'],
-                        'username' => $auditorData['username'],
-                        'email' => $auditorData['email'],
-                        'password' => Hash::make($auditorData['username']), // Password sama dengan username
-                        'email_verified_at' => now(),
-                    ]);
+                $user = User::create([
+                    'name' => $auditorData['name'],
+                    'username' => $auditorData['username'],
+                    'email' => $auditorData['email'],
+                    'password' => Hash::make($auditorData['username']), // Password sama dengan username
+                    'email_verified_at' => now(),
+                ]);
 
-                    // Assign role Auditor dengan pengecekan
-                    if ($user && $auditorRole) {
-                        $user->assignRole($auditorRole);
-                    }
-                } catch (\Exception $userError) {
-                    $this->command->warn('Skipping user: ' . $auditorData['name'] . ' - ' . $userError->getMessage());
-                }
+                // Assign role Auditor
+                $user->assignRole('Auditor');
             }
 
             DB::commit();
