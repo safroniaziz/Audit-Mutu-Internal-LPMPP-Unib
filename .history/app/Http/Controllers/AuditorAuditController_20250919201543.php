@@ -827,14 +827,18 @@ class AuditorAuditController extends Controller
                             $validRole = false;
                             $isPenugasanKetua = false;
 
-                            // Resolve role by using current pengajuan's penugasan list
-                            foreach ($pengajuan->auditors as $penugasan) {
-                                if ($penugasan->user_id == $nilai->auditor_id) {
+                            $auditorForNilai = $nilai->auditor;
+                            if ($auditorForNilai && isset($auditorForNilai->penugasan)) {
+                                foreach ($auditorForNilai->penugasan as $penugasan) {
+                                if ($penugasan->pengajuan_ami_id == $pengajuan->id &&
+                                    $penugasan->user_id == $nilai->auditor_id) {
+                                    // Only include scores from ketua and pendamping roles
                                     if ($penugasan->role == 'ketua' || $penugasan->role == 'pendamping') {
                                         $validRole = true;
                                         $isPenugasanKetua = ($penugasan->role == 'ketua');
                                         break;
                                     }
+                                }
                                 }
                             }
 
@@ -1301,14 +1305,18 @@ class AuditorAuditController extends Controller
                             $validRole = false;
                             $isPenugasanKetua = false;
 
-                            // Resolve role by using current pengajuan's penugasan list
-                            foreach ($pengajuan->auditors as $penugasan) {
-                                if ($penugasan->user_id == $nilai->auditor_id) {
+                            $auditorForNilai = $nilai->auditor;
+                            if ($auditorForNilai && isset($auditorForNilai->penugasan)) {
+                                foreach ($auditorForNilai->penugasan as $penugasan) {
+                                if ($penugasan->pengajuan_ami_id == $pengajuan->id &&
+                                    $penugasan->user_id == $nilai->auditor_id) {
+                                    // Only include scores from ketua and pendamping roles
                                     if ($penugasan->role == 'ketua' || $penugasan->role == 'pendamping') {
                                         $validRole = true;
                                         $isPenugasanKetua = ($penugasan->role == 'ketua');
                                         break;
                                     }
+                                }
                                 }
                             }
 
