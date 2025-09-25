@@ -99,8 +99,21 @@
     // Create ordered array of SS IDs for proper next step navigation
     $orderedSsIds = $groupedIkss->keys()->toArray();
 
-    // Determine active step - should be first incomplete step or first step if none completed
-    $activeStep = $firstIncompleteStep ?? array_key_first($ssCompletionStatus);
+    // Determine active step - should be first incomplete step in ordered sequence or first step if none completed
+    $activeStep = null;
+
+    // First, try to find the first incomplete step in the ordered sequence
+    foreach ($orderedSsIds as $ssId) {
+        if (isset($ssCompletionStatus[$ssId]) && !$ssCompletionStatus[$ssId]['is_completed']) {
+            $activeStep = $ssId;
+            break;
+        }
+    }
+
+    // If no incomplete step found, use the first step in ordered sequence
+    if (!$activeStep) {
+        $activeStep = $orderedSsIds[0] ?? array_key_first($ssCompletionStatus);
+    }
 @endphp
 
 @push('styles')
@@ -109,23 +122,47 @@
         .wizard-nav {
             display: flex;
             overflow-x: auto;
+            overflow-y: hidden;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
             background: #ffffff;
             border-radius: 0.475rem;
             box-shadow: 0 0 50px 0 rgb(82 63 105 / 10%);
+            /* Force scrollbar to be visible */
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .wizard-nav::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         .wizard-step {
-            flex: 1;
-            min-width: 200px;
+            flex: 0 0 auto; /* Changed from flex: 1 to prevent equal distribution */
+            min-width: 250px; /* Increased min-width */
+            max-width: 300px;
             text-align: center;
             padding: 0.5rem 2rem;
             position: relative;
             cursor: not-allowed;
             transition: all 0.2s ease;
             opacity: 0.5;
+            white-space: nowrap; /* Prevent text wrapping */
         }
 
         .wizard-step.completed,
@@ -540,11 +577,11 @@
                                                             {{ ($hasEvaluation || $hasPartialEvaluation || $setuju) ? 'disabled' : '' }}
                                                             required>
                                                         <option value="">Pilih Nilai</option>
-                                                        <option value="0" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '0') || old('nilai.'.$ikssAuditee->id) == '0' ? 'selected' : '' }}>0</option>
-                                                        <option value="1" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '1') || old('nilai.'.$ikssAuditee->id) == '1' ? 'selected' : '' }}>1</option>
-                                                        <option value="2" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '2') || old('nilai.'.$ikssAuditee->id) == '2' ? 'selected' : '' }}>2</option>
-                                                        <option value="3" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '3') || old('nilai.'.$ikssAuditee->id) == '3' ? 'selected' : '' }}>3</option>
                                                         <option value="4" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>
+                                                        <option value="3" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '3') || old('nilai.'.$ikssAuditee->id) == '3' ? 'selected' : '' }}>3</option>
+                                                        <option value="2" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '2') || old('nilai.'.$ikssAuditee->id) == '2' ? 'selected' : '' }}>2</option>
+                                                        <option value="1" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '1') || old('nilai.'.$ikssAuditee->id) == '1' ? 'selected' : '' }}>1</option>
+                                                        <option value="0" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '0') || old('nilai.'.$ikssAuditee->id) == '0' ? 'selected' : '' }}>0</option>
                                                     </select>
                                                     @error('nilai.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -618,7 +655,7 @@
         $('.wizard-step').click(function() {
             const stepElement = $(this);
             const stepId = stepElement.data('step');
-            
+
             // Check if this step can be accessed using ordered SS IDs
             const currentIndex = orderedSsIds.indexOf(stepId);
             const isFirstStep = currentIndex === 0;
@@ -698,6 +735,11 @@
                             data: formData,
                             processData: false,
                             contentType: false,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             success: function(response) {
                                 if (response.status === 'success' || response.success) {
                                     Swal.fire({
@@ -922,6 +964,11 @@
                             data: formData,
                             processData: false,
                             contentType: false,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             beforeSend: function() {
                                 // Disable the submit button
                                 $('.submit-final-step').prop('disabled', true);

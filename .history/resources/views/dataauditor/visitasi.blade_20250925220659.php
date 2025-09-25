@@ -129,23 +129,47 @@
         .wizard-nav {
             display: flex;
             overflow-x: auto;
+            overflow-y: hidden;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
             background: #ffffff;
             border-radius: 0.475rem;
             box-shadow: 0 0 50px 0 rgb(82 63 105 / 10%);
+            /* Force scrollbar to be visible */
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .wizard-nav::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         .wizard-step {
-            flex: 1;
-            min-width: 200px;
+            flex: 0 0 auto; /* Changed from flex: 1 to prevent equal distribution */
+            min-width: 250px; /* Increased min-width */
+            max-width: 300px;
             text-align: center;
             padding: 0.5rem 2rem;
             position: relative;
             cursor: not-allowed;
             transition: all 0.2s ease;
             opacity: 0.5;
+            white-space: nowrap; /* Prevent text wrapping */
         }
 
         .wizard-step.completed,
@@ -829,6 +853,11 @@
                             data: formData,
                             processData: false,
                             contentType: false,
+jad                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             success: function(response) {
                                 if (response.status === 'success' || response.success) {
                                     Swal.fire({
@@ -955,6 +984,11 @@
                             data: {
                                 _token: '{{ csrf_token() }}'
                             },
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             success: function(response) {
                                 Swal.fire({
                                     title: 'Berhasil!',

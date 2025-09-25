@@ -959,6 +959,11 @@
                             data: formData,
                             processData: false,
                             contentType: false,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             beforeSend: function() {
                                 // Disable the submit button
                                 $('.submit-final-step').prop('disabled', true);

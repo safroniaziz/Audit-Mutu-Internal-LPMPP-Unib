@@ -129,23 +129,47 @@
         .wizard-nav {
             display: flex;
             overflow-x: auto;
+            overflow-y: hidden;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
             background: #ffffff;
             border-radius: 0.475rem;
             box-shadow: 0 0 50px 0 rgb(82 63 105 / 10%);
+            /* Force scrollbar to be visible */
+            scrollbar-width: thin;
+            scrollbar-color: #888 #f1f1f1;
+        }
+
+        .wizard-nav::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .wizard-nav::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         .wizard-step {
-            flex: 1;
-            min-width: 200px;
+            flex: 0 0 auto; /* Changed from flex: 1 to prevent equal distribution */
+            min-width: 250px; /* Increased min-width */
+            max-width: 300px;
             text-align: center;
             padding: 0.5rem 2rem;
             position: relative;
             cursor: not-allowed;
             transition: all 0.2s ease;
             opacity: 0.5;
+            white-space: nowrap; /* Prevent text wrapping */
         }
 
         .wizard-step.completed,
@@ -417,7 +441,7 @@
                             $isActive = $satuanStandarId == $activeStep;
                             $stepClass = $isCompleted ? 'completed' : ($isActive ? 'active' : 'disabled');
                         @endphp
-                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $satuanStandarId }}">
+                        <div class="wizard-step {{ $stepClass }}" data-step="{{ $satuanStandarId }}" data-order="{{ $loop->index }}">
                             <div class="step-number">{{ $loop->iteration }}</div>
                             <div class="step-label">{{ $status['satuan_standar']->kode_satuan }}</div>
                             <div class="step-desc">
@@ -681,15 +705,23 @@
             $('.wizard-step').click(function() {
                 const stepElement = $(this);
                 const stepId = stepElement.data('step');
-                const prevStep = stepElement.prev('.wizard-step');
+
+                // Check if this step can be accessed using ordered SS IDs
+                const currentIndex = orderedSsIds.indexOf(stepId);
+                const isFirstStep = currentIndex === 0;
+                const prevStepId = currentIndex > 0 ? orderedSsIds[currentIndex - 1] : null;
+                const prevStepElement = prevStepId ? $(`.wizard-step[data-step="${prevStepId}"]`) : null;
+                const isPrevStepCompleted = prevStepElement && prevStepElement.hasClass('completed');
 
                 // Allow navigation if:
                 // 1. Step is completed
                 // 2. Step is currently active
-                // 3. Previous step is completed
+                // 3. Previous step (in ordered sequence) is completed
+                // 4. This is the first step
                 if (stepElement.hasClass('completed') ||
                     stepElement.hasClass('active') ||
-                    (prevStep.length && prevStep.hasClass('completed'))) {
+                    isPrevStepCompleted ||
+                    isFirstStep) {
                     showStep(stepId);
                 } else {
                     Swal.fire({
@@ -821,6 +853,11 @@
                             data: formData,
                             processData: false,
                             contentType: false,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             success: function(response) {
                                 if (response.status === 'success' || response.success) {
                                     Swal.fire({
@@ -947,6 +984,11 @@
                             data: {
                                 _token: '{{ csrf_token() }}'
                             },
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            xhrFields: { withCredentials: true },
                             success: function(response) {
                                 Swal.fire({
                                     title: 'Berhasil!',

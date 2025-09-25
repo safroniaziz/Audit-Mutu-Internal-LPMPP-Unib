@@ -876,11 +876,12 @@
                                                                     <textarea name="catatan[{{ $instrumenProdi->id }}]"
                                                                               class="form-control notes-textarea"
                                                                               rows="4"
-                                                                              placeholder="Tambahkan catatan, saran, atau observasi khusus untuk instrumen ini...">{{ $instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() ? $instrumenProdi->nilaiAuditor->first()->catatan : '' }}</textarea>
+                                                                              minlength="10"
+                                                                              placeholder="Tuliskan catatan visitasi disini (minimal 10 karakter)...">{{ $instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() ? $instrumenProdi->nilaiAuditor->first()->catatan : '' }}</textarea>
                                                                     <div class="notes-footer">
                                                                         <small class="text-muted">
                                                                             <i class="fas fa-info-circle me-1"></i>
-                                                                            Catatan bersifat opsional namun sangat membantu untuk evaluasi yang lebih komprehensif
+                                                                            Catatan visitasi minimal 10 karakter. Tuliskan observasi, temuan, atau saran untuk instrumen ini.
                                                                         </small>
                                                                     </div>
                                                                 </div>
@@ -1133,8 +1134,10 @@
             method: 'POST',
             body: formData,
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
         })
         .then(response => response.json())
         .then(data => {
@@ -1147,6 +1150,9 @@
                 }).then(() => {
                     // Update the current kriteria step to completed
                     updateKriteriaStepStatus(currentKriteriaId, true);
+
+                    // Update progress bar and counter
+                    updateProgressBar();
                 });
             } else {
                 Swal.fire({
@@ -1260,6 +1266,29 @@
             return false;
         }
 
+        // Validate catatan minimal 10 karakter
+        let invalidCatatanCount = 0;
+        $(`#instrumen-group-${currentKriteriaId} textarea[name^="catatan["]`).each(function() {
+            const catatan = $(this).val().trim();
+            if (catatan.length > 0 && catatan.length < 10) {
+                invalidCatatanCount++;
+                $(this).addClass('is-invalid');
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        if (invalidCatatanCount > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: '⚠️ Catatan Visitasi Tidak Valid',
+                text: `Ada ${invalidCatatanCount} catatan yang kurang dari 10 karakter. Silakan lengkapi atau kosongkan catatan tersebut.`,
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#6C757D'
+            });
+            return false;
+        }
+
         return true;
     }
 
@@ -1317,8 +1346,10 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1331,6 +1362,9 @@
                         }).then(() => {
                             // Update kriteria step status without reload
                             updateKriteriaStepStatus(currentKriteriaId, true);
+
+                            // Update progress bar and counter
+                            updateProgressBar();
 
                             // Navigate to next kriteria immediately
                             forceNavigateToKriteria(nextKriteriaId);
@@ -1404,8 +1438,10 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'X-Requested-With': 'XMLHttpRequest'
             },
+            credentials: 'same-origin',
             body: JSON.stringify({
                 kriteria_id: kriteriaId
             })
@@ -1562,8 +1598,10 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin'
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1576,6 +1614,9 @@
                                                 }).then(() => {
                             // Update kriteria step status
                             updateKriteriaStepStatus(currentKriteriaId, true);
+
+                            // Update progress bar and counter
+                            updateProgressBar();
 
                             // Show completion status and update UI
                             showCompletionStatus();
@@ -1609,6 +1650,59 @@
                 });
             }
         });
+    }
+
+    // Function to update progress bar and counter after successful submission
+    function updateProgressBar() {
+        // Count total and completed instrumen
+        let totalInstrumen = 0;
+        let completedInstrumen = 0;
+
+        // Get all unique radio button groups
+        const uniqueNames = new Set();
+        $('input[type="radio"][name^="nilai["]').each(function() {
+            const name = $(this).attr('name');
+            if (name) {
+                uniqueNames.add(name);
+            }
+        });
+
+        totalInstrumen = uniqueNames.size;
+
+        // Count completed by checking each unique group
+        uniqueNames.forEach(name => {
+            if ($(`input[name="${name}"]:checked`).length > 0) {
+                completedInstrumen++;
+            }
+        });
+
+        // Calculate percentage
+        const progressPercentage = totalInstrumen > 0 ? (completedInstrumen / totalInstrumen) * 100 : 0;
+
+        // Update progress bar
+        $('.progress-bar').css('width', `${progressPercentage}%`).attr('aria-valuenow', progressPercentage);
+
+        // Update status text - find the element that contains "Status: X dari Y instrumen"
+        const statusElement = $('.text-gray-600').filter(function() {
+            return $(this).text().includes('Status:');
+        });
+
+        if (statusElement.length > 0) {
+            statusElement.html(`Status: <strong>${completedInstrumen} dari ${totalInstrumen}</strong> instrumen telah dinilai.`);
+        }
+
+        // Update description
+        const descElement = $('.text-gray-700').filter(function() {
+            return $(this).text().includes('Silakan lengkapi');
+        });
+
+        if (descElement.length > 0) {
+            if (completedInstrumen === totalInstrumen && totalInstrumen > 0) {
+                descElement.text('Semua instrumen telah dinilai. Anda dapat melanjutkan ke tahap berikutnya.');
+            } else {
+                descElement.text('Silakan lengkapi penilaian yang tersisa.');
+            }
+        }
     }
 </script>
 @endpush
