@@ -114,6 +114,10 @@
                     <span class="text-muted fw-semibold">Dashboard Data Auditor</span>
                 </div>
                 <div class="flex-shrink-0">
+                    @php
+                        $currentAuditor = collect($auditess->auditors ?? [])->where('user_id', Auth::user()->id)->first();
+                        $deskApproved = (bool)($currentAuditor->is_setuju ?? false);
+                    @endphp
                     @if(isset($auditess->audit_status))
                         @if($auditess->audit_status['status'] === 'completed')
                             <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-info btn-xs">
@@ -124,10 +128,17 @@
                                 Lihat Hasil Audit
                             </a>
                         @elseif($auditess->audit_status['status'] === 'visitasi_waiting')
-                            <button class="btn btn-warning btn-xs" disabled>
-                                <i class="fas fa-clock fs-3 me-2"></i>
-                                Menunggu Jadwal Visitasi
-                            </button>
+                            @if(!$deskApproved)
+                                <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-primary btn-xs">
+                                    <i class="fas fa-arrow-right fs-3 me-2"></i>
+                                    Lanjut ke Desk Evaluation
+                                </a>
+                            @else
+                                <button class="btn btn-warning btn-xs" disabled>
+                                    <i class="fas fa-clock fs-3 me-2"></i>
+                                    Menunggu Jadwal Visitasi
+                                </button>
+                            @endif
                         @elseif($auditess->audit_status['status'] === 'visitasi_expired')
                             <button class="btn btn-danger btn-xs" disabled>
                                 <i class="fas fa-exclamation-triangle fs-3 me-2"></i>
@@ -193,29 +204,48 @@
                 <div class="card-body py-3">
                     @if($auditess && $auditess->ikssAuditee)
                         @php
-                            $groupedData = $auditess->ikssAuditee
+                            // First, let's debug what we have
+                            $filteredData = $auditess->ikssAuditee
                                 ->filter(function($ikss) {
                                     return $ikss->instrumen &&
                                            $ikss->instrumen->indikatorKinerja &&
                                            $ikss->instrumen->indikatorKinerja->satuanStandar;
-                                })
-                                @php
-                                    $groupedData = $auditess->ikssAuditee
-                                        ->filter(function($ikss) {
-                                            return $ikss->instrumen &&
-                                                   $ikss->instrumen->indikatorKinerja &&
-                                                   $ikss->instrumen->indikatorKinerja->satuanStandar;
-                                        })
-                                        ->sortBy('instrumen.indikatorKinerja.satuanStandar.id')
-                                        ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
-                                        ->map(function($satuanGroup) {
-                                            return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
-                                        });
-                                @endphp
-                        ->groupBy('instrumen.indikatorKinerja.satuanStandar.sasaran')
-                        ->map(function($satuanGroup) {
-                            return $satuanGroup->groupBy('instrumen.indikatorKinerja.tujuan');
-                        });
+                                });
+
+                            // Create a mapping of sasaran to kode_satuan for sorting
+                            $sasaranToKode = [];
+                            foreach ($filteredData as $ikss) {
+                                $sasaran = $ikss->instrumen->indikatorKinerja->satuanStandar->sasaran;
+                                $kodeSatuan = $ikss->instrumen->indikatorKinerja->satuanStandar->kode_satuan;
+                                if (!isset($sasaranToKode[$sasaran])) {
+                                    $sasaranToKode[$sasaran] = $kodeSatuan;
+                                }
+                            }
+
+                            // Sort sasaran by kode_satuan
+                            uasort($sasaranToKode, function($a, $b) {
+                                if (preg_match('/SS\s*(\d+)\.\d+/', $a, $matchesA) && preg_match('/SS\s*(\d+)\.\d+/', $b, $matchesB)) {
+                                    $groupA = intval($matchesA[1]);
+                                    $groupB = intval($matchesB[1]);
+                                    if ($groupA !== $groupB) {
+                                        return $groupA - $groupB;
+                                    }
+                                    // If same group, sort by sub-number
+                                    $subA = intval(explode('.', $a)[1]);
+                                    $subB = intval(explode('.', $b)[1]);
+                                    return $subA - $subB;
+                                }
+                                return strcmp($a, $b);
+                            });
+
+                            // Now group data in the correct order
+                            $groupedData = collect();
+                            foreach ($sasaranToKode as $sasaran => $kodeSatuan) {
+                                $sasaranData = $filteredData
+                                    ->where('instrumen.indikatorKinerja.satuanStandar.sasaran', $sasaran)
+                                    ->groupBy('instrumen.indikatorKinerja.tujuan');
+                                $groupedData->put($sasaran, $sasaranData);
+                            }
                         @endphp
 
                         <div class="table-responsive">

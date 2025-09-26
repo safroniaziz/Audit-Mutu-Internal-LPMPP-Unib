@@ -114,6 +114,10 @@
                     <span class="text-muted fw-semibold">Dashboard Data Auditor</span>
                 </div>
                 <div class="flex-shrink-0">
+                    @php
+                        $currentAuditor = collect($auditess->auditors ?? [])->where('user_id', Auth::user()->id)->first();
+                        $deskApproved = (bool)($currentAuditor->is_setuju ?? false);
+                    @endphp
                     @if(isset($auditess->audit_status))
                         @if($auditess->audit_status['status'] === 'completed')
                             <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-info btn-xs">
@@ -124,10 +128,17 @@
                                 Lihat Hasil Audit
                             </a>
                         @elseif($auditess->audit_status['status'] === 'visitasi_waiting')
-                            <button class="btn btn-warning btn-xs" disabled>
-                                <i class="fas fa-clock fs-3 me-2"></i>
-                                Menunggu Jadwal Visitasi
-                            </button>
+                            @if(!$deskApproved)
+                                <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-primary btn-xs">
+                                    <i class="fas fa-arrow-right fs-3 me-2"></i>
+                                    Lanjut ke Desk Evaluation
+                                </a>
+                            @else
+                                <button class="btn btn-warning btn-xs" disabled>
+                                    <i class="fas fa-clock fs-3 me-2"></i>
+                                    Menunggu Jadwal Visitasi
+                                </button>
+                            @endif
                         @elseif($auditess->audit_status['status'] === 'visitasi_expired')
                             <button class="btn btn-danger btn-xs" disabled>
                                 <i class="fas fa-exclamation-triangle fs-3 me-2"></i>

@@ -347,15 +347,12 @@ class AuditorAuditController extends Controller
                 }
             }
 
-            // Get pengajuan data for IKSS count
-            $pengajuan = \App\Models\PengajuanAmi::find($pengajuanId);
-
             // Check if all IKSS have been evaluated by this auditor
             $totalIkss = \App\Models\IkssAuditee::where('auditee_id', $pengajuan->auditee_id)
                 ->where('periode_id', $pengajuan->periode_id)
                 ->where('status_target', true)
                 ->count();
-
+            
             $evaluatedCount = \App\Models\IkssAuditeeNilai::where('pengajuan_ami_id', $pengajuanId)
                 ->where('auditor_id', $auditorId)
                 ->count();
@@ -365,7 +362,7 @@ class AuditorAuditController extends Controller
                 $penugasanAuditor = \App\Models\PenugasanAuditor::where('pengajuan_ami_id', $pengajuanId)
                     ->where('user_id', $auditorId)
                     ->first();
-
+                
                 if ($penugasanAuditor) {
                     $penugasanAuditor->update(['is_setuju' => true]);
                 }
