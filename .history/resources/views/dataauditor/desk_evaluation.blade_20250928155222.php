@@ -574,7 +574,7 @@
                                                     <h6>Nilai <span class="text-danger">*</span></h6>
                                                     <select class="form-select @error('nilai.'.$ikssAuditee->id) is-invalid @enderror"
                                                             name="nilai[{{ $ikssAuditee->id }}]"
-                                                            {{ $setuju ? 'disabled' : '' }}
+                                                            {{ ($hasEvaluation || $hasPartialEvaluation || $setuju) ? 'disabled' : '' }}
                                                             required>
                                                         <option value="">Pilih Nilai</option>
                                                         <option value="4" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>
