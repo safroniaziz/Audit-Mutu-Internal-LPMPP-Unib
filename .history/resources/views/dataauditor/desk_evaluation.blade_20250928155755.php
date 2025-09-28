@@ -456,8 +456,7 @@
                                             !empty($deskEvaluation[$ikssAuditee->id]->pertanyaan) &&
                                             isset($deskEvaluation[$ikssAuditee->id]->nilai) &&
                                             $deskEvaluation[$ikssAuditee->id]->nilai !== '' &&
-                                            $deskEvaluation[$ikssAuditee->id]->nilai !== null &&
-                                            is_numeric($deskEvaluation[$ikssAuditee->id]->nilai);
+                                            $deskEvaluation[$ikssAuditee->id]->nilai !== null;
 
                                         // Check if there's any partial evaluation data
                                         $hasPartialEvaluation = isset($deskEvaluation[$ikssAuditee->id]) &&
