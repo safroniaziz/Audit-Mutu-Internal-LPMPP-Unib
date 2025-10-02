@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <title>Berita Acara Audit Mutu Internal</title>
     <style>
-        @page {
-            margin: 8mm 8mm 8mm 8mm;
-        }
+        @page { margin: 8mm; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             color: #333;
-            line-height: 1.5;
+            line-height: 1.35;
             margin: 0;
             padding: 0;
             background-color: #fff;
@@ -156,14 +154,20 @@
         .tableData {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 14px 0;
+            table-layout: fixed;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .tableData th, .tableData td {
-            padding: 10px 12px;
+            padding: 6px 8px;
             border: 1px solid #e0e0e0;
             font-family: 'Roboto', sans-serif !important;
+            font-size: 10px;
+            vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            hyphens: auto;
         }
 
         .tableData th {
@@ -340,13 +344,13 @@
         <table class="tableData">
             <tbody>
                 <tr>
-                    <th style="width: 5%; ">No</th>
-                    <th style="width: 25%;">Instrumen Indikator Kinerja</th>
-                    <th style="width: 25%">Pertanyaan</th>
-                    <th style="">Hasil Observasi (Catatan Audit)</th>
-                    <th style=" width: 10%;">S</th> <!-- Diperlebar -->
-                    <th style=" width: 10%;">TS</th> <!-- Diperlebar -->
-                    <th style=" width: 15%;">Catatan</th> <!-- Diperlebar -->
+                    <th style="width: 4%">No</th>
+                    <th style="width: 20%">Instrumen Indikator Kinerja</th>
+                    <th style="width: 20%">Pertanyaan</th>
+                    <th style="width: 24%">Hasil Observasi (Catatan Audit)</th>
+                    <th style="width: 6%; text-align:center;">S</th>
+                    <th style="width: 6%; text-align:center;">TS</th>
+                    <th style="width: 20%">Catatan</th>
                 </tr>
             </tbody>
             <tbody>
@@ -366,8 +370,8 @@
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $ikssAuditee->instrumen->indikator }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ optional($ikssAuditee->nilai->first())->pertanyaan }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $hasilObservasi }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $isSesuai ? '✔' : '' }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ !$isSesuai && !empty($visitasiItem?->ketidak_sesuaian) ? '✔' : '' }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{!! $isSesuai ? 'YA' : '&nbsp;' !!}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{!! (!$isSesuai && !empty($visitasiItem?->ketidak_sesuaian)) ? 'YA' : '&nbsp;' !!}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $catatanTambahan }}</td>
                     </tr>
                 @endforeach
