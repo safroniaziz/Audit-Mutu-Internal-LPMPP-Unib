@@ -234,13 +234,8 @@ class AuditorAuditController extends Controller
         // Add audit status for the current auditor
         $auditess->audit_status = $this->getAuditStatus($pengajuan);
 
-        // Determine if penilaian instrumen prodi has been approved by current auditor
-        $currentAuditor = $auditess->auditors->firstWhere('user_id', Auth::id());
-        $isPenilaianProdiApproved = (bool)($currentAuditor->is_setuju_indikator_prodi ?? false);
-
         return view('dataauditor.perjanjian_kinerja', [
             'auditess' => $auditess,
-            'isPenilaianProdiApproved' => $isPenilaianProdiApproved,
         ]);
     }
 

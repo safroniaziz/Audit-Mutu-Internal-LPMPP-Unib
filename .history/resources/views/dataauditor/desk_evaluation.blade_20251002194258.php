@@ -1,5 +1,5 @@
 @extends('dataauditor/dashboard_template')
-                                                              {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
 @section('menuPenilaianInstrumenProdi')
     <li class="nav-item mt-2">
         <a class="nav-link text-active-primary ms-0 me-10 py-5">
@@ -7,7 +7,7 @@
         </a>
     </li>
 @endsection
-                                                              {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
 @section('menuUnduhDokumen')
     @foreach($pengajuan->auditors as $penugasan)
         @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
@@ -26,7 +26,7 @@
     $allCompleted = true;
     $lastCompletedStep = null;
     $firstIncompleteStep = null;
-                                                            {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
     foreach ($dataIkss as $ikssAuditee) {
         $satuanStandar = $ikssAuditee->instrumen->indikatorKinerja->satuanStandar;
 

@@ -1,5 +1,5 @@
 @extends('dataauditor/dashboard_template')
-                                                              {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
 @section('menuPenilaianInstrumenProdi')
     <li class="nav-item mt-2">
         <a class="nav-link text-active-primary ms-0 me-10 py-5">
@@ -7,7 +7,7 @@
         </a>
     </li>
 @endsection
-                                                              {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
 @section('menuUnduhDokumen')
     @foreach($pengajuan->auditors as $penugasan)
         @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
@@ -26,7 +26,7 @@
     $allCompleted = true;
     $lastCompletedStep = null;
     $firstIncompleteStep = null;
-                                                            {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+
     foreach ($dataIkss as $ikssAuditee) {
         $satuanStandar = $ikssAuditee->instrumen->indikatorKinerja->satuanStandar;
 
@@ -555,7 +555,7 @@
                                                     <h6>Deskripsi Penilaian Auditor <span class="text-danger">*</span></h6>
                                                     <textarea rows="2" class="form-control @error('deskripsi.'.$ikssAuditee->id) is-invalid @enderror"
                                                               name="deskripsi[{{ $ikssAuditee->id }}]"
-
+                                                              
                                                               required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->deskripsi) ? $deskEvaluation[$ikssAuditee->id]->deskripsi : old('deskripsi.'.$ikssAuditee->id) }}</textarea>
                                                     @error('deskripsi.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -565,7 +565,7 @@
                                                     <h6>Pertanyaan <span class="text-danger">*</span></h6>
                                                     <textarea rows="2" class="form-control @error('pertanyaan.'.$ikssAuditee->id) is-invalid @enderror"
                                                               name="pertanyaan[{{ $ikssAuditee->id }}]"
-
+                                                              
                                                               required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->pertanyaan) ? $deskEvaluation[$ikssAuditee->id]->pertanyaan : old('pertanyaan.'.$ikssAuditee->id) }}</textarea>
                                                     @error('pertanyaan.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -575,7 +575,7 @@
                                                     <h6>Nilai <span class="text-danger">*</span></h6>
                                                     <select class="form-select @error('nilai.'.$ikssAuditee->id) is-invalid @enderror"
                                                             name="nilai[{{ $ikssAuditee->id }}]"
-
+                                                            
                                                             required>
                                                         <option value="">Pilih Nilai</option>
                                                         <option value="4" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>

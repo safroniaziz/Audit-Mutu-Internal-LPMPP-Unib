@@ -582,7 +582,7 @@
                                                                 <h6>Ketidaksesuaian <span class="text-danger">*</span></h6>
                                                                 <select class="form-select @error('ketidak_sesuaian.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="ketidak_sesuaian[{{ $ikssAuditee->id }}]"
-                                                                        {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                                        {{ $hasEvaluation ? 'disabled' : '' }}
                                                                         required>
                                                                     <option value="">-- Pilih Jenis --</option>
                                                                     @foreach(['observasi', 'kts_mayor', 'kts_minor', 'sudah_sesuai'] as $option)
@@ -602,7 +602,7 @@
                                                                 <textarea rows="2"
                                                                         class="form-control @error('pernyataan.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="pernyataan[{{ $ikssAuditee->id }}]"
-                                                                        {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                                        {{ $hasEvaluation ? 'disabled' : '' }}
                                                                         required>{{ old('pernyataan.'.$ikssAuditee->id, $hasEvaluation ? $visitasi[$ikssAuditee->id]->pernyataan : '') }}</textarea>
                                                                 @error('pernyataan.'.$ikssAuditee->id)
                                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -614,7 +614,7 @@
                                                                 <textarea rows="2"
                                                                         class="form-control @error('kelebihan.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="kelebihan[{{ $ikssAuditee->id }}]"
-                                                                        {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                                        {{ $hasEvaluation ? 'disabled' : '' }}
                                                                         required>{{ old('kelebihan.'.$ikssAuditee->id, $hasEvaluation ? $visitasi[$ikssAuditee->id]->kelebihan : '') }}</textarea>
                                                                 @error('kelebihan.'.$ikssAuditee->id)
                                                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -626,7 +626,7 @@
                                                                 <textarea rows="2"
                                                                         class="form-control @error('peluang_peningkatan.'.$ikssAuditee->id) is-invalid @enderror"
                                                                         name="peluang_peningkatan[{{ $ikssAuditee->id }}]"
-                                                                        {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                                        {{ $hasEvaluation ? 'disabled' : '' }}
                                                                         required>{{ old('peluang_peningkatan.'.$ikssAuditee->id, $hasEvaluation ? $visitasi[$ikssAuditee->id]->peluang_peningkatan : '') }}</textarea>
                                                                 @error('peluang_peningkatan.'.$ikssAuditee->id)
                                                                     <div class="invalid-feedback">{{ $message }}</div>

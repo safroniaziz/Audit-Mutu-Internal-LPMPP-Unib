@@ -351,14 +351,24 @@
             </tbody>
             <tbody>
                 @foreach ($pengajuanAmis->ikssAuditee as $index => $ikssAuditee)
+                    @php
+                        // Ambil catatan visitasi milik auditor saat ini jika ada, jika tidak ambil data pertama
+                        $visitasiItem = optional($ikssAuditee->visitasi)->firstWhere('auditor_id', Auth::id()) ?? optional($ikssAuditee->visitasi)->first();
+                        $hasilObservasi = $visitasiItem->pernyataan ?? '';
+                        $isSesuai = isset($visitasiItem->ketidak_sesuaian) && $visitasiItem->ketidak_sesuaian === 'sudah_sesuai';
+                        $catatanTambahan = trim(implode(' | ', array_filter([
+                            $visitasiItem->kelebihan ?? null,
+                            $visitasiItem->peluang_peningkatan ?? null,
+                        ])));
+                    @endphp
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $index+1 }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $ikssAuditee->instrumen->indikator }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ optional($ikssAuditee->nilai->first())->pertanyaan }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $hasilObservasi }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $isSesuai ? '✔' : '' }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ !$isSesuai && !empty($visitasiItem?->ketidak_sesuaian) ? '✔' : '' }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $catatanTambahan }}</td>
                     </tr>
                 @endforeach
             </tbody>

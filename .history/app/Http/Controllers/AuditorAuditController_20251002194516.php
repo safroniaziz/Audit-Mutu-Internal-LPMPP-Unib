@@ -234,13 +234,8 @@ class AuditorAuditController extends Controller
         // Add audit status for the current auditor
         $auditess->audit_status = $this->getAuditStatus($pengajuan);
 
-        // Determine if penilaian instrumen prodi has been approved by current auditor
-        $currentAuditor = $auditess->auditors->firstWhere('user_id', Auth::id());
-        $isPenilaianProdiApproved = (bool)($currentAuditor->is_setuju_indikator_prodi ?? false);
-
         return view('dataauditor.perjanjian_kinerja', [
             'auditess' => $auditess,
-            'isPenilaianProdiApproved' => $isPenilaianProdiApproved,
         ]);
     }
 
@@ -452,18 +447,13 @@ class AuditorAuditController extends Controller
             $setuju = true;
         }
 
-        // Determine if penilaian instrumen prodi has been approved by current auditor
-        $currentAuditor = $penugasanAuditor->auditors->firstWhere('user_id', Auth::id());
-        $isPenilaianProdiApproved = (bool)($currentAuditor->is_setuju_indikator_prodi ?? false);
-
         return view('dataauditor.visitasi', [
             'pengajuan' => $pengajuan,
             'dataIkss' => $dataIkss,
             'groupedIkss' => $groupedIkss,
             'setuju' => $setuju,
             'visitasi' => $visitasi ?? collect(),
-            'visitasiTimeValidation' => $visitasiTimeValidation,
-            'isPenilaianProdiApproved' => $isPenilaianProdiApproved
+            'visitasiTimeValidation' => $visitasiTimeValidation
         ]);
     }
 
