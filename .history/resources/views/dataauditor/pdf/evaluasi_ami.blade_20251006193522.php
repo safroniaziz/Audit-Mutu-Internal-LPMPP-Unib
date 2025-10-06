@@ -275,7 +275,7 @@
             </tr>
             <tr>
                 <td class="info-cell">
-                    <strong>Tanggal:</strong> 5 Mei 2025
+                    <strong>Tanggal:</strong> {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
                 </td>
             </tr>
             <tr>

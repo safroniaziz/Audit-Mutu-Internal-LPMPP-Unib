@@ -261,6 +261,8 @@
             </tr>
         </table>
 
+
+
         <div class="header">
             <h1>LAPORAN AUDIT MUTU INTERNAL <br> (AMI) <br> {{ $pengajuanAmis->auditee->jenis_unit_kerja == "prodi" ? 'PROGRAM STUDI' : 'FAKULTAS' }}</h1>
             <p>{{ $periodeAktif->nomor_surat }}</p>
@@ -571,7 +573,30 @@
             </tbody>
         </table>
 
-        <div class="section-title" style="margin-top: 20px !important;">V. TEMUAN AUDIT</div>
+        <div class="section-title" style="margin-top: 20px !important;">V. PRESENSI</div>
+
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="5%">No</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Nama</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Peran</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="25%">Tanda Tangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for ($i = 1; $i <= 10; $i++)
+                    <tr>
+                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $i }}</td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                    </tr>
+                @endfor
+            </tbody>
+        </table>
+
+        <div class="section-title" style="margin-top: 20px !important;">VI. TEMUAN AUDIT</div>
 
         <p style="font-weight: bold; font-size:14px; color:#00447c;">1. Ketidaksesuaian</p>
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
@@ -764,6 +789,65 @@
             </tbody>
         </table>
 
+        @php
+            // Radar SS tepat di bawah tabel SS
+            $ssLabels = [];
+            $ssValues = [];
+            foreach (($sortedGrouped ?? []) as $item) {
+                if (!empty($item['has_data'])) {
+                    $ssLabels[] = $item['kode_satuan'];
+                    $ssValues[] = round((float)($item['rata_rata'] ?? 0), 2);
+                }
+            }
+            $ssConfig = [
+                'type' => 'radar',
+                'data' => [
+                    'labels' => $ssLabels,
+                    'datasets' => [[
+                        'label' => 'Nilai Sasaran Strategis',
+                        'data' => $ssValues,
+                        'fill' => true,
+                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                        'borderColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBorderColor' => '#fff',
+                        'pointHoverBackgroundColor' => '#fff',
+                        'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)',
+                        'pointRadius' => 3,
+                        'pointHoverRadius' => 5,
+                        'tension' => 0.2
+                    ]],
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'maintainAspectRatio' => true,
+                    'elements' => [ 'line' => [ 'borderWidth' => 2 ] ],
+                    'scales' => [
+                        'r' => [
+                            'min' => 0,
+                            'max' => 4,
+                            'beginAtZero' => true,
+                            'angleLines' => [ 'display' => true, 'color' => 'rgba(210,210,210,0.5)', 'lineWidth' => 1 ],
+                            'grid' => [ 'color' => 'rgba(210,210,210,0.5)', 'circular' => true, 'lineWidth' => 1 ],
+                            'ticks' => [ 'stepSize' => 1, 'backdropColor' => 'transparent', 'color' => '#666', 'font' => ['size' => 10] ],
+                            'pointLabels' => [ 'font' => ['size' => 10, 'weight' => 'bold'], 'color' => '#333', 'padding' => 15 ],
+                        ]
+                    ],
+                    'plugins' => [
+                        'legend' => [ 'position' => 'bottom', 'labels' => [ 'boxWidth' => 12, 'padding' => 15, 'font' => ['size' => 11] ] ],
+                    ],
+                ],
+            ];
+            $qcBase = 'https://quickchart.io/chart';
+            $ssUrl = $qcBase . '?version=4&width=700&height=500&backgroundColor=white&c=' . urlencode(json_encode($ssConfig, JSON_UNESCAPED_SLASHES));
+        @endphp
+        @if(!empty($ssLabels))
+            <div style="margin: 10px 0 30px;">
+                <div style="font-weight:bold; margin-bottom:8px;">Grafik Radar Sasaran Strategis</div>
+                <img src="{{ $ssUrl }}" alt="Radar Sasaran Strategis" style="width:100%; max-width:100%;">
+            </div>
+        @endif
+
                 <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
 
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
@@ -825,14 +909,71 @@
             </tbody>
         </table>
 
+        @php
+            // Radar Prodi tepat di bawah tabel Prodi
+            $prodiLabels = [];
+            $prodiValues = [];
+            foreach (($kriteriaScores ?? []) as $item) {
+                $prodiLabels[] = $item['kode_kriteria'] ?? '';
+                $prodiValues[] = round((float)($item['rata_rata'] ?? 0), 2);
+            }
+            $prodiConfig = [
+                'type' => 'radar',
+                'data' => [
+                    'labels' => $prodiLabels,
+                    'datasets' => [[
+                        'label' => 'Nilai Instrumen Prodi',
+                        'data' => $prodiValues,
+                        'fill' => true,
+                        'backgroundColor' => 'rgba(40, 167, 69, 0.2)',
+                        'borderColor' => 'rgba(40, 167, 69, 1)',
+                        'pointBackgroundColor' => 'rgba(40, 167, 69, 1)',
+                        'pointBorderColor' => '#fff',
+                        'pointHoverBackgroundColor' => '#fff',
+                        'pointHoverBorderColor' => 'rgba(40, 167, 69, 1)',
+                        'pointRadius' => 3,
+                        'pointHoverRadius' => 5,
+                        'tension' => 0.2
+                    ]],
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'maintainAspectRatio' => true,
+                    'elements' => [ 'line' => [ 'borderWidth' => 2 ] ],
+                    'scales' => [
+                        'r' => [
+                            'min' => 0,
+                            'max' => 4,
+                            'beginAtZero' => true,
+                            'angleLines' => [ 'display' => true, 'color' => 'rgba(210,210,210,0.5)', 'lineWidth' => 1 ],
+                            'grid' => [ 'color' => 'rgba(210,210,210,0.5)', 'circular' => true, 'lineWidth' => 1 ],
+                            'ticks' => [ 'stepSize' => 1, 'backdropColor' => 'transparent', 'color' => '#666', 'font' => ['size' => 10] ],
+                            'pointLabels' => [ 'font' => ['size' => 10, 'weight' => 'bold'], 'color' => '#333', 'padding' => 15 ],
+                        ]
+                    ],
+                    'plugins' => [
+                        'legend' => [ 'position' => 'bottom', 'labels' => [ 'boxWidth' => 12, 'padding' => 15, 'font' => ['size' => 11] ] ],
+                    ],
+                ],
+            ];
+            $qcBase = 'https://quickchart.io/chart';
+            $prodiUrl = $qcBase . '?version=4&width=700&height=500&backgroundColor=white&c=' . urlencode(json_encode($prodiConfig, JSON_UNESCAPED_SLASHES));
+        @endphp
+        @if(!empty($prodiLabels))
+            <div style="margin: 10px 0 30px;">
+                <div style="font-weight:bold; margin-bottom:8px;">Grafik Radar Instrumen Prodi</div>
+                <img src="{{ $prodiUrl }}" alt="Radar Instrumen Prodi" style="width:100%; max-width:100%;">
+            </div>
+        @endif
+
         <div class="signature-section">
             <div class="signature-right">
-                <p class="date">Bengkulu, 05 Mei 2025</p>
+                <p class="date">Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
             </div>
         </div>
 
         <div class="footer">
-            <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
+            <p>Dibuat pada {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y H:i') }} WIB</p>
             <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>

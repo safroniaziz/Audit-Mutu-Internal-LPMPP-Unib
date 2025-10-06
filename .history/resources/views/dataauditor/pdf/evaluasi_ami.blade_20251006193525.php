@@ -275,7 +275,7 @@
             </tr>
             <tr>
                 <td class="info-cell">
-                    <strong>Tanggal:</strong> 5 Mei 2025
+                    <strong>Tanggal:</strong> {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
                 </td>
             </tr>
             <tr>
@@ -310,20 +310,20 @@
             </thead>
             <tbody>
                 <tr>
-                    <td style="text-align: center;">1</td>
-                    <td>Sangat sesuai</td>
-                </tr>
-                <tr>
-                    <td style="text-align: center;">2</td>
-                    <td>Sesuai</td>
+                    <td style="text-align: center;">4</td>
+                    <td>Sangat Sesuai</td>
                 </tr>
                 <tr>
                     <td style="text-align: center;">3</td>
-                    <td>Kurang sesuai</td>
+                    <td>Sesuai</td>
                 </tr>
                 <tr>
-                    <td style="text-align: center;">4</td>
-                    <td>Tidak sesuai</td>
+                    <td style="text-align: center;">2</td>
+                    <td>Kurang Sesuai</td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;">1</td>
+                    <td>Tidak Sesuai</td>
                 </tr>
             </tbody>
         </table>
@@ -384,27 +384,39 @@
                 <h4 style="font-family: 'Roboto', sans-serif !important;">Materi/instrumen Audit</h4>
             </div>
             <div class="risalah-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                @if($masukanAuditor && $masukanAuditor->materi_instrumen)
+                    <p>{{ $masukanAuditor->materi_instrumen }}</p>
+                @else
+                    <p class="text-muted">Belum ada masukan untuk materi/instrumen audit</p>
+                @endif
             </div>
 
             <div class="risalah-header" style="font-family: 'Roboto', sans-serif !important;">
                 <h4 style="font-family: 'Roboto', sans-serif !important;">Pelaksanaan Audit</h4>
             </div>
             <div class="risalah-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                @if($masukanAuditor && $masukanAuditor->pelaksanaan_audit)
+                    <p>{{ $masukanAuditor->pelaksanaan_audit }}</p>
+                @else
+                    <p class="text-muted">Belum ada masukan untuk pelaksanaan audit</p>
+                @endif
             </div>
 
             <div class="risalah-header" style="font-family: 'Roboto', sans-serif !important;">
                 <h4 style="font-family: 'Roboto', sans-serif !important;">Saran untuk teraudit</h4>
             </div>
             <div class="risalah-body">
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                @if($masukanAuditor && $masukanAuditor->saran_teraudit)
+                    <p>{{ $masukanAuditor->saran_teraudit }}</p>
+                @else
+                    <p class="text-muted">Belum ada masukan untuk saran teraudit</p>
+                @endif
             </div>
         </div>
 
         <div class="signature-section">
             <div class="signature-right">
-                <p class="date">Bengkulu, 05 Mei 2025</p>
+                <p class="date">Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p class="signature">{{ Auth::user()->name }}</p>
                 <p>Auditor</p>
             </div>

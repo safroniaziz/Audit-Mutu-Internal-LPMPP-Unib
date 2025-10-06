@@ -275,7 +275,7 @@
             </tr>
             <tr>
                 <td class="info-cell">
-                    <strong>Tanggal:</strong> 5 Mei 2025
+                    <strong>Tanggal:</strong> {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}
                 </td>
             </tr>
             <tr>
@@ -416,14 +416,14 @@
 
         <div class="signature-section">
             <div class="signature-right">
-                <p class="date">Bengkulu, 05 Mei 2025</p>
+                <p class="date">Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p class="signature">{{ Auth::user()->name }}</p>
                 <p>Auditor</p>
             </div>
         </div>
 
         <div class="footer">
-            <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
+            <p>Dibuat pada {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y H:i') }} WIB</p>
             <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>

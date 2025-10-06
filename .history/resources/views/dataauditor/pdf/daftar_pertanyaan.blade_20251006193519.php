@@ -387,7 +387,7 @@
         </div>
 
         <div class="footer">
-            <p>Dibuat pada {{ \Carbon\Carbon::now()->translatedFormat('l, d F Y H:i') }} WIB</p>
+            <p>Dibuat pada Senin, 05 Mei 2025 14:00 WIB</p>
             <p>Sistem Integrasi Mutu UNIB Universitas Bengkulu</p>
         </div>
     </div>

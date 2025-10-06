@@ -261,6 +261,8 @@
             </tr>
         </table>
 
+
+
         <div class="header">
             <h1>LAPORAN AUDIT MUTU INTERNAL <br> (AMI) <br> {{ $pengajuanAmis->auditee->jenis_unit_kerja == "prodi" ? 'PROGRAM STUDI' : 'FAKULTAS' }}</h1>
             <p>{{ $periodeAktif->nomor_surat }}</p>
@@ -432,7 +434,14 @@
     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; height: 80px; min-width: 120px;">
         @foreach($pengajuanAmis->auditors as $penugasan)
             @if($penugasan->role == 'ketua')
-                {{-- <img src="{{ public_path('storage/' . $penugasan->auditor->ttd) }}" alt="TTD pendamping" style="max-height: 50px;"> --}}
+                @php
+                    $pathTtdKetua = public_path('storage/' . $penugasan->auditor->ttd);
+                @endphp
+                @if (file_exists($pathTtdKetua) && is_file($pathTtdKetua))
+                    <img src="{{ $pathTtdKetua }}" alt="TTD Ketua" style="max-height: 50px;">
+                @else
+                    <span>-</span>
+                @endif
             @endif
         @endforeach
     </td>
@@ -442,7 +451,14 @@
     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; height: 80px; min-width: 120px;">
         @foreach($pengajuanAmis->auditors as $penugasan)
             @if($penugasan->role == 'pendamping')
-                {{-- <img src="{{ public_path('storage/' . $penugasan->auditor->ttd) }}" alt="TTD pendamping" style="max-height: 50px;"> --}}
+                @php
+                    $pathTtdPendamping = public_path('storage/' . $penugasan->auditor->ttd);
+                @endphp
+                @if (file_exists($pathTtdPendamping) && is_file($pathTtdPendamping))
+                    <img src="{{ $pathTtdPendamping }}" alt="TTD pendamping" style="max-height: 50px;">
+                @else
+                    <span>-</span>
+                @endif
             @endif
         @endforeach
     </td>
@@ -455,7 +471,7 @@
         @endphp
 
         @if (file_exists($pathTtd) && is_file($pathTtd))
-            {{-- <img src="{{ $pathTtd }}" alt="TTD Auditee" style="max-height: 50px;"> --}}
+            <img src="{{ $pathTtd }}" alt="TTD Auditee" style="max-height: 50px;">
         @else
             <span>-</span>
         @endif
@@ -557,7 +573,30 @@
             </tbody>
         </table>
 
-        <div class="section-title" style="margin-top: 20px !important;">V. TEMUAN AUDIT</div>
+        <div class="section-title" style="margin-top: 20px !important;">V. PRESENSI</div>
+
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="5%">No</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Nama</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Peran</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: center; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="25%">Tanda Tangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for ($i = 1; $i <= 10; $i++)
+                    <tr>
+                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $i }}</td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                    </tr>
+                @endfor
+            </tbody>
+        </table>
+
+        <div class="section-title" style="margin-top: 20px !important;">VI. TEMUAN AUDIT</div>
 
         <p style="font-weight: bold; font-size:14px; color:#00447c;">1. Ketidaksesuaian</p>
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
@@ -711,6 +750,10 @@
                     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;">4</td>
                     <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;" colspan="4">Daftar Hadir ({{ $periodeAktif ? $periodeAktif->nomor_surat : '-' }})</td>
                 </tr>
+                <tr>
+                    <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;">5</td>
+                    <td style="border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 6px;" colspan="4">Penilaian Instrumen Prodi ({{ $periodeAktif ? $periodeAktif->nomor_surat : '-' }})</td>
+                </tr>
             </tbody>
         </table>
 
@@ -746,8 +789,66 @@
             </tbody>
         </table>
 
-        @if(isset($kriteriaScores) && count($kriteriaScores) > 0)
-        <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
+        @php
+            // Radar SS tepat di bawah tabel SS
+            $ssLabels = [];
+            $ssValues = [];
+            foreach (($sortedGrouped ?? []) as $item) {
+                if (!empty($item['has_data'])) {
+                    $ssLabels[] = $item['kode_satuan'];
+                    $ssValues[] = round((float)($item['rata_rata'] ?? 0), 2);
+                }
+            }
+            $ssConfig = [
+                'type' => 'radar',
+                'data' => [
+                    'labels' => $ssLabels,
+                    'datasets' => [[
+                        'label' => 'Nilai Sasaran Strategis',
+                        'data' => $ssValues,
+                        'fill' => true,
+                        'backgroundColor' => 'rgba(54, 162, 235, 0.2)',
+                        'borderColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBackgroundColor' => 'rgba(54, 162, 235, 1)',
+                        'pointBorderColor' => '#fff',
+                        'pointHoverBackgroundColor' => '#fff',
+                        'pointHoverBorderColor' => 'rgba(54, 162, 235, 1)',
+                        'pointRadius' => 3,
+                        'pointHoverRadius' => 5,
+                        'tension' => 0.2
+                    ]],
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'maintainAspectRatio' => true,
+                    'elements' => [ 'line' => [ 'borderWidth' => 2 ] ],
+                    'scales' => [
+                        'r' => [
+                            'min' => 0,
+                            'max' => 4,
+                            'beginAtZero' => true,
+                            'angleLines' => [ 'display' => true, 'color' => 'rgba(210,210,210,0.5)', 'lineWidth' => 1 ],
+                            'grid' => [ 'color' => 'rgba(210,210,210,0.5)', 'circular' => true, 'lineWidth' => 1 ],
+                            'ticks' => [ 'stepSize' => 1, 'backdropColor' => 'transparent', 'color' => '#666', 'font' => ['size' => 10] ],
+                            'pointLabels' => [ 'font' => ['size' => 10, 'weight' => 'bold'], 'color' => '#333', 'padding' => 15 ],
+                        ]
+                    ],
+                    'plugins' => [
+                        'legend' => [ 'position' => 'bottom', 'labels' => [ 'boxWidth' => 12, 'padding' => 15, 'font' => ['size' => 11] ] ],
+                    ],
+                ],
+            ];
+            $qcBase = 'https://quickchart.io/chart';
+            $ssUrl = $qcBase . '?version=4&width=700&height=500&backgroundColor=white&c=' . urlencode(json_encode($ssConfig, JSON_UNESCAPED_SLASHES));
+        @endphp
+        @if(!empty($ssLabels))
+            <div style="margin: 10px 0 30px;">
+                <div style="font-weight:bold; margin-bottom:8px;">Grafik Radar Sasaran Strategis</div>
+                <img src="{{ $ssUrl }}" alt="Radar Sasaran Strategis" style="width:100%; max-width:100%;">
+            </div>
+        @endif
+
+                <div class="section-title" style="margin-top: 30px !important;">IX. HASIL PENILAIAN INSTRUMEN PRODI</div>
 
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
             <thead>
@@ -766,22 +867,108 @@
                 @foreach ($kriteriaScores as $index => $kriteria)
                     <tr>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $index + 1 }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $kriteria['kode_kriteria'] }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $kriteria['kode_kriteria'] }}</td>
                         <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $kriteria['nama_kriteria'] }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai_ketua'], 2) }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai_anggota'], 2) }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['total_nilai'], 2) }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ $kriteria['jumlah_penilaian'] }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{ number_format($kriteria['rata_rata'], 2) }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai_ketua'] > 0)
+                                {{ number_format($kriteria['total_nilai_ketua'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai_anggota'] > 0)
+                                {{ number_format($kriteria['total_nilai_anggota'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['total_nilai'] > 0)
+                                {{ number_format($kriteria['total_nilai'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['jumlah_penilaian'] > 0)
+                                {{ $kriteria['jumlah_penilaian'] }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                            @if($kriteria['rata_rata'] > 0)
+                                {{ number_format($kriteria['rata_rata'], 2) }}
+                            @else
+                                <span style="color: red;">-</span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        @php
+            // Radar Prodi tepat di bawah tabel Prodi
+            $prodiLabels = [];
+            $prodiValues = [];
+            foreach (($kriteriaScores ?? []) as $item) {
+                $prodiLabels[] = $item['kode_kriteria'] ?? '';
+                $prodiValues[] = round((float)($item['rata_rata'] ?? 0), 2);
+            }
+            $prodiConfig = [
+                'type' => 'radar',
+                'data' => [
+                    'labels' => $prodiLabels,
+                    'datasets' => [[
+                        'label' => 'Nilai Instrumen Prodi',
+                        'data' => $prodiValues,
+                        'fill' => true,
+                        'backgroundColor' => 'rgba(40, 167, 69, 0.2)',
+                        'borderColor' => 'rgba(40, 167, 69, 1)',
+                        'pointBackgroundColor' => 'rgba(40, 167, 69, 1)',
+                        'pointBorderColor' => '#fff',
+                        'pointHoverBackgroundColor' => '#fff',
+                        'pointHoverBorderColor' => 'rgba(40, 167, 69, 1)',
+                        'pointRadius' => 3,
+                        'pointHoverRadius' => 5,
+                        'tension' => 0.2
+                    ]],
+                ],
+                'options' => [
+                    'responsive' => true,
+                    'maintainAspectRatio' => true,
+                    'elements' => [ 'line' => [ 'borderWidth' => 2 ] ],
+                    'scales' => [
+                        'r' => [
+                            'min' => 0,
+                            'max' => 4,
+                            'beginAtZero' => true,
+                            'angleLines' => [ 'display' => true, 'color' => 'rgba(210,210,210,0.5)', 'lineWidth' => 1 ],
+                            'grid' => [ 'color' => 'rgba(210,210,210,0.5)', 'circular' => true, 'lineWidth' => 1 ],
+                            'ticks' => [ 'stepSize' => 1, 'backdropColor' => 'transparent', 'color' => '#666', 'font' => ['size' => 10] ],
+                            'pointLabels' => [ 'font' => ['size' => 10, 'weight' => 'bold'], 'color' => '#333', 'padding' => 15 ],
+                        ]
+                    ],
+                    'plugins' => [
+                        'legend' => [ 'position' => 'bottom', 'labels' => [ 'boxWidth' => 12, 'padding' => 15, 'font' => ['size' => 11] ] ],
+                    ],
+                ],
+            ];
+            $qcBase = 'https://quickchart.io/chart';
+            $prodiUrl = $qcBase . '?version=4&width=700&height=500&backgroundColor=white&c=' . urlencode(json_encode($prodiConfig, JSON_UNESCAPED_SLASHES));
+        @endphp
+        @if(!empty($prodiLabels))
+            <div style="margin: 10px 0 30px;">
+                <div style="font-weight:bold; margin-bottom:8px;">Grafik Radar Instrumen Prodi</div>
+                <img src="{{ $prodiUrl }}" alt="Radar Instrumen Prodi" style="width:100%; max-width:100%;">
+            </div>
         @endif
 
         <div class="signature-section">
             <div class="signature-right">
-                <p class="date">Bengkulu, 05 Mei 2025</p>
+                <p class="date">Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
             </div>
         </div>
 
