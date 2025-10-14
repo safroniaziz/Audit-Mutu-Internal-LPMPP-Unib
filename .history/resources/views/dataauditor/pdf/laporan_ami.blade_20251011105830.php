@@ -986,20 +986,20 @@
         <div class="section-title" style="margin-top: 30px !important;">VI. KESIMPULAN AUDIT</div>
         <p>Hasil evaluasi yang dilakukan oleh tim audit menghasilkan kesimpulan sebagai berikut:</p>
 
-        <table class="kesimpulan-table">
-            <thead>
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+            <thead >
                 <tr>
-                    <th class="col-no-kesimpulan">No.</th>
-                    <th class="col-pertanyaan">Pertanyaan</th>
-                    <th class="col-jawaban">Jawaban</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="5%" class="text-center">No.</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Pertanyaan</th>
+                    <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;" width="15%" class="text-center">Jawaban</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($jawabanKuisioner as $index => $item)
                     <tr>
-                        <td class="col-no-kesimpulan">{{ $index + 1 }}</td>
-                        <td class="col-pertanyaan">{{ $item->kuisioner->pertanyaan }}</td>
-                        <td class="col-jawaban"><strong>{{ $item->opsi->opsi }}</strong></td>
+                        <td style="padding: 10px; border: 1px solid #ddd;" class="text-center align-middle">{{ $index + 1 }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;">{{ $item->kuisioner->pertanyaan }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd;" class="text-center"><strong>{{ $item->opsi->opsi }}</strong></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -1034,32 +1034,30 @@
 
         <div class="section-title" style="margin-top: 30px !important;">VIII. KETERCAPAIAN SASARAN STRATEGIS</div>
 
-        <table class="sasaran-strategis-table">
+        <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
             <thead>
-                <tr>
-                    <th class="col-no-ss">No</th>
-                    <th class="col-kode-satuan">Kode Satuan</th>
-                    <th class="col-sasaran">Sasaran</th>
-                    <th class="col-nilai-ketua">Total Nilai Ketua</th>
-                    <th class="col-nilai-anggota">Total Nilai Anggota</th>
-                    <th class="col-total-nilai">Total Nilai</th>
-                    <th class="col-jml-penilaian">Jumlah Penilaian</th>
-                    <th class="col-rata-rata">Rata-Rata</th>
-                </tr>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">No</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Kode Satuan</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold;">Sasaran</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold; text-align:center;">Total Nilai Ketua</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold; text-align:center;">Total Nilai Anggota</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold; text-align:center;">Total Nilai</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold; text-align:center;">Jumlah Penilaian</th>
+                <th style="padding: 10px; border: 1px solid #ddd; text-align: left; background-color: #00447c; font-size:12px; font-family: 'Roboto', sans-serif !important; color:white; font-weight: bold; text-align:center;">Rata-Rata</th>
             </thead>
             <tbody>
                 @php $counter = 1; @endphp
                 @foreach ($sortedGrouped as $group)
                     @if($group['has_data'])
                         <tr>
-                            <td class="col-no-ss">{{ $counter++ }}</td>
-                            <td class="col-kode-satuan">{{ $group['kode_satuan'] }}</td>
-                            <td class="col-sasaran">{{ $group['sasaran'] }}</td>
-                            <td class="col-nilai-ketua">{{ number_format($group['total_nilai_ketua'], 2) }}</td>
-                            <td class="col-nilai-anggota">{{ number_format($group['total_nilai_anggota'], 2) }}</td>
-                            <td class="col-total-nilai">{{ number_format($group['total_nilai'], 2) }}</td>
-                            <td class="col-jml-penilaian">{{ $group['jumlah_penilaian'] }}</td>
-                            <td class="col-rata-rata">{{ number_format($group['rata_rata'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $counter++ }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $group['kode_satuan'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $group['sasaran'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai_ketua'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai_anggota'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ $group['jumlah_penilaian'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['rata_rata'], 2) }}</td>
                         </tr>
                     @endif
                 @endforeach

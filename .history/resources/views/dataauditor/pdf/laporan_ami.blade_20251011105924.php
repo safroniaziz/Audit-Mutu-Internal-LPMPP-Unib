@@ -1052,14 +1052,14 @@
                 @foreach ($sortedGrouped as $group)
                     @if($group['has_data'])
                         <tr>
-                            <td class="col-no-ss">{{ $counter++ }}</td>
-                            <td class="col-kode-satuan">{{ $group['kode_satuan'] }}</td>
-                            <td class="col-sasaran">{{ $group['sasaran'] }}</td>
-                            <td class="col-nilai-ketua">{{ number_format($group['total_nilai_ketua'], 2) }}</td>
-                            <td class="col-nilai-anggota">{{ number_format($group['total_nilai_anggota'], 2) }}</td>
-                            <td class="col-total-nilai">{{ number_format($group['total_nilai'], 2) }}</td>
-                            <td class="col-jml-penilaian">{{ $group['jumlah_penilaian'] }}</td>
-                            <td class="col-rata-rata">{{ number_format($group['rata_rata'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $counter++ }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $group['kode_satuan'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd;">{{ $group['sasaran'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai_ketua'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai_anggota'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['total_nilai'], 2) }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ $group['jumlah_penilaian'] }}</td>
+                            <td style="padding: 10px; border: 1px solid #ddd; text-align:center;">{{ number_format($group['rata_rata'], 2) }}</td>
                         </tr>
                     @endif
                 @endforeach
