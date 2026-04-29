@@ -804,6 +804,20 @@
         <div class="section-title">IV. JADWAL AUDIT</div>
         <p>Hari/Tanggal Audit : {{ \Carbon\Carbon::parse($pengajuanAmis->waktu)->translatedFormat('l, d F Y') }}</p>
 
+        @php
+            $defaultJadwalAudit = [
+                1 => 'Pembukaan & Pertemuan dengan Kaprodi',
+                2 => 'Pertemuan dengan Staf Dosen',
+                3 => 'Pertemuan dengan Karyawan',
+                4 => 'Pertemuan dengan Mahasiswa',
+                5 => 'Pertemuan dengan alumni/pengguna lulusan (jika ada)',
+                6 => 'Penyampaian Temuan & Penutupan',
+            ];
+
+            $jadwalAuditRows = collect($laporanAmiJadwal ?? [])->keyBy('no');
+            $presensiRows = collect($laporanAmiPresensi ?? [])->keyBy('no');
+        @endphp
+
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
             <thead>
                 <tr>
@@ -813,40 +827,33 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">1</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Pembukaan & Pertemuan dengan Kaprodi</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">2</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Pertemuan dengan Staf Dosen</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">3</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Pertemuan dengan Karyawan</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">4</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Pertemuan dengan Mahasiswa</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">5</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Pertemuan dengan alumni/pengguna lulusan (jika ada)</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">6</td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;"></td>
-                    <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">Penyampaian Temuan & Penutupan</td>
-                </tr>
+                @for ($i = 1; $i <= 6; $i++)
+                    @php
+                        $jadwalRow = $jadwalAuditRows->get($i, []);
+                    @endphp
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $i }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $jadwalRow['jam'] ?? '' }}</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; text-align: left;">{{ $defaultJadwalAudit[$i] }}</td>
+                    </tr>
+                @endfor
             </tbody>
         </table>
 
         <div class="section-title" style="margin-top: 20px !important;">V. PRESENSI</div>
+
+        @php
+            $presensiPrintRows = collect($laporanAmiPresensi ?? [])->values();
+            if ($presensiPrintRows->isEmpty()) {
+                $presensiPrintRows = collect(range(1, 10))->map(function ($n) {
+                    return [
+                        'no' => $n,
+                        'nama' => '',
+                        'peran' => '',
+                    ];
+                });
+            }
+        @endphp
 
         <table class="tujuanAudit" style="width: 100%; border-collapse: collapse; margin-top: 5px;">
             <thead>
@@ -858,14 +865,14 @@
                 </tr>
             </thead>
             <tbody>
-                @for ($i = 1; $i <= 10; $i++)
+                @foreach ($presensiPrintRows as $index => $presensiRow)
                     <tr>
-                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $i }}</td>
-                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
-                        <td style="padding: 18px; border: 1px solid #ddd;"></td>
+                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $presensiRow['no'] ?? ($index + 1) }}</td>
+                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $presensiRow['nama'] ?? '' }}</td>
+                        <td style="padding: 18px; border: 1px solid #ddd;">{{ $presensiRow['peran'] ?? '' }}</td>
                         <td style="padding: 18px; border: 1px solid #ddd;"></td>
                     </tr>
-                @endfor
+                @endforeach
             </tbody>
         </table>
 

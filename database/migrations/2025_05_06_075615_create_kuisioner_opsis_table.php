@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('kuisioner_opsis')) {
+            return;
+        }
+
         Schema::create('kuisioner_opsis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kuisioner_id')

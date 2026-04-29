@@ -172,7 +172,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui dokumen Perjanjian Kinerja karena belum ada pengajuan AMI yang disubmit untuk periode ini. Setelah pengajuan AMI disubmit, data tidak dapat diubah lagi.
+                                    Anda masih dapat mengubah dan memperbarui dokumen Perjanjian Kinerja selama belum ada penugasan auditor untuk periode ini. Setelah auditor ditugaskan, data tidak dapat diubah lagi.
                                 </span>
                             </p>
                         </div>
@@ -221,12 +221,69 @@
                 @endif
             </div>
 
+            @if(!$pengajuanAmiExists && !$perjanjianKinerja)
+                @if(isset($previousPerjanjianKinerja) && $previousPerjanjianKinerja)
+                    <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
+                        <div class="me-4">
+                            <i class="bi bi-arrow-repeat fs-2 text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-dark mb-2">Gunakan Dokumen Perjanjian Kinerja Dari Periode Sebelumnya</h4>
+                            <div class="fs-6 text-gray-700 mb-3">
+                                Dokumen Perjanjian Kinerja dari <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong> ditemukan:
+                                <div class="mt-2">
+                                    <strong>{{ $previousPerjanjianKinerja->nama_file }}</strong>
+                                    ({{ number_format(($previousPerjanjianKinerja->size ?? 0) / 1024, 2) }} KB)
+                                </div>
+                            </div>
+                            <div class="fs-7 text-gray-700 mb-3">
+                                Cara pakai: klik tombol <strong>Pakai Dokumen Lama & Simpan</strong>.
+                                Sistem akan menyimpan dokumen itu ke periode aktif saat ini.
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{{ Storage::url($previousPerjanjianKinerja->file_path) }}" class="btn btn-sm btn-light-primary" target="_blank">
+                                    <i class="bi bi-eye me-2"></i>Lihat Dokumen Lama
+                                </a>
+                                <button type="button" class="btn btn-sm btn-warning" id="usePreviousBtn">
+                                    <i class="bi bi-check2-circle me-2"></i>Pakai Dokumen Lama & Simpan
+                                </button>
+                                <button type="button" class="btn btn-sm btn-light-dark" id="chooseUploadBtn">
+                                    <i class="bi bi-upload me-2"></i>Ganti Dengan Upload Baru
+                                </button>
+                            </div>
+                            <div class="fs-7 text-danger mt-3">
+                                Wajib simpan salah satu opsi (pakai dokumen lama atau upload baru) sebelum lanjut ke proses berikutnya.
+                            </div>
+                        </div>
+                    </div>
+                @elseif(!empty($hasPreviousPeriode))
+                    <div class="alert alert-danger d-flex align-items-start p-5 mb-10">
+                        <div class="me-4">
+                            <i class="bi bi-exclamation-triangle-fill fs-2 text-danger"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-dark mb-2">Dokumen Periode Sebelumnya Belum Ditemukan</h4>
+                            <div class="fs-6 text-gray-700">
+                                Periode aktif sudah terhubung ke <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong>,
+                                tetapi dokumen Perjanjian Kinerja di periode tersebut tidak ditemukan.
+                                Silakan unggah dokumen baru untuk periode aktif ini.
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @endif
+
             <div class="row">
                 <div class="col-12">
                     @if($perjanjianKinerja && $perjanjianKinerja->file_path)
                         <div class="uploaded-file-info mb-8">
                             <i class="bi bi-file-earmark-pdf text-danger icon"></i>
                             <h3 class="fs-2 fw-bold mb-3">Dokumen Telah Diunggah</h3>
+                            @if(!empty($isCurrentFromPrevious))
+                                <div class="badge badge-light-warning fs-8 mb-3">
+                                    Sumber: Perjanjian Kinerja {{ $previousPeriodeLabel ?? 'periode sebelumnya' }}
+                                </div>
+                            @endif
                             <p class="text-gray-600 mb-5">
                                 Nama File: {{ $perjanjianKinerja->nama_file }}<br>
                                 Ukuran: {{ number_format($perjanjianKinerja->size / 1024, 2) }} KB
@@ -237,11 +294,7 @@
                                 </a>
                                 @if($perjanjianKinerja)
                                     @php
-                                        // Cek apakah sudah ada pengajuan AMI
-                                        $pengajuanAmi = \App\Models\PengajuanAmi::where('auditee_id', auth()->user()->unit_kerja_id)
-                                            ->where('periode_id', $periodeAktif->id)
-                                            ->first();
-                                        $canDelete = !$pengajuanAmi;
+                                        $canDelete = !$pengajuanAmiExists;
                                     @endphp
 
                                     @if($canDelete)
@@ -249,7 +302,7 @@
                                             <i class="bi bi-trash me-2"></i>Hapus Dokumen
                                         </button>
                                     @else
-                                        <button type="button" class="btn btn-sm btn-secondary" disabled title="Tidak dapat dihapus karena sudah ada pengajuan AMI">
+                                        <button type="button" class="btn btn-sm btn-secondary" disabled title="Tidak dapat dihapus karena penugasan auditor sudah dibuat">
                                             <i class="bi bi-lock me-2"></i>Tidak Dapat Dihapus
                                         </button>
                                     @endif
@@ -261,17 +314,13 @@
                     <form id="uploadForm" class="form" action="{{ route('auditee.pengajuanAmi.uploadPerjanjianKinerja') }}" method="POST" enctype="multipart/form-data" {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'style=display:none' : '' }}>
                         @csrf
                         @php
-                            // Cek apakah sudah ada pengajuan AMI
-                            $pengajuanAmi = \App\Models\PengajuanAmi::where('auditee_id', auth()->user()->unit_kerja_id)
-                                ->where('periode_id', $periodeAktif->id)
-                                ->first();
-                            $canUpload = !$pengajuanAmi;
+                            $canUpload = !$pengajuanAmiExists;
                         @endphp
 
                         @if(!$canUpload)
                             <div class="alert alert-warning mb-5">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Perhatian:</strong> Form upload telah dinonaktifkan karena sudah ada pengajuan AMI di entitas dan periode yang sama.
+                                <strong>Perhatian:</strong> Form upload telah dinonaktifkan karena penugasan auditor untuk periode ini sudah dibuat.
                             </div>
                         @endif
 
@@ -324,6 +373,66 @@
         const uploadForm = $('#uploadForm');
         const submitBtn = $('#submitBtn');
         const fileList = $('#fileList');
+        const usePreviousBtn = $('#usePreviousBtn');
+        const chooseUploadBtn = $('#chooseUploadBtn');
+
+        chooseUploadBtn.on('click', function() {
+            const uploadSection = $('#uploadForm');
+            if (uploadSection.length) {
+                $('html, body').animate({
+                    scrollTop: uploadSection.offset().top - 120
+                }, 300);
+                fileInput.trigger('click');
+            }
+        });
+
+        usePreviousBtn.on('click', function() {
+            Swal.fire({
+                title: 'Pakai dokumen sebelumnya?',
+                text: 'Dokumen periode sebelumnya akan disimpan sebagai dokumen Perjanjian Kinerja periode aktif.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, pakai',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#3085d6'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ route("auditee.pengajuanAmi.usePreviousPerjanjianKinerja") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonText: 'Ok'
+                            }).then(() => {
+                                window.location.href = response.redirect_url;
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Terjadi kesalahan saat memakai dokumen periode sebelumnya.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                });
+            });
+        });
 
         // Browse files button
         $('#browseFilesBtn').on('click', function() {

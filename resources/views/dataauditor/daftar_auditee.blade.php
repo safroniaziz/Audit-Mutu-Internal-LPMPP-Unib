@@ -71,6 +71,9 @@
                             $endedPeriods = $auditess->filter(function($auditee) {
                                 return $auditee->audit_period_status === 'ended';
                             });
+                            $inactivePeriods = $auditess->filter(function($auditee) {
+                                return $auditee->audit_period_status === 'inactive_period';
+                            });
                         @endphp
                         @if($notStartedPeriods->count() > 0)
                             <div class="mt-3 p-3 bg-info bg-opacity-10 border border-info border-opacity-25 rounded">
@@ -84,6 +87,13 @@
                                 <i class="fas fa-exclamation-triangle text-warning me-2"></i>
                                 <strong>Perhatian:</strong> {{ $endedPeriods->count() }} auditee belum dapat diaudit karena jadwal audit sudah berakhir.
                                 Tombol "Mulai Audit" dan "Lanjutkan" akan aktif setelah jadwal audit diperpanjang.
+                            </div>
+                        @endif
+                        @if($inactivePeriods->count() > 0)
+                            <div class="mt-3 p-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 rounded">
+                                <i class="fas fa-ban text-secondary me-2"></i>
+                                <strong>Informasi:</strong> {{ $inactivePeriods->count() }} auditee berada di periode yang tidak aktif.
+                                Audit hanya bisa dilakukan pada periode aktif saat ini.
                             </div>
                         @endif
                     </div>
@@ -365,6 +375,8 @@
                                                     <span class="fw-bold fs-7 text-dark">
                                                         @if($auditee->audit_period_status === 'active')
                                                             Aktif
+                                                        @elseif($auditee->audit_period_status === 'inactive_period')
+                                                            Periode Tidak Aktif
                                                         @elseif($auditee->audit_period_status === 'not_started')
                                                             Belum Mulai
                                                         @elseif($auditee->audit_period_status === 'ended')
@@ -455,6 +467,8 @@
                                                 <i class="fas fa-calendar-times me-1"></i>
                                                 @if($auditee->audit_period_status === 'not_started')
                                                     Jadwal Audit Belum Mulai
+                                                @elseif($auditee->audit_period_status === 'inactive_period')
+                                                    Periode Tidak Aktif
                                                 @elseif($auditee->audit_period_status === 'ended')
                                                     Jadwal Audit Sudah Berakhir
                                                 @else

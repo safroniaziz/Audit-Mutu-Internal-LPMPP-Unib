@@ -108,7 +108,12 @@
                         </a>
                     </div>
 
-                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('indikatorInstrumen.index','kriteriaInstrumen.index','instrumenProdi.index') ? 'show' : '' }}">
+                    @php
+                        $selectedFakultas = request()->query('fakultas');
+                        $selectedProdiId = (string) request()->query('prodi_id', '');
+                        $isAuditeeFilterActive = !empty($selectedFakultas) || !empty($selectedProdiId);
+                    @endphp
+                    <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ Route::is('indikatorInstrumen.*','kriteriaInstrumen.*','instrumenProdi.*') || (Route::is('indikatorInstrumen.index') && $isAuditeeFilterActive) ? 'show' : '' }}">
                         <!--begin:Menu link-->
                         <span class="menu-link">
                             <span class="menu-icon">
@@ -122,30 +127,54 @@
                         <div class="menu-sub menu-sub-accordion">
                             <!--begin:Menu item-->
                             <div class="menu-item">
-                                <a class="menu-link {{ Route::is('indikatorInstrumen.index') ? 'active' : '' }}" href="{{ route('indikatorInstrumen.index') }}">
+                                <a class="menu-link {{ Route::is('indikatorInstrumen.*','kriteriaInstrumen.*','instrumenProdi.*') ? 'active' : '' }}" href="{{ route('indikatorInstrumen.index') }}">
                                     <span class="menu-bullet">
                                         <span class="bullet bullet-dot"></span>
                                     </span>
-                                    <span class="menu-title">Indikator Penilaian</span>
-                                </a>
-                            </div>
-                            <div class="menu-item">
-                                <a class="menu-link {{ Route::is('kriteriaInstrumen.index') ? 'active' : '' }}" href="{{ route('kriteriaInstrumen.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
-                                    </span>
-                                    <span class="menu-title">Kriteria Penilaian</span>
+                                    <span class="menu-title">Kelola Instrumen Prodi</span>
                                 </a>
                             </div>
 
-                            <div class="menu-item">
-                                <a class="menu-link {{ Route::is('instrumenProdi.index') ? 'active' : '' }}" href="{{ route('instrumenProdi.index') }}">
-                                    <span class="menu-bullet">
-                                        <span class="bullet bullet-dot"></span>
+                            @foreach(($sidebarFakultasAuditee ?? collect()) as $fakultasName => $auditees)
+                                @php
+                                    $isFakultasOpen = Route::is('indikatorInstrumen.*') && (
+                                        $selectedFakultas === $fakultasName || $auditees->contains(function ($auditee) use ($selectedProdiId) {
+                                            return (string) $auditee->id === $selectedProdiId;
+                                        })
+                                    );
+                                @endphp
+                                <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ $isFakultasOpen ? 'show' : '' }}">
+                                    <span class="menu-link {{ Route::is('indikatorInstrumen.index') && $selectedFakultas === $fakultasName && !$selectedProdiId ? 'active' : '' }}">
+                                        <span class="menu-bullet">
+                                            <span class="bullet bullet-dot"></span>
+                                        </span>
+                                        <span class="menu-title">{{ $fakultasName }}</span>
+                                        <span class="menu-arrow"></span>
                                     </span>
-                                    <span class="menu-title">Elemen Penilaian</span>
-                                </a>
-                            </div>
+                                    <div class="menu-sub menu-sub-accordion">
+                                        @forelse($auditees as $auditee)
+                                            <div class="menu-item">
+                                                <a class="menu-link {{ Route::is('indikatorInstrumen.index') && (string) $auditee->id === $selectedProdiId ? 'active' : '' }}"
+                                                   href="{{ route('indikatorInstrumen.index', ['fakultas' => $fakultasName, 'prodi_id' => $auditee->id]) }}">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title">{{ $auditee->nama_unit_kerja }}{{ $auditee->jenjang ? ' (' . $auditee->jenjang . ')' : '' }}</span>
+                                                </a>
+                                            </div>
+                                        @empty
+                                            <div class="menu-item">
+                                                <span class="menu-link disabled">
+                                                    <span class="menu-bullet">
+                                                        <span class="bullet bullet-dot"></span>
+                                                    </span>
+                                                    <span class="menu-title text-muted">Belum ada auditee</span>
+                                                </span>
+                                            </div>
+                                        @endforelse
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                         <!--end:Menu sub-->
                     </div>
@@ -258,6 +287,28 @@
                                 <i class="fa fa-file-alt fs-4"></i>
                             </span>
                             <span class="menu-title">Laporan AMI</span>
+                        </a>
+                        <!--end:Menu link-->
+                    </div>
+
+                    <div class="menu-item {{ Route::is('dashboardNilaiAmi.index') ? 'show' : '' }}">
+                        <!--begin:Menu link-->
+                        <a class="menu-link {{ Route::is('dashboardNilaiAmi.index') ? 'active' : '' }}" href="{{ route('dashboardNilaiAmi.index') }}">
+                            <span class="menu-icon">
+                                <i class="fas fa-chart-pie fs-4"></i>
+                            </span>
+                            <span class="menu-title">Visualisasi Nilai</span>
+                        </a>
+                        <!--end:Menu link-->
+                    </div>
+
+                    <div class="menu-item {{ Route::is('dashboardNilaiAmi.index') ? 'show' : '' }}">
+                        <!--begin:Menu link-->
+                        <a class="menu-link {{ Route::is('dashboardNilaiAmi.index') ? 'active' : '' }}" href="{{ url('/indikator-rtm') }}">
+                            <span class="menu-icon">
+                                <i class="fas fa-tachometer-alt fs-4"></i>
+                            </span>
+                            <span class="menu-title">Indikator RTM</span>
                         </a>
                         <!--end:Menu link-->
                     </div>

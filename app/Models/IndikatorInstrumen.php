@@ -14,6 +14,9 @@ class IndikatorInstrumen extends Model
 
     protected $table = 'indikator_instrumens';
     protected $guarded = [];
+    protected $casts = [
+        'threshold' => 'float',
+    ];
 
     // Relasi many-to-many dengan UnitKerja (Prodi)
     public function prodis()

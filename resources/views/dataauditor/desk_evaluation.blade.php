@@ -1,15 +1,17 @@
 @extends('dataauditor/dashboard_template')
 @section('menuPenilaianInstrumenProdi')
     <li class="nav-item mt-2">
-        <a class="nav-link text-active-primary ms-0 me-10 py-5">
+        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
             <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
         </a>
     </li>
+@endsection
+
 @section('menuUnduhDokumen')
     @foreach($pengajuan->auditors as $penugasan)
         @if($penugasan->role == 'ketua' && $penugasan->user_id == Auth::id())
             <li class="nav-item mt-2">
-                <a class="nav-link text-active-primary ms-0 me-10 py-5">
+                <a href="{{ route('auditor.audit.unduhDokumen', $pengajuan->id) }}" class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.unduhDokumen') ? 'active' : '' }}">
                     <i class="fas fa-download me-2"></i> Unduh Dokumen
                 </a>
             </li>
@@ -117,8 +119,8 @@
         /* Wizard navigation styles */
         .wizard-nav {
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-x: scroll !important;
+            overflow-y: hidden !important;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
@@ -128,6 +130,14 @@
             /* Force scrollbar to be visible */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            flex-wrap: nowrap !important;
+            cursor: grab;
+        }
+
+        .wizard-nav:active {
+            cursor: grabbing;
         }
 
         .wizard-nav::-webkit-scrollbar {
@@ -328,9 +338,9 @@
                                     @if($allCompleted)
                                         {{ $totalCompleted }} dari {{ $totalIkss }} instrumen telah dievaluasi dengan lengkap.
                                         @if(!($isPenilaianProdiApproved ?? false))
-                                            <br>Silakan klik tombol <strong>Setujui</strong> untuk melanjutkan ke tahap <strong>Visitasi</strong>.
+                                            <br>Silakan klik tombol <strong>Setujui</strong> untuk melanjutkan ke tahap <strong>Penilaian Instrumen Prodi</strong>.
                                         @else
-                                            <br>Silakan lanjut ke tahap <strong>Visitasi</strong>.
+                                            <br>Silakan lanjut ke tahap <strong>Penilaian Instrumen Prodi</strong>.
                                         @endif
                                     @else
                                         {{ $totalCompleted }} dari {{ $totalIkss }} instrumen telah dievaluasi.
@@ -344,8 +354,8 @@
                     <div class="ms-auto">
                         @if($allCompleted)
                             @if($setuju)
-                                <a href="{{ route('auditor.audit.visitasi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Visitasi
+                                <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
                                 </a>
                             @else
                                 <button type="button" class="btn btn-sm px-4 btn-success" id="approve-desk-btn" data-id="{{ $pengajuan->id }}">
@@ -630,6 +640,92 @@
     $(document).ready(function() {
         // Initial setup - ensure only first section is visible
         initializeWizard();
+
+        const wizardNav = $('.wizard-nav');
+        let isDraggingNav = false;
+        let navStartX = 0;
+        let navStartScrollLeft = 0;
+        let navMoved = false;
+
+        // Unified wheel/trackpad scrolling handler
+        wizardNav.on('wheel', function(e) {
+            const nav = this;
+            if (nav.scrollWidth <= nav.clientWidth) {
+                return;
+            }
+
+            const deltaX = e.originalEvent.deltaX;
+            const deltaY = e.originalEvent.deltaY;
+
+            if (deltaX !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaX;
+            } else if (deltaY !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaY;
+            }
+        }, { passive: false });
+
+        // Add trackpad swipe support using pointer events
+        let pointerStartX = 0;
+        let pointerStartY = 0;
+        let isPointerDown = false;
+
+        wizardNav.on('pointerdown', function(e) {
+            isPointerDown = true;
+            pointerStartX = e.pageX;
+            pointerStartY = e.pageY;
+            wizardNav.css('cursor', 'grabbing');
+        });
+
+        wizardNav.on('pointerup pointerleave', function(e) {
+            isPointerDown = false;
+            wizardNav.css('cursor', 'grab');
+        });
+
+        wizardNav.on('pointermove', function(e) {
+            if (!isPointerDown) return;
+
+            const deltaX = e.pageX - pointerStartX;
+            const deltaY = e.pageY - pointerStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                e.preventDefault();
+                wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+                pointerStartX = e.pageX;
+            }
+        });
+
+        // Keep original drag functionality
+        wizardNav.on('mousedown', function(e) {
+            isDraggingNav = true;
+            navMoved = false;
+            navStartX = e.pageX;
+            navStartScrollLeft = this.scrollLeft;
+            wizardNav.css('cursor', 'grabbing');
+        });
+
+        $(document).on('mousemove', function(e) {
+            if (!isDraggingNav) return;
+            const delta = e.pageX - navStartX;
+            if (Math.abs(delta) > 5) {
+                navMoved = true;
+            }
+            wizardNav[0].scrollLeft = navStartScrollLeft - delta;
+        });
+
+        $(document).on('mouseup', function() {
+            isDraggingNav = false;
+            wizardNav.css('cursor', 'grab');
+        });
+
+        wizardNav.find('.wizard-step').on('click', function(e) {
+            if (navMoved) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                navMoved = false;
+            }
+        });
 
         // Auto scroll to form after reload
         if ($('.wizard-content.active').length) {

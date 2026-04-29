@@ -208,6 +208,17 @@
                                 </div>
                                 <!--end::Status Badge-->
 
+                                <div class="mb-3">
+                                    <span class="text-muted fw-semibold fs-8 d-block">Periode Sebelumnya</span>
+                                    <span class="fw-bold fs-7">
+                                        @if($periodeAktif->previousPeriode)
+                                            {{ $periodeAktif->previousPeriode->nomor_surat }} (Siklus {{ $periodeAktif->previousPeriode->siklus }}/{{ $periodeAktif->previousPeriode->tahun_ami }})
+                                        @else
+                                            -
+                                        @endif
+                                    </span>
+                                </div>
+
                                 <!--begin::Info Row-->
                                 <div class="row g-3 mb-4">
                                     <div class="col-6">
@@ -604,6 +615,20 @@
         .periode-card:nth-child(2) { animation-delay: 0.2s; }
         .periode-card:nth-child(3) { animation-delay: 0.3s; }
         .periode-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .dropdown-menu {
+            z-index: 9999 !important;
+            position: absolute !important;
+        }
+
+        .card-footer .dropdown {
+            position: static;
+        }
+
+        .card-footer .dropdown .dropdown-menu {
+            position: absolute;
+            z-index: 9999 !important;
+        }
     </style>
 
     <!-- Enhanced JavaScript -->
@@ -934,19 +959,3 @@
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     @endpush
 @endsection
-
-/* Alternative solution with higher z-index */
-.dropdown-menu {
-    z-index: 9999 !important;
-    position: absolute !important;
-}
-
-/* Ensure proper stacking context */
-.card-footer .dropdown {
-    position: static;
-}
-
-.card-footer .dropdown .dropdown-menu {
-    position: absolute;
-    z-index: 9999 !important;
-}

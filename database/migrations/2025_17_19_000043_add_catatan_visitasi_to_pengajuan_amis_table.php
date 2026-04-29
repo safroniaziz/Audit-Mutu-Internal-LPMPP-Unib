@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pengajuan_amis', function (Blueprint $table) {
-            $table->text('catatan_visitasi')->nullable()->after('waktu');
-        });
+        if (!Schema::hasColumn('pengajuan_amis', 'catatan_visitasi')) {
+            Schema::table('pengajuan_amis', function (Blueprint $table) {
+                $table->text('catatan_visitasi')->nullable()->after('waktu');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pengajuan_amis', function (Blueprint $table) {
-            $table->dropColumn('catatan_visitasi');
-        });
+        if (Schema::hasColumn('pengajuan_amis', 'catatan_visitasi')) {
+            Schema::table('pengajuan_amis', function (Blueprint $table) {
+                $table->dropColumn('catatan_visitasi');
+            });
+        }
     }
 };

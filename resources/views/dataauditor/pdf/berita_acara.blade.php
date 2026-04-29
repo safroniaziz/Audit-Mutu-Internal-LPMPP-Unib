@@ -244,10 +244,30 @@
         </table>
 
         <!-- Tanda Tangan -->
+        @php
+            $pathTtdAuditor = Auth::user()->ttd ? public_path('storage/' . Auth::user()->ttd) : null;
+            $pathTtdAuditee = $pengajuan->auditee->ttd ? public_path('storage/' . $pengajuan->auditee->ttd) : null;
+        @endphp
         <table class="ttd-table">
             <tr>
                 <td>Auditor</td>
                 <td>Auditee</td>
+            </tr>
+            <tr>
+                <td style="height: 70px;">
+                    @if($pathTtdAuditor && file_exists($pathTtdAuditor) && is_file($pathTtdAuditor))
+                        <img src="{{ $pathTtdAuditor }}" alt="TTD Auditor" style="max-height: 55px;">
+                    @else
+                        -
+                    @endif
+                </td>
+                <td style="height: 70px;">
+                    @if($pathTtdAuditee && file_exists($pathTtdAuditee) && is_file($pathTtdAuditee))
+                        <img src="{{ $pathTtdAuditee }}" alt="TTD Auditee" style="max-height: 55px;">
+                    @else
+                        -
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td>({{ Auth::user()->name }})</td>

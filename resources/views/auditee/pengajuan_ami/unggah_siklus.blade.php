@@ -114,7 +114,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, Pengisian Instrumen, dan Pengisian Instrumen Prodi) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, Pengisian Instrumen, dan Pengisian Instrumen Prodi) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>

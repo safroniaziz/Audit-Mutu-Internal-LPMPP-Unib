@@ -62,6 +62,30 @@
             transform: translateY(-5px);
             box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
         }
+
+        .section-separator {
+            border-top: 1px dashed #d0d5dd;
+            margin: 1.5rem 0 0;
+            padding: 1.25rem 2.25rem 0;
+        }
+
+        .period-chip {
+            background: #f8f5ff;
+            border: 1px solid #e7defc;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .profile-section-title {
+            background: #f5f8ff;
+            border: 1px solid #dce7ff;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+        }
+
+        .content-inset {
+            padding: 0 2.25rem;
+        }
     </style>
 @endpush
 @section('dashboardProfile')
@@ -93,6 +117,16 @@
                     </div>
                 @endif
 
+                @if (session('error'))
+                    <div class="alert alert-danger d-flex align-items-center p-5 mb-10">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 text-danger me-4"></i>
+                        <div class="d-flex flex-column">
+                            <h4 class="mb-1 text-dark">Akses Dibatasi</h4>
+                            <span class="fs-6 text-gray-700">{{ session('error') }}</span>
+                        </div>
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert alert-danger d-flex align-items-center p-5 mb-10">
                         <i class="bi bi-exclamation-triangle-fill fs-2 text-danger me-4"></i>
@@ -107,10 +141,156 @@
                     </div>
                 @endif
 
+                <div class="content-inset pt-6">
+                    @if(isset($hasPreviousRtl) && !$hasPreviousRtl)
+                        <div class="card border border-warning mb-10">
+                            <div class="card-header bg-light-warning">
+                                <h4 class="card-title fw-bold text-dark mb-0">
+                                    <i class="bi bi-upload text-warning me-2"></i>Wajib Upload RTL Periode Sebelumnya
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-4 text-gray-700">
+                                    Sebelum lanjut ke periode aktif saat ini, upload dulu dokumen RTL untuk
+                                    <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong>.
+                                </p>
+                                <form id="uploadRtlPreviousForm" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="row g-3 align-items-end">
+                                        <div class="col-lg-8">
+                                            <label class="form-label fw-semibold">Dokumen RTL</label>
+                                            <input type="file" name="file_rtl" id="fileRtlPrevious" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
+                                            <small class="text-muted">Format: PDF/DOC/DOCX/XLS/XLSX/JPG/PNG, max 10MB.</small>
+                                        </div>
+                                        <div class="col-lg-4 d-flex gap-2">
+                                            <button type="submit" class="btn btn-warning w-100" id="btnUploadRtlPrevious">
+                                                <i class="bi bi-cloud-upload me-1"></i> Upload RTL
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    @elseif(isset($previousRtlFile) && $previousRtlFile)
+                        <div class="alert alert-success d-flex align-items-center p-4 mb-10">
+                            <i class="bi bi-check-circle-fill fs-2 text-success me-3"></i>
+                            <div class="flex-grow-1">
+                                RTL periode sebelumnya sudah terunggah:
+                                <a href="{{ asset('storage/' . $previousRtlFile->path) }}" target="_blank" class="fw-bold text-decoration-underline">
+                                    {{ $previousRtlFile->nama_berkas }}
+                                </a>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-light-danger" id="btnDeleteRtlPrevious">
+                                <i class="bi bi-trash me-1"></i> Hapus
+                            </button>
+                        </div>
+                    @endif
+
+                    <div class="card border border-gray-300 mb-12 position-relative">
+                    <div class="card-header bg-light-primary py-4">
+                        <div>
+                            <h4 class="card-title fw-bold text-dark mb-1">
+                                <i class="bi bi-diagram-3 me-2 text-primary"></i>Status Tahapan Pengajuan AMI
+                            </h4>
+                            @if($periodeAktif)
+                                <div class="d-flex flex-wrap gap-2 mt-2">
+                                    <span class="period-chip fs-8 text-dark">
+                                        <i class="bi bi-calendar-event me-1 text-primary"></i>
+                                        Periode Aktif:
+                                        <strong>
+                                            Siklus {{ $periodeAktif->siklus }}/{{ $periodeAktif->tahun_ami }}
+                                            (No. Surat: {{ $periodeAktif->nomor_surat ?? '-' }})
+                                        </strong>
+                                    </span>
+                                    <span class="period-chip fs-8 text-dark">
+                                        <i class="bi bi-arrow-counterclockwise me-1 text-primary"></i>
+                                        RTL Periode Sebelumnya:
+                                        <strong>
+                                            @if($periodeAktif && $periodeAktif->previousPeriode)
+                                                Siklus {{ $periodeAktif->previousPeriode->siklus }}/{{ $periodeAktif->previousPeriode->tahun_ami }}
+                                                (No. Surat: {{ $periodeAktif->previousPeriode->nomor_surat ?? '-' }})
+                                            @else
+                                                Tidak ada (periode awal)
+                                            @endif
+                                        </strong>
+                                    </span>
+                                </div>
+                            @else
+                                <div class="text-muted fs-7 mt-1">Belum ada periode aktif.</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @php
+                            $steps = [
+                                ['key' => 'profil', 'label' => 'Profil'],
+                                ['key' => 'rtl_sebelumnya', 'label' => 'RTL Periode Sebelumnya'],
+                                ['key' => 'perjanjian_kinerja', 'label' => 'Perjanjian Kinerja'],
+                                ['key' => 'pemilihan_ikss', 'label' => 'Pemilihan IKSS'],
+                                ['key' => 'pengisian_instrumen', 'label' => 'Pengisian Instrumen'],
+                                ['key' => 'pengisian_instrumen_prodi', 'label' => 'Pengisian Instrumen Prodi'],
+                                ['key' => 'unggah_siklus', 'label' => 'Unggah Siklus'],
+                            ];
+                        @endphp
+
+                        <div class="row g-3">
+                            @foreach($steps as $index => $step)
+                                @php
+                                    $isDone = (bool)($stepStatuses[$step['key']] ?? false);
+                                    $isRtlNotRequired = $step['key'] === 'rtl_sebelumnya' && !(bool)($rtlRequired ?? false);
+                                    $isBlocked = false;
+                                    $blockedByLabel = null;
+                                    if (!$isDone && !$isRtlNotRequired) {
+                                        for ($i = 0; $i < $index; $i++) {
+                                            if (!($stepStatuses[$steps[$i]['key']] ?? false)) {
+                                                $isBlocked = true;
+                                                $blockedByLabel = $steps[$i]['label'];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    $badgeClass = $isRtlNotRequired
+                                        ? 'badge-light-info text-info'
+                                        : ($isDone
+                                            ? 'badge-light-success text-success'
+                                            : ($isBlocked ? 'badge-light-danger text-danger' : 'badge-light-warning text-warning'));
+                                    $statusLabel = $isRtlNotRequired ? 'Tidak Wajib' : ($isDone ? 'Selesai' : ($isBlocked ? 'Terkunci' : 'Belum'));
+                                @endphp
+                                <div class="col-lg-6">
+                                    <div class="border rounded p-3 bg-light">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="badge badge-circle {{ $isRtlNotRequired ? 'badge-info' : ($isDone ? 'badge-success' : ($isBlocked ? 'badge-danger' : 'badge-warning')) }}">{{ $index + 1 }}</span>
+                                                <span class="fw-semibold text-dark">{{ $step['label'] }}</span>
+                                            </div>
+                                            <span class="badge {{ $badgeClass }}">{{ $statusLabel }}</span>
+                                        </div>
+                                        @if($isBlocked && $blockedByLabel)
+                                            <div class="mt-2 fs-8 text-danger fw-semibold">
+                                                Alasan terkunci: lengkapi tahap <span class="text-dark">{{ $blockedByLabel }}</span> terlebih dahulu.
+                                            </div>
+                                        @elseif(!$isDone && !$isBlocked && !$isRtlNotRequired)
+                                            <div class="mt-2 fs-8 text-muted">
+                                                Tahap ini siap dikerjakan.
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
                 <form id="kt_account_profile_details_form" class="form" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    <div class="card-body border-top p-9">
+                    <div class="section-separator">
+                        <div class="d-flex align-items-center gap-2 mb-4 profile-section-title">
+                            <i class="bi bi-person-lines-fill text-primary fs-3"></i>
+                            <h4 class="fw-bold text-dark mb-0">Data & Kelengkapan Profil Auditee</h4>
+                        </div>
+                    </div>
+                    <div class="card-body border rounded p-9 bg-white">
                         @php
                             $user = Auth::user();
                             $completionPercentage = $user->getProfileCompletionPercentage();
@@ -170,6 +350,10 @@
                                             <span class="fw-semibold text-danger">
                                                 Mohon lengkapi data profil Anda hingga mencapai 100% sebelum dapat melanjutkan ke proses selanjutnya.
                                             </span>
+                                        @elseif(isset($hasPreviousRtl) && !$hasPreviousRtl)
+                                            <span class="fw-semibold text-danger">
+                                                Unggah dokumen RTL periode sebelumnya ({{ $previousPeriodeLabel ?? 'periode sebelumnya' }}) terlebih dahulu. Tahapan Perjanjian Kinerja, Pemilihan IKSS, Pengisian Instrumen, Pengisian Instrumen Prodi, dan Unggah Siklus akan terkunci.
+                                            </span>
                                         @else
                                             <span class="fw-semibold text-success">
                                                 Profil Anda sudah lengkap. Silakan klik tombol "Proses Selanjutnya" untuk mengunggah Perjanjian Kinerja.
@@ -180,9 +364,12 @@
                             </div>
 
                             <div class="ms-auto">
+                                @php
+                                    $canProceed = $completionPercentage >= 100 && (isset($hasPreviousRtl) ? $hasPreviousRtl : true);
+                                @endphp
                                 <a href="{{ route('auditee.pengajuanAmi.perjanjianKinerja') }}"
-                                   class="btn btn-sm px-4 {{ $completionPercentage < 100 ? 'btn-secondary disabled' : 'btn-primary' }}"
-                                   style="{{ $completionPercentage < 100 ? 'pointer-events: none; opacity: 0.7;' : '' }}"
+                                   class="btn btn-sm px-4 {{ $canProceed ? 'btn-primary' : 'btn-secondary disabled' }}"
+                                   style="{{ $canProceed ? '' : 'pointer-events: none; opacity: 0.7;' }}"
                                 >
                                     <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                                 </a>
@@ -278,6 +465,7 @@
                         <button type="submit" class="btn btn-primary" id="kt_account_profile_details_submit">Simpan Perubahan</button>
                     </div>
                 </form>
+                </div>
             </div>
             <!--end::details View-->
         </div>
@@ -422,6 +610,98 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            @if (session('rtl_guard_message'))
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Akses Dibatasi',
+                    text: @json(session('rtl_guard_message')),
+                    confirmButtonColor: '#3085d6'
+                });
+            @endif
+
+            $('#uploadRtlPreviousForm').on('submit', function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(this);
+                const submitBtn = $('#btnUploadRtlPrevious');
+                submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Uploading...');
+
+                $.ajax({
+                    url: '{{ route("auditee.pengajuanAmi.uploadPreviousRtl") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: response.message,
+                            confirmButtonColor: '#3085d6'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        const message = xhr.responseJSON?.message || 'Gagal mengunggah dokumen RTL.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: message,
+                            confirmButtonColor: '#d33'
+                        });
+                    },
+                    complete: function() {
+                        submitBtn.prop('disabled', false).html('<i class="bi bi-cloud-upload me-1"></i> Upload RTL');
+                    }
+                });
+            });
+
+            $('#btnDeleteRtlPrevious').on('click', function() {
+                Swal.fire({
+                    title: 'Hapus dokumen RTL?',
+                    text: 'Dokumen RTL periode sebelumnya akan dihapus.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '{{ route("auditee.pengajuanAmi.deletePreviousRtl") }}',
+                        type: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message,
+                                confirmButtonColor: '#3085d6'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        },
+                        error: function(xhr) {
+                            const message = xhr.responseJSON?.message || 'Gagal menghapus dokumen RTL.';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: message,
+                                confirmButtonColor: '#d33'
+                            });
+                        }
+                    });
+                });
+            });
+
             // Function to clear previous error states
             function clearErrorStates() {
                 $('.form-control').removeClass('is-invalid');

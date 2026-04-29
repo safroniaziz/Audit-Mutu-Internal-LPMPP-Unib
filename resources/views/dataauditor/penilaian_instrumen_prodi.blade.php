@@ -179,6 +179,15 @@
     // Get current auditor's penugasan to check approval status
     $currentAuditorPenugasan = $pengajuan->auditors->where('user_id', Auth::id())->first();
     $isPenilaianProdiApproved = $currentAuditorPenugasan ? (bool)$currentAuditorPenugasan->is_setuju_indikator_prodi : false;
+
+    // Check for pending reset request
+    $hasPendingResetRequest = false;
+    if ($isPenilaianProdiApproved && $currentAuditorPenugasan) {
+        $hasPendingResetRequest = \App\Models\ResetApprovalRequest::where('penugasan_auditor_id', $currentAuditorPenugasan->id)
+            ->where('tahap', 'instrumen_prodi')
+            ->where('status', 'pending')
+            ->exists();
+    }
 @endphp
 
 @push('styles')
@@ -186,13 +195,22 @@
     /* Wizard navigation styles */
     .wizard-nav {
         display: flex;
-        overflow-x: auto;
+        overflow-x: scroll !important;
+        overflow-y: hidden !important;
         padding: 1.5rem 0;
         margin-bottom: 2rem;
         position: relative;
         background: #ffffff;
         border-radius: 0.475rem;
         box-shadow: 0 0 50px 0 rgb(82 63 105 / 10%);
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        flex-wrap: nowrap !important;
+        cursor: grab;
+    }
+
+    .wizard-nav:active {
+        cursor: grabbing;
     }
 
     .wizard-nav::-webkit-scrollbar {
@@ -437,7 +455,8 @@
         transform: translateY(-1px);
     }
 
-    .rating-input:checked + .rating-card {
+    .rating-input:checked + .rating-card,
+    .rating-card.selected {
         background: #F0F8FF;
         border-color: #009EF7;
         box-shadow: 0 4px 12px rgba(0, 158, 247, 0.2);
@@ -537,9 +556,9 @@
 @section('dashboardProfile')
     <!-- Back Button -->
     <div class="mb-5">
-        <a href="{{ route('auditor.audit.visitasi', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
+        <a href="{{ route('auditor.audit.deskEvaluation', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>
-            Kembali ke Visitasi
+            Kembali ke Desk Evaluation
         </a>
     </div>
 
@@ -586,14 +605,17 @@
                     @if($currentAuditor)
                         @if($isAllCompleted)
                             @if($isPenilaianProdiApproved)
-                                @if($currentAuditor->role == 'ketua')
-                                    <a href="{{ route('auditor.audit.unduhDokumen', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                        <i class="fas fa-arrow-right me-2"></i> Lanjut ke Unduh Dokumen
-                                    </a>
+                                <a href="{{ route('auditor.audit.visitasi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Visitasi
+                                </a>
+                                @if($hasPendingResetRequest)
+                                    <button type="button" class="btn btn-sm px-4 btn-warning" disabled>
+                                        <i class="fas fa-clock me-2"></i> Menunggu Reset
+                                    </button>
                                 @else
-                                    <a href="{{ route('auditor.audit.daftarAuditee') }}" class="btn btn-sm px-4 btn-primary">
-                                        <i class="fas fa-arrow-left me-2"></i> Kembali ke Halaman Daftar Auditee
-                                    </a>
+                                    <button type="button" class="btn btn-sm px-4 btn-outline-danger" id="btn-request-reset" data-penugasan-id="{{ $currentAuditorPenugasan->id }}">
+                                        <i class="fas fa-undo me-2"></i> Ajukan Pembatalan
+                                    </button>
                                 @endif
                             @else
                                 <button type="button" class="btn btn-sm px-4 btn-success" id="approve-penilaian-btn" data-id="{{ $pengajuan->id }}">
@@ -830,34 +852,37 @@
                                                             <div class="mb-4">
                                                                 <label class="form-label fw-bold text-gray-800 mb-3">Pilih Nilai Penilaian</label>
                                                                 <div class="rating-container">
+                                                                    @php
+                                                                        $savedNilai = ($instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first()) ? (int)$instrumenProdi->nilaiAuditor->first()->nilai : null;
+                                                                    @endphp
                                                                     <div class="row g-3">
                                                                         <div class="col-6 col-md-3">
-                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="4" id="nilai4_{{ $instrumenProdi->id }}" class="rating-input" {{ ($instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() && $instrumenProdi->nilaiAuditor->first()->nilai == 4) ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
-                                                                            <label for="nilai4_{{ $instrumenProdi->id }}" class="rating-card">
+                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="4" id="nilai4_{{ $instrumenProdi->id }}" class="rating-input" {{ $savedNilai === 4 ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
+                                                                            <label for="nilai4_{{ $instrumenProdi->id }}" class="rating-card {{ $savedNilai === 4 ? 'selected' : '' }}">
                                                                                 <div class="rating-number">4</div>
                                                                                 <div class="rating-label">Sangat Baik</div>
                                                                                 <div class="rating-desc">Melampaui standar</div>
                                                                             </label>
                                                                         </div>
                                                                         <div class="col-6 col-md-3">
-                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="3" id="nilai3_{{ $instrumenProdi->id }}" class="rating-input" {{ ($instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() && $instrumenProdi->nilaiAuditor->first()->nilai == 3) ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
-                                                                            <label for="nilai3_{{ $instrumenProdi->id }}" class="rating-card">
+                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="3" id="nilai3_{{ $instrumenProdi->id }}" class="rating-input" {{ $savedNilai === 3 ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
+                                                                            <label for="nilai3_{{ $instrumenProdi->id }}" class="rating-card {{ $savedNilai === 3 ? 'selected' : '' }}">
                                                                                 <div class="rating-number">3</div>
                                                                                 <div class="rating-label">Baik</div>
                                                                                 <div class="rating-label">Memenuhi standar</div>
                                                                             </label>
                                                                         </div>
                                                                         <div class="col-6 col-md-3">
-                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="2" id="nilai2_{{ $instrumenProdi->id }}" class="rating-input" {{ ($instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() && $instrumenProdi->nilaiAuditor->first()->nilai == 2) ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
-                                                                            <label for="nilai2_{{ $instrumenProdi->id }}" class="rating-card">
+                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="2" id="nilai2_{{ $instrumenProdi->id }}" class="rating-input" {{ $savedNilai === 2 ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
+                                                                            <label for="nilai2_{{ $instrumenProdi->id }}" class="rating-card {{ $savedNilai === 2 ? 'selected' : '' }}">
                                                                                 <div class="rating-number">2</div>
                                                                                 <div class="rating-label">Kurang</div>
                                                                                 <div class="rating-desc">Perlu perbaikan</div>
                                                                             </label>
                                                                         </div>
                                                                         <div class="col-6 col-md-3">
-                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="1" id="nilai1_{{ $instrumenProdi->id }}" class="rating-input" {{ ($instrumenProdi->nilaiAuditor && $instrumenProdi->nilaiAuditor->first() && $instrumenProdi->nilaiAuditor->first()->nilai == 1) ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
-                                                                            <label for="nilai1_{{ $instrumenProdi->id }}" class="rating-card">
+                                                                            <input type="radio" name="nilai[{{ $instrumenProdi->id }}]" value="1" id="nilai1_{{ $instrumenProdi->id }}" class="rating-input" {{ $savedNilai === 1 ? 'checked' : '' }} {{ $isPenilaianProdiApproved ? 'disabled' : '' }} required>
+                                                                            <label for="nilai1_{{ $instrumenProdi->id }}" class="rating-card {{ $savedNilai === 1 ? 'selected' : '' }}">
                                                                                 <div class="rating-number">1</div>
                                                                                 <div class="rating-label">Sangat Kurang</div>
                                                                                 <div class="rating-desc">Tidak memenuhi standar</div>
@@ -955,6 +980,125 @@
         if (activeKriteriaId) {
             updateSaveButtonStatus(activeKriteriaId);
         }
+
+        const wizardNav = $('.wizard-nav');
+        let isDraggingNav = false;
+        let navStartX = 0;
+        let navStartScrollLeft = 0;
+        let navMoved = false;
+
+        // Unified wheel/trackpad scrolling handler
+        wizardNav.on('wheel', function(e) {
+            const nav = this;
+            if (nav.scrollWidth <= nav.clientWidth) {
+                return;
+            }
+
+            const deltaX = e.originalEvent.deltaX;
+            const deltaY = e.originalEvent.deltaY;
+
+            if (deltaX !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaX;
+            } else if (deltaY !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaY;
+            }
+        }, { passive: false });
+
+        // Add trackpad swipe support using pointer events
+        let pointerStartX = 0;
+        let pointerStartY = 0;
+        let isPointerDown = false;
+
+        wizardNav.on('pointerdown', function(e) {
+            isPointerDown = true;
+            pointerStartX = e.pageX;
+            pointerStartY = e.pageY;
+            wizardNav.css('cursor', 'grabbing');
+        });
+
+        wizardNav.on('pointerup pointerleave', function(e) {
+            isPointerDown = false;
+            wizardNav.css('cursor', 'grab');
+        });
+
+        wizardNav.on('pointermove', function(e) {
+            if (!isPointerDown) return;
+
+            const deltaX = e.pageX - pointerStartX;
+            const deltaY = e.pageY - pointerStartY;
+
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                e.preventDefault();
+                wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+                pointerStartX = e.pageX;
+            }
+        });
+
+        // Keep original drag functionality
+        wizardNav.on('mousedown', function(e) {
+            isDraggingNav = true;
+            navMoved = false;
+            navStartX = e.pageX;
+            navStartScrollLeft = this.scrollLeft;
+            wizardNav.css('cursor', 'grabbing');
+        });
+
+        $(document).on('mousemove', function(e) {
+            if (!isDraggingNav) return;
+            const delta = e.pageX - navStartX;
+            if (Math.abs(delta) > 5) {
+                navMoved = true;
+            }
+            wizardNav[0].scrollLeft = navStartScrollLeft - delta;
+        });
+
+        $(document).on('mouseup', function() {
+            isDraggingNav = false;
+            wizardNav.css('cursor', 'grab');
+        });
+
+        wizardNav.find('.wizard-step').on('click', function(e) {
+            if (navMoved) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                navMoved = false;
+            }
+        });
+
+
+        // Rating card click handler: set checked + add .selected class for visual feedback
+        $(document).on('click', '.rating-card', function() {
+            const targetId = $(this).attr('for');
+            const targetInput = document.getElementById(targetId);
+            if (!targetInput || targetInput.disabled) {
+                return;
+            }
+            // Set the radio input as checked
+            targetInput.checked = true;
+
+            // Update .selected class in the same rating group
+            const groupName = targetInput.name;
+            $(`input[name="${CSS.escape(groupName)}"]`).each(function() {
+                $(this).next('.rating-card').removeClass('selected');
+            });
+            $(this).addClass('selected');
+
+            // Trigger change for save button update
+            $(targetInput).trigger('change');
+        });
+
+        // Initialize .selected class for pre-checked inputs (from saved data)
+        $('.rating-input:checked').each(function() {
+            $(this).next('.rating-card').addClass('selected');
+        });
+
+        // Show navigation buttons for active kriteria on page load
+        const initialKriteria = '{{ $activeKriteriaId }}';
+        if (initialKriteria) {
+            showNavigationButtons(initialKriteria);
+        }
     });
     function showKriteriaContent(kriteriaId, isAccessible) {
         // Check if kriteria is accessible
@@ -1023,8 +1167,8 @@
                                 text: 'Penilaian Instrumen Prodi berhasil disetujui.',
                                 icon: 'success'
                             }).then(() => {
-                                // Stay on the same page after approval
-                                window.location.reload();
+                                // After approval, go to visitasi (next step)
+                                window.location.href = '{{ route("auditor.audit.visitasi", $pengajuan->id) }}';
                             });
                         } else {
                             Swal.fire({
@@ -1075,18 +1219,8 @@
                                 text: 'Penilaian Instrumen Prodi berhasil disetujui.',
                                 icon: 'success'
                                                     }).then(() => {
-                            // Check if we're on completion page
-                            if ($('.text-center.py-10').length > 0) {
-                                // We're on completion page, redirect based on role
-                                @if($currentAuditor && $currentAuditor->role == 'ketua')
-                                    window.location.href = '{{ route("auditor.audit.unduhDokumen", $pengajuan->id) }}';
-                                @else
-                                    window.location.href = '{{ route("auditor.audit.daftarAuditee") }}';
-                                @endif
-                            } else {
-                                // We're on regular page, reload
-                                window.location.reload();
-                            }
+                            // After approval, always go to visitasi (next step)
+                            window.location.href = '{{ route("auditor.audit.visitasi", $pengajuan->id) }}';
                         });
                         } else {
                             Swal.fire({
@@ -1102,6 +1236,61 @@
                             text: 'Terjadi kesalahan saat menyetujui penilaian.',
                             icon: 'error'
                         });
+                    }
+                });
+            }
+        });
+    });
+
+    // Reset approval request handler
+    $(document).on('click', '#btn-request-reset', function() {
+        const penugasanId = $(this).data('penugasan-id');
+        Swal.fire({
+            title: 'Ajukan Pembatalan Persetujuan',
+            html: '<p class="text-muted mb-3">Permintaan akan dikirim ke admin untuk disetujui.</p>',
+            input: 'textarea',
+            inputLabel: 'Alasan pembatalan (min. 10 karakter)',
+            inputPlaceholder: 'Jelaskan alasan Anda ingin membatalkan persetujuan...',
+            inputAttributes: {
+                'aria-label': 'Alasan pembatalan'
+            },
+            inputValidator: (value) => {
+                if (!value || value.length < 10) {
+                    return 'Alasan minimal 10 karakter.';
+                }
+            },
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-paper-plane me-1"></i> Kirim Permintaan',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '{{ route("auditor.audit.submitResetRequest") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        penugasan_auditor_id: penugasanId,
+                        tahap: 'instrumen_prodi',
+                        alasan: result.value
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                title: 'Terkirim!',
+                                text: response.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Gagal', response.message, 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        const msg = xhr.responseJSON?.message || 'Terjadi kesalahan.';
+                        Swal.fire('Error', msg, 'error');
                     }
                 });
             }

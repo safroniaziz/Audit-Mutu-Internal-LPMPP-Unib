@@ -128,8 +128,8 @@
         /* Wizard navigation styles */
         .wizard-nav {
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-x: scroll !important;
+            overflow-y: hidden !important;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
@@ -139,6 +139,14 @@
             /* Force scrollbar to be visible */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            flex-wrap: nowrap !important;
+            cursor: grab;
+        }
+
+        .wizard-nav:active {
+            cursor: grabbing;
         }
 
         .wizard-nav::-webkit-scrollbar {
@@ -387,17 +395,23 @@
                         @if($currentAuditor)
                             @if($allCompleted)
                                 @if($setuju)
-                                    <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                        <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
-                                    </a>
-                                @elseif(!($isPenilaianProdiApproved ?? false))
+                                    @if($currentAuditor->role == 'ketua')
+                                        <a href="{{ route('auditor.audit.unduhDokumen', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                            <i class="fas fa-arrow-right me-2"></i> Lanjut ke Unduh Dokumen
+                                        </a>
+                                    @else
+                                        <a href="{{ route('auditor.audit.daftarAuditee') }}" class="btn btn-sm px-4 btn-primary">
+                                            <i class="fas fa-arrow-left me-2"></i> Kembali ke Halaman Daftar Auditee
+                                        </a>
+                                    @endif
+                                @else
                                     <button type="button" class="btn btn-sm px-4 btn-success {{ !$visitasiTimeValidation['is_valid'] ? 'disabled' : '' }}"
                                             id="approve-visitasi-btn" data-id="{{ $pengajuan->id }}"
                                             {{ !$visitasiTimeValidation['is_valid'] ? 'style="cursor: not-allowed; opacity: 0.65;"' : '' }}>
                                         <i class="bi bi-check-circle me-2"></i> Setujui
                                     </button>
                                 @endif
-                            @elseif(!($isPenilaianProdiApproved ?? false))
+                            @else
                                 <button type="button" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
                                     <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                                 </button>
@@ -562,6 +576,40 @@
                                                             </div>
                                                         </div>
 
+                                                        @php
+                                                            $targetValue = trim((string) ($ikssAuditee->instrumen->target ?? ''));
+                                                            $realisasiValue = trim((string) ($ikssAuditee->realisasi ?? ''));
+                                                            $showNilai = false;
+
+                                                            if ($targetValue !== '' && $realisasiValue !== '') {
+                                                                if (is_numeric($targetValue) && is_numeric($realisasiValue)) {
+                                                                    $showNilai = ((float) $targetValue === (float) $realisasiValue);
+                                                                } else {
+                                                                    $showNilai = (strcasecmp($targetValue, $realisasiValue) === 0);
+                                                                }
+                                                            }
+                                                        @endphp
+
+                                                        @if($showNilai)
+                                                            <div class="mb-4">
+                                                                <h6>Nilai <span class="text-danger">*</span></h6>
+                                                                <select class="form-select @error('nilai.'.$ikssAuditee->id) is-invalid @enderror"
+                                                                        name="nilai[{{ $ikssAuditee->id }}]"
+                                                                        {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                                        required>
+                                                                    <option value="">Pilih Nilai</option>
+                                                                    <option value="4" {{ ((isset($deskEvaluation[$ikssAuditee->id]) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4') ? 'selected' : '' }}>4</option>
+                                                                    <option value="3" {{ ((isset($deskEvaluation[$ikssAuditee->id]) && $deskEvaluation[$ikssAuditee->id]->nilai == '3') || old('nilai.'.$ikssAuditee->id) == '3') ? 'selected' : '' }}>3</option>
+                                                                    <option value="2" {{ ((isset($deskEvaluation[$ikssAuditee->id]) && $deskEvaluation[$ikssAuditee->id]->nilai == '2') || old('nilai.'.$ikssAuditee->id) == '2') ? 'selected' : '' }}>2</option>
+                                                                    <option value="1" {{ ((isset($deskEvaluation[$ikssAuditee->id]) && $deskEvaluation[$ikssAuditee->id]->nilai == '1') || old('nilai.'.$ikssAuditee->id) == '1') ? 'selected' : '' }}>1</option>
+                                                                    <option value="0" {{ ((isset($deskEvaluation[$ikssAuditee->id]) && $deskEvaluation[$ikssAuditee->id]->nilai == '0') || old('nilai.'.$ikssAuditee->id) == '0') ? 'selected' : '' }}>0</option>
+                                                                </select>
+                                                                @error('nilai.'.$ikssAuditee->id)
+                                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                                @enderror
+                                                            </div>
+                                                        @endif
+
                                                         <div class="mb-4">
                                                             <h6>Pengukuran</h6>
                                                             <h6 class="text-muted fs-7">Akar Penyebab (target tidak tercapai)/ Akar Penunjang (target tercapai)</h6>
@@ -632,6 +680,7 @@
                                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                                 @enderror
                                                             </div>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -693,6 +742,92 @@
         $(document).ready(function() {
             // Initial setup - ensure only first section is visible
             initializeWizard();
+
+            const wizardNav = $('.wizard-nav');
+            let isDraggingNav = false;
+            let navStartX = 0;
+            let navStartScrollLeft = 0;
+            let navMoved = false;
+
+            // Unified wheel/trackpad scrolling handler
+            wizardNav.on('wheel', function(e) {
+                const nav = this;
+                if (nav.scrollWidth <= nav.clientWidth) {
+                    return;
+                }
+
+                const deltaX = e.originalEvent.deltaX;
+                const deltaY = e.originalEvent.deltaY;
+
+                if (deltaX !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaX;
+                } else if (deltaY !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaY;
+                }
+            }, { passive: false });
+
+            // Add trackpad swipe support using pointer events
+            let pointerStartX = 0;
+            let pointerStartY = 0;
+            let isPointerDown = false;
+
+            wizardNav.on('pointerdown', function(e) {
+                isPointerDown = true;
+                pointerStartX = e.pageX;
+                pointerStartY = e.pageY;
+                wizardNav.css('cursor', 'grabbing');
+            });
+
+            wizardNav.on('pointerup pointerleave', function(e) {
+                isPointerDown = false;
+                wizardNav.css('cursor', 'grab');
+            });
+
+            wizardNav.on('pointermove', function(e) {
+                if (!isPointerDown) return;
+
+                const deltaX = e.pageX - pointerStartX;
+                const deltaY = e.pageY - pointerStartY;
+
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    e.preventDefault();
+                    wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+                    pointerStartX = e.pageX;
+                }
+            });
+
+            // Keep original drag functionality
+            wizardNav.on('mousedown', function(e) {
+                isDraggingNav = true;
+                navMoved = false;
+                navStartX = e.pageX;
+                navStartScrollLeft = this.scrollLeft;
+                wizardNav.css('cursor', 'grabbing');
+            });
+
+            $(document).on('mousemove', function(e) {
+                if (!isDraggingNav) return;
+                const delta = e.pageX - navStartX;
+                if (Math.abs(delta) > 5) {
+                    navMoved = true;
+                }
+                wizardNav[0].scrollLeft = navStartScrollLeft - delta;
+            });
+
+            $(document).on('mouseup', function() {
+                isDraggingNav = false;
+                wizardNav.css('cursor', 'grab');
+            });
+
+            wizardNav.find('.wizard-step').on('click', function(e) {
+                if (navMoved) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    navMoved = false;
+                }
+            });
 
             // Auto scroll to form after reload
             if ($('.wizard-content.active').length) {

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('indikator_kinerjas')) {
+            return;
+        }
+
         Schema::create('indikator_kinerjas', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('satuan_standar_id');

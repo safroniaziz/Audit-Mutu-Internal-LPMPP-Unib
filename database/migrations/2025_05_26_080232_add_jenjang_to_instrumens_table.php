@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('instrumen_iksses', function (Blueprint $table) {
-            $table->enum('jenjang', ['D3', 'D4', 'S1', 'S2', 'S3', 'Profesi', 'Semua'])->nullable()->after('is_wajib');
-        });
+        if (!Schema::hasColumn('instrumen_iksses', 'jenjang')) {
+            Schema::table('instrumen_iksses', function (Blueprint $table) {
+                $table->enum('jenjang', ['D3', 'D4', 'S1', 'S2', 'S3', 'Profesi', 'Semua'])->nullable()->after('is_wajib');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('instrumen_iksses', function (Blueprint $table) {
-            $table->dropColumn('jenjang');
-        });
+        if (Schema::hasColumn('instrumen_iksses', 'jenjang')) {
+            Schema::table('instrumen_iksses', function (Blueprint $table) {
+                $table->dropColumn('jenjang');
+            });
+        }
     }
 };

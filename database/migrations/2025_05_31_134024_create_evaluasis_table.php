@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('evaluasis')) {
+            return;
+        }
+
         Schema::create('evaluasis', function (Blueprint $table) {
             $table->id();
             $table->string('nomor'); // Contoh: "1", "8", "8.a"

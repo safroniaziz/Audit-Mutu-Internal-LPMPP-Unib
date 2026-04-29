@@ -416,7 +416,15 @@
 
         <div class="signature-section">
             <div class="signature-right">
+                @php
+                    $pathTtdAuditor = Auth::user()->ttd ? public_path('storage/' . Auth::user()->ttd) : null;
+                @endphp
                 <p class="date">Bengkulu, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+                @if($pathTtdAuditor && file_exists($pathTtdAuditor) && is_file($pathTtdAuditor))
+                    <p style="margin: 10px 0 5px;">
+                        <img src="{{ $pathTtdAuditor }}" alt="TTD Auditor" style="max-height: 55px;">
+                    </p>
+                @endif
                 <p class="signature">{{ Auth::user()->name }}</p>
                 <p>Auditor</p>
             </div>

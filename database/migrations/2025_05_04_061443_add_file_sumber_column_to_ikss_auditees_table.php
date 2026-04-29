@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ikss_auditees', function (Blueprint $table) {
-            $table->string('file_sumber')->nullable();
-        });
+        if (!Schema::hasColumn('ikss_auditees', 'file_sumber')) {
+            Schema::table('ikss_auditees', function (Blueprint $table) {
+                $table->string('file_sumber')->nullable();
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ikss_auditees', function (Blueprint $table) {
-            //
-        });
+        if (Schema::hasColumn('ikss_auditees', 'file_sumber')) {
+            Schema::table('ikss_auditees', function (Blueprint $table) {
+                $table->dropColumn('file_sumber');
+            });
+        }
     }
 };

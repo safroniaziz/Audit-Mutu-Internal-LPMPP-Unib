@@ -8,6 +8,7 @@ use App\Models\UnitKerja;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class AuditorProfilController extends Controller
@@ -59,5 +60,30 @@ class AuditorProfilController extends Controller
         } else {
             return response()->json(['error' => 'Gagal membuat file zip'], 500);
         }
+    }
+
+    public function updateTtd(Request $request)
+    {
+        $request->validate([
+            'ttd' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+        ], [
+            'ttd.required' => 'File tanda tangan wajib dipilih.',
+            'ttd.image' => 'File harus berupa gambar.',
+            'ttd.mimes' => 'Format tanda tangan harus JPG, JPEG, atau PNG.',
+            'ttd.max' => 'Ukuran tanda tangan maksimal 2MB.',
+        ]);
+
+        $user = Auth::user();
+
+        if ($request->hasFile('ttd')) {
+            if ($user->ttd && Storage::disk('public')->exists($user->ttd)) {
+                Storage::disk('public')->delete($user->ttd);
+            }
+
+            $ttdPath = $request->file('ttd')->store('ttd/auditor', 'public');
+            $user->update(['ttd' => $ttdPath]);
+        }
+
+        return redirect()->route('auditor.dashboard')->with('success', 'Tanda tangan berhasil diunggah.');
     }
 }

@@ -143,7 +143,7 @@
                             <button type="button" class="btn btn-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalTambahKriteria">
                                 <i class="fas fa-plus fa-sm"></i> Tambah Kriteria
                             </button>
-                            <a href="{{ route('indikatorInstrumen.index') }}" class="btn btn-secondary btn-sm" style="padding-top: .8rem; padding-bottom: .8rem;">
+                            <a href="{{ route('indikatorInstrumen.index', ['fakultas' => request()->query('fakultas'), 'prodi_id' => request()->query('prodi_id')]) }}" class="btn btn-secondary btn-sm" style="padding-top: .8rem; padding-bottom: .8rem;">
                                 <i class="fas fa-arrow-left fa-sm"></i> Kembali ke Indikator
                             </a>
                         </div>

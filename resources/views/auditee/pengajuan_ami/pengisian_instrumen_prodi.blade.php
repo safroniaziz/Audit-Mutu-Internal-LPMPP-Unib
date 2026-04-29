@@ -51,13 +51,13 @@
 
             // Count completed submissions - check if data is actually complete (allow 0 values)
             foreach ($kriteriaData['instrumens'] as $instrumenProdi) {
-                if ($instrumenProdi->submission &&
-                    !is_null($instrumenProdi->submission->realisasi) &&
-                    $instrumenProdi->submission->realisasi !== '' &&
-                    !is_null($instrumenProdi->submission->akar_penyebab) &&
-                    $instrumenProdi->submission->akar_penyebab !== '' &&
-                    !is_null($instrumenProdi->submission->rencana_perbaikan) &&
-                    $instrumenProdi->submission->rencana_perbaikan !== '') {
+                if ($instrumenProdi->submissionCurrent &&
+                    !is_null($instrumenProdi->submissionCurrent->realisasi) &&
+                    $instrumenProdi->submissionCurrent->realisasi !== '' &&
+                    !is_null($instrumenProdi->submissionCurrent->akar_penyebab) &&
+                    $instrumenProdi->submissionCurrent->akar_penyebab !== '' &&
+                    !is_null($instrumenProdi->submissionCurrent->rencana_perbaikan) &&
+                    $instrumenProdi->submissionCurrent->rencana_perbaikan !== '') {
                     $completedInstrumen++;
                 }
             }
@@ -89,8 +89,8 @@
     /* Wizard navigation styles */
     .wizard-nav {
         display: flex;
-        overflow-x: auto;
-        overflow-y: hidden;
+        overflow-x: scroll !important;
+        overflow-y: hidden !important;
         padding: 1.5rem 0;
         margin-bottom: 2rem;
         background: #ffffff;
@@ -98,6 +98,14 @@
         box-shadow: 0 0 50px 0 rgb(82 63 105 / 10%);
         scrollbar-width: thin;
         scrollbar-color: #888 #f1f1f1;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        flex-wrap: nowrap !important;
+        cursor: grab;
+    }
+
+    .wizard-nav:active {
+        cursor: grabbing;
     }
 
     .wizard-nav::-webkit-scrollbar {
@@ -348,7 +356,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, dan Pengisian Instrumen) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, dan Pengisian Instrumen) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
@@ -365,9 +373,26 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-warning">
-                                    Data pengisian instrumen prodi tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
+                                    Data pengisian instrumen prodi tidak dapat diubah karena penugasan auditor untuk periode ini sudah dibuat. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
                                 </span>
                             </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if(!empty($defaultDariPeriodeSebelumnyaProdi))
+                <div class="alert alert-info d-flex align-items-start p-5 mb-10">
+                    <div class="me-4">
+                        <i class="bi bi-arrow-repeat fs-2 text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="fw-bold text-dark mb-2">Default Dari Periode Sebelumnya</h4>
+                        <div class="fs-6 text-gray-700">
+                            <strong>{{ $defaultFallbackCountProdi ?? 0 }} instrumen</strong> menampilkan nilai default dari
+                            <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong> (prefill).
+                            Nilai ini <strong>belum tersimpan</strong> ke periode aktif sampai Anda klik
+                            <strong>Simpan &amp; Lanjutkan</strong>.
                         </div>
                     </div>
                 </div>
@@ -424,13 +449,13 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission &&
-                                            !is_null($instrumenProdi->submission->realisasi) &&
-                                            $instrumenProdi->submission->realisasi !== '' &&
-                                            !is_null($instrumenProdi->submission->akar_penyebab) &&
-                                            $instrumenProdi->submission->akar_penyebab !== '' &&
-                                            !is_null($instrumenProdi->submission->rencana_perbaikan) &&
-                                            $instrumenProdi->submission->rencana_perbaikan !== '') {
+                                        if ($instrumenProdi->submissionCurrent &&
+                                            !is_null($instrumenProdi->submissionCurrent->realisasi) &&
+                                            $instrumenProdi->submissionCurrent->realisasi !== '' &&
+                                            !is_null($instrumenProdi->submissionCurrent->akar_penyebab) &&
+                                            $instrumenProdi->submissionCurrent->akar_penyebab !== '' &&
+                                            !is_null($instrumenProdi->submissionCurrent->rencana_perbaikan) &&
+                                            $instrumenProdi->submissionCurrent->rencana_perbaikan !== '') {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -533,13 +558,13 @@
                                 if (isset($indikatorData['kriterias'][$kriteriaId])) {
                                     $totalKriteriaInstrumen += count($indikatorData['kriterias'][$kriteriaId]['instrumens']);
                                     foreach ($indikatorData['kriterias'][$kriteriaId]['instrumens'] as $instrumenProdi) {
-                                        if ($instrumenProdi->submission &&
-                                            !is_null($instrumenProdi->submission->realisasi) &&
-                                            $instrumenProdi->submission->realisasi !== '' &&
-                                            !is_null($instrumenProdi->submission->akar_penyebab) &&
-                                            $instrumenProdi->submission->akar_penyebab !== '' &&
-                                            !is_null($instrumenProdi->submission->rencana_perbaikan) &&
-                                            $instrumenProdi->submission->rencana_perbaikan !== '') {
+                                        if ($instrumenProdi->submissionCurrent &&
+                                            !is_null($instrumenProdi->submissionCurrent->realisasi) &&
+                                            $instrumenProdi->submissionCurrent->realisasi !== '' &&
+                                            !is_null($instrumenProdi->submissionCurrent->akar_penyebab) &&
+                                            $instrumenProdi->submissionCurrent->akar_penyebab !== '' &&
+                                            !is_null($instrumenProdi->submissionCurrent->rencana_perbaikan) &&
+                                            $instrumenProdi->submissionCurrent->rencana_perbaikan !== '') {
                                             $completedKriteriaInstrumen++;
                                         }
                                     }
@@ -588,6 +613,11 @@
                                                             <span class="d-block text-muted pt-2 fs-7">{{ $instrumenProdi->indikator }}</span>
                                                         </h3>
                                                     </div>
+                                                    @if(!empty($instrumenProdi->comparisonStatus['has_previous']))
+                                                        <span class="badge fs-8 {{ !empty($instrumenProdi->comparisonStatus['is_changed']) ? 'badge-light-warning' : 'badge-light-success' }}">
+                                                            {{ !empty($instrumenProdi->comparisonStatus['is_changed']) ? 'Berubah dari periode sebelumnya' : 'Sama dengan periode sebelumnya' }}
+                                                        </span>
+                                                    @endif
                                                 </div>
                                                 <div class="card-body">
                                                     <input type="hidden" name="instrumen_ids[]" value="{{ $instrumenProdi->id }}">
@@ -598,9 +628,9 @@
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Sumber Data/Bukti</td>
                                                                     <td>
-                                                                        @if($instrumenProdi->submission && $instrumenProdi->submission->file_sumber)
+                                                                        @if($instrumenProdi->submissionDisplay && $instrumenProdi->submissionDisplay->file_sumber)
                                                                             <div class="mb-2">
-                                                                                <a href="{{ Storage::url($instrumenProdi->submission->file_sumber) }}" target="_blank" class="btn btn-sm btn-light-primary">
+                                                                                <a href="{{ Storage::url($instrumenProdi->submissionDisplay->file_sumber) }}" target="_blank" class="btn btn-sm btn-light-primary">
                                                                                     <i class="fas fa-file-download me-2"></i>
                                                                                     Lihat Dokumen
                                                                                 </a>
@@ -619,7 +649,7 @@
                                                                                 <input type="url"
                                                                                     class="form-control"
                                                                                     name="url_sumber[{{ $instrumenProdi->id }}]"
-                                                                                    value="{{ $instrumenProdi->submission ? $instrumenProdi->submission->url_sumber : '' }}"
+                                                                                    value="{{ $instrumenProdi->submissionDisplay ? $instrumenProdi->submissionDisplay->url_sumber : '' }}"
                                                                                     placeholder="Masukkan URL sumber (opsional)">
                                                                             </div>
                                                                             <div class="form-text text-muted italic text-xs">Tambahkan URL sumber jika ada (contoh: https://example.com)</div>
@@ -633,12 +663,12 @@
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Realisasi</td>
                                                                     <td>
-                                                                        <input type="number"
+                                                                        <input type="text"
                                                                             class="form-control"
                                                                             name="realisasi[{{ $instrumenProdi->id }}]"
-                                                                            min="0"
-                                                                            step="0.01"
-                                                                            value="{{ $instrumenProdi->submission ? $instrumenProdi->submission->realisasi : '' }}"
+                                                                            inputmode="decimal"
+                                                                            autocomplete="off"
+                                                                            value="{{ $instrumenProdi->submissionDisplay ? $instrumenProdi->submissionDisplay->realisasi : '' }}"
                                                                             >
                                                                         <div class="form-text text-muted italic text-xs">Masukkan realisasi dalam bentuk angka</div>
                                                                     </td>
@@ -650,14 +680,14 @@
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Akar Penyebab</td>
                                                                     <td>
-                                                                        <textarea class="form-control" name="akar_penyebab[{{ $instrumenProdi->id }}]" rows="3">{{ $instrumenProdi->submission ? $instrumenProdi->submission->akar_penyebab : '' }}</textarea>
+                                                                        <textarea class="form-control" name="akar_penyebab[{{ $instrumenProdi->id }}]" rows="3">{{ $instrumenProdi->submissionDisplay ? $instrumenProdi->submissionDisplay->akar_penyebab : '' }}</textarea>
                                                                         <div class="form-text text-muted italic text-xs">Masukkan akar penyebab jika ada</div>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
                                                                     <td class="fw-semibold bg-light">Rencana Perbaikan</td>
                                                                     <td>
-                                                                        <textarea class="form-control" name="rencana_perbaikan[{{ $instrumenProdi->id }}]" rows="3">{{ $instrumenProdi->submission ? $instrumenProdi->submission->rencana_perbaikan : '' }}</textarea>
+                                                                        <textarea class="form-control" name="rencana_perbaikan[{{ $instrumenProdi->id }}]" rows="3">{{ $instrumenProdi->submissionDisplay ? $instrumenProdi->submissionDisplay->rencana_perbaikan : '' }}</textarea>
                                                                         <div class="form-text text-muted italic text-xs">Masukkan rencana perbaikan jika ada</div>
                                                                     </td>
                                                                 </tr>
@@ -731,6 +761,92 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    const wizardNav = $('.wizard-nav');
+    let isDraggingNav = false;
+    let navStartX = 0;
+    let navStartScrollLeft = 0;
+    let navMoved = false;
+
+    // Unified wheel/trackpad scrolling handler
+    wizardNav.on('wheel', function(e) {
+        const nav = this;
+        if (nav.scrollWidth <= nav.clientWidth) {
+            return;
+        }
+
+        const deltaX = e.originalEvent.deltaX;
+        const deltaY = e.originalEvent.deltaY;
+
+        if (deltaX !== 0) {
+            e.preventDefault();
+            nav.scrollLeft += deltaX;
+        } else if (deltaY !== 0) {
+            e.preventDefault();
+            nav.scrollLeft += deltaY;
+        }
+    }, { passive: false });
+
+    // Add trackpad swipe support using pointer events
+    let pointerStartX = 0;
+    let pointerStartY = 0;
+    let isPointerDown = false;
+
+    wizardNav.on('pointerdown', function(e) {
+        isPointerDown = true;
+        pointerStartX = e.pageX;
+        pointerStartY = e.pageY;
+        wizardNav.css('cursor', 'grabbing');
+    });
+
+    wizardNav.on('pointerup pointerleave', function(e) {
+        isPointerDown = false;
+        wizardNav.css('cursor', 'grab');
+    });
+
+    wizardNav.on('pointermove', function(e) {
+        if (!isPointerDown) return;
+
+        const deltaX = e.pageX - pointerStartX;
+        const deltaY = e.pageY - pointerStartY;
+
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            e.preventDefault();
+            wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+            pointerStartX = e.pageX;
+        }
+    });
+
+    // Keep original drag functionality
+    wizardNav.on('mousedown', function(e) {
+        isDraggingNav = true;
+        navMoved = false;
+        navStartX = e.pageX;
+        navStartScrollLeft = this.scrollLeft;
+        wizardNav.css('cursor', 'grabbing');
+    });
+
+    $(document).on('mousemove', function(e) {
+        if (!isDraggingNav) return;
+        const delta = e.pageX - navStartX;
+        if (Math.abs(delta) > 5) {
+            navMoved = true;
+        }
+        wizardNav[0].scrollLeft = navStartScrollLeft - delta;
+    });
+
+    $(document).on('mouseup', function() {
+        isDraggingNav = false;
+        wizardNav.css('cursor', 'grab');
+    });
+
+    wizardNav.find('.wizard-step').on('click', function(e) {
+        if (navMoved) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            navMoved = false;
+        }
+    });
+
     // Function to find the first incomplete step
     function findFirstIncompleteStep() {
         let firstIncompleteId = null;
@@ -793,6 +909,13 @@ $(document).ready(function() {
         const form = $(this);
         const formData = new FormData(this);
         const isLastStep = form.find('button[type="submit"]').text().includes('Selesai');
+
+        // Normalisasi input realisasi agar konsisten sebelum validasi+submit.
+        form.find('input[name*="realisasi"]').each(function() {
+            const raw = String($(this).val() ?? '').trim();
+            const normalized = raw.replace(',', '.');
+            $(this).val(normalized);
+        });
 
         // Validasi field wajib
         const requiredFields = form.find('input[name*="realisasi"], textarea[name*="akar_penyebab"], textarea[name*="rencana_perbaikan"]');
@@ -964,6 +1087,12 @@ $(document).ready(function() {
     }
 
     window.showKriteriaContent = showKriteriaContent;
+
+    // Filter karakter agar input realisasi tetap numerik (mendukung titik/koma desimal).
+    $(document).on('input', 'input[name*="realisasi"]', function() {
+        const cleaned = String($(this).val() ?? '').replace(/[^0-9.,-]/g, '');
+        $(this).val(cleaned);
+    });
 
 
 });

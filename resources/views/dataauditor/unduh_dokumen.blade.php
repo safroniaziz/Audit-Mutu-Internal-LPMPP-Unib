@@ -169,6 +169,9 @@
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-sm btn-warning px-4" data-bs-toggle="modal" data-bs-target="#laporanAmiMetadataModal">
+                                    <i class="fas fa-calendar-check me-2"></i> Input Jadwal & Presensi
+                                </button>
                                 <button type="button" class="btn btn-sm btn-primary px-4" data-bs-toggle="modal" data-bs-target="#laporanAmiModal">
                                     <i class="fas fa-edit me-2"></i> {{ $jawabanKuisioner->count() > 0 ? 'Update Kuisioner' : 'Isi Kuisioner' }}
                                 </button>
@@ -703,6 +706,155 @@
         </div>
     </div>
 
+    <!-- Modal Metadata Laporan AMI -->
+    <div class="modal fade" id="laporanAmiMetadataModal" tabindex="-1" aria-labelledby="laporanAmiMetadataModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="laporanAmiMetadataModalLabel">Input Jadwal Audit dan Presensi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="laporanAmiMetadataForm" action="{{ route('auditor.audit.saveLaporanAmiMetadata', [$pengajuan->id]) }}" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-info d-flex align-items-start p-4 mb-6">
+                            <i class="fas fa-info-circle fs-2 text-info me-3 mt-1"></i>
+                            <div>
+                                Data ini dipakai otomatis pada PDF <strong>Laporan AMI</strong> bagian <strong>Jadwal Audit</strong> dan <strong>Presensi</strong>.
+                            </div>
+                        </div>
+
+                        @php
+                            $defaultKegiatan = [
+                                1 => 'Pembukaan & Pertemuan dengan Kaprodi',
+                                2 => 'Pertemuan dengan Staf Dosen',
+                                3 => 'Pertemuan dengan Karyawan',
+                                4 => 'Pertemuan dengan Mahasiswa',
+                                5 => 'Pertemuan dengan alumni/pengguna lulusan (jika ada)',
+                                6 => 'Penyampaian Temuan & Penutupan',
+                            ];
+                        @endphp
+
+                        <h6 class="fw-bolder text-primary mb-3">Jadwal Audit</h6>
+                        <div class="table-responsive mb-6">
+                            <table class="table table-bordered align-middle">
+                                <thead>
+                                    <tr>
+                                        <th width="8%">No</th>
+                                        <th width="22%">Jam Mulai</th>
+                                        <th width="22%">Jam Selesai</th>
+                                        <th>Kegiatan Audit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for($i = 1; $i <= 6; $i++)
+                                        @php
+                                            $existingJadwal = collect($laporanAmiJadwal ?? [])->firstWhere('no', $i);
+                                            $existingMulai = $existingJadwal['jam_mulai'] ?? '';
+                                            $existingSelesai = $existingJadwal['jam_selesai'] ?? '';
+
+                                            if (($existingMulai === '' || $existingSelesai === '') && !empty($existingJadwal['jam'])) {
+                                                $parts = explode('-', (string)$existingJadwal['jam']);
+                                                if ($existingMulai === '' && isset($parts[0])) {
+                                                    $existingMulai = trim($parts[0]);
+                                                }
+                                                if ($existingSelesai === '' && isset($parts[1])) {
+                                                    $existingSelesai = trim($parts[1]);
+                                                }
+                                            }
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $i }}</td>
+                                            <td>
+                                                <input type="time"
+                                                       name="jadwal_mulai[{{ $i }}]"
+                                                       class="form-control"
+                                                       value="{{ old('jadwal_mulai.'.$i, $existingMulai) }}">
+                                            </td>
+                                            <td>
+                                                <input type="time"
+                                                       name="jadwal_selesai[{{ $i }}]"
+                                                       class="form-control"
+                                                       value="{{ old('jadwal_selesai.'.$i, $existingSelesai) }}">
+                                            </td>
+                                            <td>{{ $defaultKegiatan[$i] }}</td>
+                                        </tr>
+                                    @endfor
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h6 class="fw-bolder text-primary mb-3">Presensi</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead>
+                                    <tr>
+                                        <th width="8%">No</th>
+                                        <th>Nama</th>
+                                        <th width="35%">Peran</th>
+                                        <th width="10%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="presensiRows">
+                                    @php
+                                        $presensiRows = collect(old('presensi_nama', []))->map(function($nama, $idx) {
+                                            return [
+                                                'nama' => $nama,
+                                                'peran' => old('presensi_peran.'.$idx),
+                                            ];
+                                        });
+
+                                        if ($presensiRows->isEmpty()) {
+                                            $presensiRows = collect($laporanAmiPresensi ?? [])->map(function($row) {
+                                                return [
+                                                    'nama' => $row['nama'] ?? '',
+                                                    'peran' => $row['peran'] ?? '',
+                                                ];
+                                            });
+                                        }
+
+                                        if ($presensiRows->isEmpty()) {
+                                            $presensiRows = collect([['nama' => '', 'peran' => '']]);
+                                        }
+                                    @endphp
+
+                                    @foreach($presensiRows as $row)
+                                        <tr>
+                                            <td class="presensi-no">{{ $loop->iteration }}</td>
+                                            <td>
+                                                <input type="text" name="presensi_nama[]" class="form-control" value="{{ $row['nama'] ?? '' }}">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="presensi_peran[]" class="form-control" value="{{ $row['peran'] ?? '' }}">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-sm btn-light-danger remove-presensi-row">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-sm btn-light-primary" id="addPresensiRow">
+                                <i class="fas fa-plus me-2"></i> Tambah Presensi
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary" id="submitLaporanAmiMetadata">
+                            <i class="fas fa-save me-2"></i> Simpan Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -910,6 +1062,56 @@
                     new Chart(ctxRadarProdi, configRadarProdi);
                 }
             }
+
+            // Presensi dynamic rows
+            const presensiRowsEl = document.getElementById('presensiRows');
+            const addPresensiBtn = document.getElementById('addPresensiRow');
+
+            function renumberPresensiRows() {
+                if (!presensiRowsEl) return;
+                presensiRowsEl.querySelectorAll('tr').forEach((row, index) => {
+                    const noCell = row.querySelector('.presensi-no');
+                    if (noCell) noCell.textContent = index + 1;
+                });
+            }
+
+            if (addPresensiBtn && presensiRowsEl) {
+                addPresensiBtn.addEventListener('click', function() {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="presensi-no"></td>
+                        <td><input type="text" name="presensi_nama[]" class="form-control"></td>
+                        <td><input type="text" name="presensi_peran[]" class="form-control"></td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-light-danger remove-presensi-row">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    presensiRowsEl.appendChild(tr);
+                    renumberPresensiRows();
+                });
+
+                presensiRowsEl.addEventListener('click', function(e) {
+                    const btn = e.target.closest('.remove-presensi-row');
+                    if (!btn) return;
+
+                    const rowCount = presensiRowsEl.querySelectorAll('tr').length;
+                    if (rowCount <= 1) {
+                        Swal.fire({
+                            title: 'Peringatan',
+                            text: 'Minimal harus ada 1 baris presensi.',
+                            icon: 'warning'
+                        });
+                        return;
+                    }
+
+                    btn.closest('tr').remove();
+                    renumberPresensiRows();
+                });
+
+                renumberPresensiRows();
+            }
         });
 
         // Handle form submission for kuisioner with AJAX
@@ -1104,5 +1306,82 @@
                 }
             });
         });
+
+        // Handle form submission for metadata laporan AMI with AJAX + Swal
+        const laporanAmiMetadataForm = document.getElementById('laporanAmiMetadataForm');
+        const submitLaporanAmiMetadataBtn = document.getElementById('submitLaporanAmiMetadata');
+
+        if (laporanAmiMetadataForm && submitLaporanAmiMetadataBtn) {
+            laporanAmiMetadataForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(laporanAmiMetadataForm);
+
+                Swal.fire({
+                    title: 'Konfirmasi Simpan',
+                    text: 'Simpan data Jadwal Audit dan Presensi untuk Laporan AMI?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Simpan!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    submitLaporanAmiMetadataBtn.setAttribute('data-kt-indicator', 'on');
+
+                    fetch(laporanAmiMetadataForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json'
+                        },
+                        credentials: 'same-origin'
+                    })
+                    .then(async (response) => {
+                        const data = await response.json().catch(() => ({}));
+                        if (!response.ok) {
+                            throw { status: response.status, data };
+                        }
+                        return data;
+                    })
+                    .then((data) => {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: data.message || 'Data Jadwal Audit dan Presensi berhasil disimpan.',
+                            icon: 'success',
+                            confirmButtonColor: '#28a745'
+                        }).then(() => {
+                            const modalEl = document.getElementById('laporanAmiMetadataModal');
+                            const modal = bootstrap.Modal.getInstance(modalEl);
+                            if (modal) modal.hide();
+                            location.reload();
+                        });
+                    })
+                    .catch((error) => {
+                        let message = 'Terjadi kesalahan saat menyimpan data.';
+                        if (error?.status === 422 && error?.data?.errors) {
+                            message = Object.values(error.data.errors).flat().join('\n');
+                        } else if (error?.data?.message) {
+                            message = error.data.message;
+                        }
+
+                        Swal.fire({
+                            title: 'Gagal Menyimpan',
+                            text: message,
+                            icon: 'error',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    })
+                    .finally(() => {
+                        submitLaporanAmiMetadataBtn.removeAttribute('data-kt-indicator');
+                    });
+                });
+            });
+        }
     </script>
 @endpush

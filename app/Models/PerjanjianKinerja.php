@@ -16,6 +16,7 @@ class PerjanjianKinerja extends Model
         'pengajuan_ami_id',
         'nama_file',
         'file_path',
+        'size',
     ];
 
     public function periode()

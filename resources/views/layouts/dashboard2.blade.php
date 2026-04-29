@@ -539,26 +539,34 @@
 
                                                     // Get all instrumen IDs that belong to this prodi
                                                     $prodiInstrumenIds = collect();
-                                                    foreach ($dataIkssProdi->indikatorKinerjas as $indikator) {
-                                                        foreach ($indikator->instrumen as $instrumen) {
-                                                            if ($instrumen->jenis_auditee === 'prodi') {
-                                                                $prodiInstrumenIds->push($instrumen->id);
+                                                    if ($dataIkssProdi) {
+                                                        foreach ($dataIkssProdi->indikatorKinerjas as $indikator) {
+                                                            foreach ($indikator->instrumen as $instrumen) {
+                                                                if ($instrumen->jenis_auditee === 'prodi') {
+                                                                    $prodiInstrumenIds->push($instrumen->id);
+                                                                }
                                                             }
                                                         }
                                                     }
 
                                                     // Check if all prodi's IKSS have entries
-                                                    $ikssEntries = App\Models\IkssAuditee::where('auditee_id', $unitKerjaId)
-                                                        ->where('periode_id', $periodeAktif->id)
-                                                        ->whereIn('instrumen_id', $prodiInstrumenIds)
-                                                        ->get();
+                                                    $ikssEntries = collect();
+                                                    if ($periodeAktif) {
+                                                        $ikssEntries = App\Models\IkssAuditee::where('auditee_id', $unitKerjaId)
+                                                            ->where('periode_id', $periodeAktif->id)
+                                                            ->whereIn('instrumen_id', $prodiInstrumenIds)
+                                                            ->get();
+                                                    }
 
                                                     $sudahMengisiIkss = $prodiInstrumenIds->count() > 0 && $ikssEntries->count() === $prodiInstrumenIds->count();
 
-                                                    $sudahMengisiInstrumen = App\Models\IkssAuditee::where('auditee_id', $unitKerjaId)
-                                                                        ->where('periode_id', $periodeAktif->id)
-                                                                        ->whereNotNull('realisasi')
-                                                                        ->exists();
+                                                    $sudahMengisiInstrumen = false;
+                                                    if ($periodeAktif) {
+                                                        $sudahMengisiInstrumen = App\Models\IkssAuditee::where('auditee_id', $unitKerjaId)
+                                                                            ->where('periode_id', $periodeAktif->id)
+                                                                            ->whereNotNull('realisasi')
+                                                                            ->exists();
+                                                    }
 
                                                 @endphp
 
@@ -598,9 +606,12 @@
                                                     <li class="nav-item mt-2">
                                                         @php
                                                             $periodeAktif = App\Models\PeriodeAktif::whereNull('deleted_at')->first();
-                                                            $hasPerjanjianKinerja = App\Models\PerjanjianKinerja::where('auditee_id', Auth::user()->unit_kerja_id)
-                                                                ->where('periode_id', $periodeAktif->id)
-                                                                ->exists();
+                                                            $hasPerjanjianKinerja = false;
+                                                            if ($periodeAktif) {
+                                                                $hasPerjanjianKinerja = App\Models\PerjanjianKinerja::where('auditee_id', Auth::user()->unit_kerja_id)
+                                                                    ->where('periode_id', $periodeAktif->id)
+                                                                    ->exists();
+                                                            }
                                                         @endphp
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                              title="{{ !$hasPerjanjianKinerja ? '<strong>Tidak dapat diakses</strong><br>Unggah Perjanjian Kinerja terlebih dahulu' : '' }}">

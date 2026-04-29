@@ -4,8 +4,8 @@
         /* Wizard navigation styles */
         .wizard-nav {
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-x: scroll !important;
+            overflow-y: hidden !important;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
@@ -17,7 +17,11 @@
             scrollbar-color: #888 #f1f1f1;
             /* Ensure no CSS interference */
             width: 100%;
+            max-width: 100%;
             box-sizing: border-box;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            flex-wrap: nowrap !important;
         }
 
         .wizard-nav::-webkit-scrollbar {
@@ -39,15 +43,16 @@
         }
 
         .wizard-step {
-            flex: 0 0 auto; /* Changed from flex: 1 to prevent equal distribution */
-            min-width: 280px; /* Increased even more to force scroll */
-            max-width: 320px;
+            flex: 0 0 auto !important; /* Changed from flex: 1 to prevent equal distribution */
+            min-width: 280px !important; /* Increased even more to force scroll */
+            max-width: 320px !important;
             text-align: center;
             padding: 0.5rem 2rem;
             position: relative;
             cursor: pointer;
             transition: all 0.3s ease;
-            white-space: nowrap; /* Prevent text wrapping */
+            white-space: nowrap !important; /* Prevent text wrapping */
+            flex-shrink: 0 !important;
         }
 
         .wizard-step:not(:last-child):after {
@@ -124,6 +129,16 @@
             box-shadow: 0 0 20px 0 rgb(0 158 247 / 30%);
         }
 
+        .wizard-step.active .step-label {
+            color: #009EF7 !important;
+            font-weight: 700;
+        }
+
+        .wizard-step.active .step-desc,
+        .wizard-step.active .step-progress {
+            color: #009EF7 !important;
+        }
+
         .wizard-step.completed .step-number {
             background: #50CD89;
             color: white;
@@ -184,6 +199,10 @@
             cursor: grab;
         }
 
+        .wizard-nav:active {
+            cursor: grabbing;
+        }
+
         .wizard-nav.dragging {
             cursor: grabbing;
             user-select: none;
@@ -207,16 +226,21 @@
             to { opacity: 1; }
         }
 
-        /* Original styles */
+        /* Form disabled styles */
         .form-disabled {
             position: relative;
-            opacity: 0.85;
+            opacity: 0.7;
+        }
+
+        .form-disabled input[type="radio"] {
+            cursor: not-allowed;
             pointer-events: none;
         }
 
-        .form-disabled input[type="radio"],
-        .form-disabled button {
+        .form-disabled .btn-next {
             cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.5;
         }
 
         .notice {
@@ -273,10 +297,10 @@
                                     $ssInstrumenCounts[$ssId]['selected']++;
                                     $ssInstrumenCounts[$ssId]['selected_yes']++;
                                     $totalDiisi++;
-                                } elseif (isset($dataTerpilih['pilihan_'.$instrumen->id])) {
+                                } elseif (isset($dataTerpilihCurrent['pilihan_'.$instrumen->id])) {
                                     $ssInstrumenCounts[$ssId]['selected']++;
                                     $totalDiisi++;
-                                    if ($dataTerpilih['pilihan_'.$instrumen->id] == 1) {
+                                    if ($dataTerpilihCurrent['pilihan_'.$instrumen->id] == 1) {
                                         $ssInstrumenCounts[$ssId]['selected_yes']++;
                                     }
                                 }
@@ -305,9 +329,44 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if(!empty($defaultDariPeriodeSebelumnya) && !$sudahMengisi)
+                <div class="alert alert-info d-flex align-items-start p-5 mb-10 border border-info">
+                    <div class="me-4">
+                        <i class="bi bi-info-circle-fill fs-2 text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="fw-bold text-dark mb-2">💡 Tips Cepat: Gunakan Pilihan Periode Sebelumnya</h4>
+                        <div class="fs-6 text-gray-700">
+                            <p class="mb-3">Pilihan IKSS dari <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong> sudah diprefill sebagai default.</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="copyFromPreviousPeriod()">
+                                    <i class="bi bi-check2-square me-1"></i> Gunakan Pilihan Sama dengan Periode Sebelumnya
+                                </button>
+                                <span class="text-muted small">atau ubah pilihan manual di bawah, lalu klik Simpan & Lanjutkan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+            @if(!empty($defaultDariPeriodeSebelumnya) && $sudahMengisi)
+                <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
+                    <div class="me-4">
+                        <i class="bi bi-arrow-repeat fs-2 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="fw-bold text-dark mb-2">Default Periode Sebelumnya Masih Aktif</h4>
+                        <div class="fs-6 text-gray-700">
+                            Untuk instrumen yang belum disimpan di periode aktif, sistem tetap menampilkan default dari
+                            <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong>.
+                            Silakan lanjutkan simpan per SS sampai semua tersimpan.
                         </div>
                     </div>
                 </div>
@@ -326,7 +385,7 @@
                                 @if($semuaInstrumenDiisi)
                                     IKSS telah dipilih dengan lengkap. Silakan lanjut ke tahap pengisian Instrumen Audit.
                                 @else
-                                    Silakan lengkapi pengisian data <strong>IKSS</strong> di bawah ini secara menyeluruh untuk dapat melanjutkan ke tahap <strong>pengisian Instrumen Audit</strong>.
+                                    Silakan lengkapi pengisian data <strong>IKSS</strong> dan simpan pada periode aktif ini untuk dapat melanjutkan ke tahap <strong>pengisian Instrumen Audit</strong>.
                                 @endif
                             </span>
                         </p>
@@ -368,18 +427,20 @@
 
                 <!-- Status Form Information -->
                 @if($pengajuanAmiExists)
-                    <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
+                    <div class="alert alert-success d-flex align-items-start p-5 mb-10 border border-success">
                         <div class="me-4">
-                            <i class="bi bi-lock-fill fs-2 text-warning"></i>
+                            <i class="bi bi-check-circle-fill fs-2 text-success"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="fw-bold text-dark mb-2">🔒 Data Sudah Dikunci</h4>
+                            <h4 class="fw-bold text-dark mb-2">✅ Proses Pemilihan IKSS Sudah Selesai</h4>
                             <div class="fs-6 text-gray-700">
-                                <p class="mt-2">
-                                    <strong>Informasi:</strong>
-                                    <span class="fw-semibold text-warning">
-                                        Data IKSS tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
-                                    </span>
+                                <p class="mb-2">
+                                    Data IKSS untuk periode ini sudah tersimpan. Pilihan Anda tidak dapat diubah kembali karena proses pengisian telah selesai.
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Status:</strong> <span class="badge badge-success">Terseimpan</span>
+                                    <span class="text-muted mx-2">|</span>
+                                    <strong>Total Instrumen Dipilih:</strong> {{ $totalInstrumen }} instrumen
                                 </p>
                             </div>
                         </div>
@@ -420,24 +481,6 @@
                         @endphp
                         <div class="wizard-content" data-step="{{ $loop->iteration }}" data-ss-id="{{ $satuanId }}">
                             <div class="timeline timeline-border-dashed">
-                                <div class="alert bg-light-{{ $ssStats['is_submitted'] ? 'success' : 'warning' }} mb-5">
-                                    <div class="d-flex align-items-center">
-                                        <i class="ki-duotone ki-information-5 fs-2qx me-4 text-{{ $ssStats['is_submitted'] ? 'success' : 'warning' }}">
-                                            <i class="path1"></i>
-                                            <i class="path2"></i>
-                                            <i class="path3"></i>
-                                        </i>
-                                        <div class="d-flex flex-column">
-                                            <h4 class="mb-1 text-{{ $ssStats['is_submitted'] ? 'success' : 'warning' }}">
-                                                Status: {{ $ssStats['is_submitted'] ? 'Sudah Diisi' : 'Belum Diisi' }}
-                                            </h4>
-                                            <span>Sasaran Strategis: {{ $ssStats['kode_satuan'] }} - {{ $ssStats['sasaran'] }}</span>
-                                            <span class="text-muted mt-1">
-                                                Progress: {{ $ssStats['selected'] }}/{{ $ssStats['total'] }} instrumen dipilih ({{ $ssStats['selected_yes'] }} dipilih YA)
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
 
                                 @foreach ($indikators as $indikator)
                                     <div class="timeline-item">
@@ -454,6 +497,13 @@
                                             </div>
 
                                             @foreach ($indikator->instrumen as $instrumen)
+                                                @php
+                                                    $pilihanKey = 'pilihan_' . $instrumen->id;
+                                                    $hasPrevValue = isset($dataTerpilihPrevious[$pilihanKey]);
+                                                    $prevValue = $hasPrevValue ? (int) $dataTerpilihPrevious[$pilihanKey] : null;
+                                                    $currentValue = isset($dataTerpilih[$pilihanKey]) ? (int) $dataTerpilih[$pilihanKey] : null;
+                                                    $isChangedFromPrev = $hasPrevValue && $currentValue !== null && $currentValue !== $prevValue;
+                                                @endphp
                                                 <div class="d-flex align-items-start border border-dashed border-gray-300 rounded px-6 py-4 mb-3" data-is-wajib="0">
                                                     <div class="flex-grow-1">
                                                         <div class="fs-6 fw-bold text-gray-900 mb-1">
@@ -488,6 +538,17 @@
                                                             <label class="form-check-label" for="tidak_{{ $instrumen->id }}">Tidak</label>
                                                         </div>
                                                     </div>
+                                                    @if($hasPrevValue)
+                                                        <div class="w-100 mt-2">
+                                                            <span
+                                                                id="compare_{{ $instrumen->id }}"
+                                                                class="badge fs-8 {{ $isChangedFromPrev ? 'badge-light-warning' : 'badge-light-success' }}"
+                                                                data-prev="{{ $prevValue }}"
+                                                            >
+                                                                {{ $isChangedFromPrev ? 'Berubah dari periode sebelumnya' : 'Sama dengan periode sebelumnya' }}
+                                                            </span>
+                                                        </div>
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
@@ -500,9 +561,15 @@
                                 <button type="button" class="btn btn-light-primary btn-prev" {{ $loop->first ? 'disabled' : '' }}>
                                     <i class="fas fa-arrow-left me-2"></i> Sebelumnya
                                 </button>
-                                <button type="button" class="btn btn-primary btn-next" data-ss-id="{{ $satuanId }}">
-                                    {{ $loop->last ? 'Selesai' : 'Simpan & Lanjutkan' }} <i class="fas fa-arrow-right ms-2"></i>
-                                </button>
+                                @if($pengajuanAmiExists)
+                                    <button type="button" class="btn btn-success" disabled>
+                                        <i class="bi bi-check-circle me-2"></i> Sudah Tersimpan
+                                    </button>
+                                @else
+                                    <button type="button" class="btn btn-primary btn-next" data-ss-id="{{ $satuanId }}">
+                                        {{ $loop->last ? 'Selesai' : 'Simpan & Lanjutkan' }} <i class="fas fa-arrow-right ms-2"></i>
+                                    </button>
+                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -517,7 +584,34 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize data from database
             const dataTerpilih = @json($dataTerpilih);
+            const dataTerpilihCurrent = @json($dataTerpilihCurrent ?? []);
+            const dataTerpilihPrevious = @json($dataTerpilihPrevious ?? []);
             let currentStep = 1;
+
+            function updateComparisonBadge(instrumenId) {
+                const key = `pilihan_${instrumenId}`;
+                if (!Object.prototype.hasOwnProperty.call(dataTerpilihPrevious, key)) {
+                    return;
+                }
+
+                const badge = document.getElementById(`compare_${instrumenId}`);
+                if (!badge) {
+                    return;
+                }
+
+                const prevValue = parseInt(dataTerpilihPrevious[key], 10);
+                const checked = document.querySelector(`input[name="pilihan_${instrumenId}"]:checked`);
+                if (!checked) {
+                    badge.className = 'badge fs-8 badge-light-secondary';
+                    badge.textContent = 'Belum dipilih (ada data periode sebelumnya)';
+                    return;
+                }
+
+                const currentValue = parseInt(checked.value, 10);
+                const isSame = currentValue === prevValue;
+                badge.className = `badge fs-8 ${isSame ? 'badge-light-success' : 'badge-light-warning'}`;
+                badge.textContent = isSame ? 'Sama dengan periode sebelumnya' : 'Berubah dari periode sebelumnya';
+            }
 
             // Function to find the next incomplete step
             function findNextIncompleteStep() {
@@ -539,6 +633,7 @@
                 if (radio) {
                     radio.checked = true;
                 }
+                updateComparisonBadge(instrumenId);
             });
 
             const wizardSteps = document.querySelectorAll('.wizard-step');
@@ -709,7 +804,7 @@
                     const instrumenId = radioName?.replace('pilihan_', '');
 
                     if (instrumenId) {
-                        const isInDatabase = dataTerpilih.hasOwnProperty(`pilihan_${instrumenId}`);
+                        const isInDatabase = dataTerpilihCurrent.hasOwnProperty(`pilihan_${instrumenId}`);
 
                         // All instruments are optional, just check if saved in database
                         if (isInDatabase) {
@@ -731,24 +826,19 @@
             function updateStepAccessibility() {
                 wizardSteps.forEach((step, index) => {
                     const stepNumber = index + 1;
-                    const previousStep = stepNumber - 1;
-                    const isAccessible = stepNumber === 1 || (previousStep > 0 && isStepCompleted(previousStep));
+                    step.style.pointerEvents = 'auto';
+                    step.style.opacity = '1';
+                    step.removeAttribute('title');
 
-                    console.log(`Step ${stepNumber} accessibility check:`, {
-                        isAccessible,
-                        previousStepCompleted: previousStep > 0 ? isStepCompleted(previousStep) : true
-                    });
-
-                    step.style.pointerEvents = isAccessible ? 'auto' : 'none';
-                    step.style.opacity = isAccessible ? '1' : '0.5';
-
-                    if (!isAccessible) {
-                        step.setAttribute('title', 'Selesaikan dan simpan Sasaran Strategis sebelumnya terlebih dahulu');
-                    } else {
-                        step.removeAttribute('title');
+                    // Active step must stay blue even if completed.
+                    if (stepNumber === currentStep) {
+                        step.classList.add('active');
+                        step.classList.remove('completed');
+                        return;
                     }
 
-                    // Update completed status based on database state
+                    // Update completed status for non-active steps.
+                    step.classList.remove('active');
                     if (isStepCompleted(stepNumber)) {
                         step.classList.add('completed');
                     } else {
@@ -820,6 +910,8 @@
             // Add event listener for radio button changes
             document.querySelectorAll('input[type="radio"]').forEach(radio => {
                 radio.addEventListener('change', function() {
+                    const instrumenId = this.name.replace('pilihan_', '');
+                    updateComparisonBadge(instrumenId);
                     updateCurrentStepProgress();
                     updateOverallProgress();
                     updateStepAccessibility(); // Update accessibility after any change
@@ -961,16 +1053,14 @@
             let isDown = false;
             let startX;
             let scrollLeft;
+            let movedDuringDrag = false;
 
             wizardNav.on('mousedown', function(e) {
-                // Only enable drag when clicking on empty space, not on wizard steps
-                if (!$(e.target).closest('.wizard-step').length) {
-                    isDown = true;
-                    wizardNav.addClass('dragging');
-                    startX = e.pageX - wizardNav.offset().left;
-                    scrollLeft = wizardNav.scrollLeft();
-                    e.preventDefault();
-                }
+                isDown = true;
+                movedDuringDrag = false;
+                wizardNav.addClass('dragging');
+                startX = e.pageX - wizardNav.offset().left;
+                scrollLeft = wizardNav.scrollLeft();
             });
 
             wizardNav.on('mouseleave mouseup', function() {
@@ -983,14 +1073,247 @@
                 e.preventDefault();
                 const x = e.pageX - wizardNav.offset().left;
                 const walk = (x - startX) * 2; // Scroll speed multiplier
+                if (Math.abs(walk) > 5) {
+                    movedDuringDrag = true;
+                }
                 wizardNav.scrollLeft(scrollLeft - walk);
             });
 
-            // Enable wheel scrolling (horizontal)
-            wizardNav.on('wheel', function(e) {
-                e.preventDefault();
-                this.scrollLeft += e.originalEvent.deltaY;
+            // Prevent accidental step click when user is dragging.
+            wizardNav.find('.wizard-step').on('click', function(e) {
+                if (movedDuringDrag) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
             });
+
+            // Unified wheel/trackpad scrolling handler
+            wizardNav.on('wheel', function(e) {
+                const nav = this;
+                if (nav.scrollWidth <= nav.clientWidth) {
+                    return;
+                }
+
+                // Handle both trackpad horizontal scroll and mouse wheel
+                const deltaX = e.originalEvent.deltaX;
+                const deltaY = e.originalEvent.deltaY;
+
+                // Use deltaX if available (trackpad horizontal scroll), otherwise use deltaY (mouse wheel)
+                if (deltaX !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaX;
+                } else if (deltaY !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaY;
+                }
+            }, { passive: false });
+
+            // Add trackpad swipe support using pointer events
+            let pointerStartX = 0;
+            let pointerStartY = 0;
+            let isPointerDown = false;
+
+            wizardNav.on('pointerdown', function(e) {
+                isPointerDown = true;
+                pointerStartX = e.pageX;
+                pointerStartY = e.pageY;
+                wizardNav.css('cursor', 'grabbing');
+            });
+
+            wizardNav.on('pointerup pointerleave', function(e) {
+                isPointerDown = false;
+                wizardNav.css('cursor', 'grab');
+            });
+
+            wizardNav.on('pointermove', function(e) {
+                if (!isPointerDown) return;
+
+                const deltaX = e.pageX - pointerStartX;
+                const deltaY = e.pageY - pointerStartY;
+
+                // Only scroll if horizontal movement is greater than vertical
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    e.preventDefault();
+                    wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+                    pointerStartX = e.pageX;
+                }
+            });
+
+            // Add touch swipe support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            wizardNav.on('touchstart', function(e) {
+                touchStartX = e.originalEvent.changedTouches[0].screenX;
+            }, { passive: true });
+
+            wizardNav.on('touchend', function(e) {
+                touchEndX = e.originalEvent.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        // Swipe left - scroll right
+                        wizardNav[0].scrollLeft += 200;
+                    } else {
+                        // Swipe right - scroll left
+                        wizardNav[0].scrollLeft -= 200;
+                    }
+                }
+            }
         });
+
+            // Fungsi untuk copy pilihan dari periode sebelumnya
+            function copyFromPreviousPeriod() {
+                // Data dari PHP
+                const dataTerpilihPrevious = @json($dataTerpilihPrevious ?? []);
+                const dataTerpilihCurrent = @json($dataTerpilihCurrent ?? []);
+
+                // Cek validasi: ada minimal 1 perubahan yang conflict
+                const conflicts = [];
+                const newSelections = [];
+                const removedSelections = [];
+
+                // Cek instrumen yang status_target berubah
+                for (const [key, prevValue] of Object.entries(dataTerpilihPrevious)) {
+                    const currentValue = dataTerpilihCurrent[key];
+
+                    if (currentValue === undefined) {
+                        // Baru dipilih di periode sebelumnya, belum ada di periode aktif
+                        newSelections.push(key);
+                    } else if (currentValue !== prevValue) {
+                        // Status berubah: jadi conflict
+                        conflicts.push({
+                            key: key,
+                            prev: prevValue,
+                            current: currentValue
+                        });
+                    }
+                }
+
+                // Cek instrumen yang sebelumnya dipilih tapi sekarang tidak
+                for (const [key, currentValue] of Object.entries(dataTerpilihCurrent)) {
+                    if (dataTerpilihPrevious[key] === undefined && currentValue === 1) {
+                        // Dulu dipilih (1), sekarang tidak ada di previous (berarti 0)
+                        removedSelections.push(key);
+                    }
+                }
+
+                // Jika ada conflict, tampilkan peringatan
+                if (conflicts.length > 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '⚠️ Tidak Dapat Menggunakan Pilihan Sama',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Terdapat <strong class="text-danger">${conflicts.length} perubahan status pilihan IKSS</strong> antara periode sebelumnya dan periode aktif saat ini:</p>
+                                <ul class="mb-3 small">
+                                    ${conflicts.slice(0, 5).map(c => `<li>Instrumen ${c.key.replace('pilihan_', '')}: Dulu <strong>${c.prev === 1 ? 'Dipilih' : 'Tidak Dipilih'}</strong>, sekarang <strong>${c.current === 1 ? 'Dipilih' : 'Tidak Dipilih'}</strong></li>`).join('')}
+                                    ${conflicts.length > 5 ? `<li>...dan ${conflicts.length - 5} lainnya</li>` : ''}
+                                </ul>
+                                <p class="text-muted small">Anda harus memilih manual instrumen yang ingin digunakan.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#f64e60'
+                    });
+                    return;
+                }
+
+                // Jika ada yang baru dipilih di periode sebelumnya tapi belum ada di periode aktif
+                if (newSelections.length > 0) {
+                    Swal.fire({
+                        icon: 'question',
+                        title: 'Gunakan Pilihan Sama dengan Periode Sebelumnya?',
+                        html: `
+                            <div class="text-start">
+                                <p class="mb-3">Akan <strong>menambah ${newSelections.length} pilihan IKSS</strong> dari periode sebelumnya:</p>
+                                <p class="text-muted small">Pilihan IKSS yang sudah ada di periode aktif akan tetap dipertahankan.</p>
+                            </div>
+                        `,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Gunakan',
+                        cancelButtonText: 'Batal',
+                        confirmButtonColor: '#009EF7'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Submit form dengan pilihan dari periode sebelumnya
+                            submitCopyFromPrevious();
+                        }
+                    });
+                    return;
+                }
+
+                // Jika semua sama, beri info
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Pilihan Sama dengan Periode Sebelumnya',
+                    text: 'Pilihan IKSS di periode aktif sudah sama dengan periode sebelumnya. Tidak ada perubahan.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#009EF7'
+                });
+            }
+
+            function submitCopyFromPrevious() {
+                const dataTerpilihPrevious = @js($dataTerpilihPrevious);
+                const auditeeId = @js(Auth::user()->unit_kerja_id);
+
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('_token', document.querySelector('input[name="_token"]').value);
+                formData.append('auditee_id', {{ Auth::user()->unit_kerja_id }});
+
+                // Tambahkan semua pilihan dari periode sebelumnya
+                for (const [key, value] of Object.entries(dataTerpilihPrevious)) {
+                    const instrumenId = key.replace('pilihan_', '');
+                    // Hanya tambahkan yang belum ada di current
+                    if (@js($dataTerpilihCurrent)[key] === undefined) {
+                        formData.append(key, value);
+                    }
+                }
+
+                // Show loading
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Submit via AJAX
+                $.ajax({
+                    url: '{{ route("auditee.pengajuanAmi.saveIkss") }}',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: `Pilihan IKSS dari periode sebelumnya berhasil disimpan! (${response.saved_count} instrumen)`,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: xhr.responseJSON?.message || 'Terjadi kesalahan',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
     </script>
 @endpush

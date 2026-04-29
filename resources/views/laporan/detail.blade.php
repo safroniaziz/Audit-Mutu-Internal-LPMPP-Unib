@@ -1,6 +1,36 @@
 @extends('layouts.dashboard.dashboard')
 @section('menu')
     Detail Laporan AMI
+    <div class="modal fade" id="ssComparisonDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Detail Perbandingan SS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2 text-muted fs-8">Kode SS</div>
+                    <div class="fw-bold mb-3" id="ss-detail-kode">-</div>
+                    <div class="mb-2 text-muted fs-8">Sasaran</div>
+                    <div class="fw-semibold mb-4" id="ss-detail-sasaran">-</div>
+                    <div class="d-flex align-items-center justify-content-between rounded bg-light p-4">
+                        <div class="text-center">
+                            <div class="text-muted fs-8">Sebelumnya</div>
+                            <div class="fw-bold fs-2" id="ss-detail-prev">0.00</div>
+                        </div>
+                        <div class="text-center">
+                            <i id="ss-detail-arrow" class="fas fa-arrows-left-right fs-2 text-warning"></i>
+                            <div id="ss-detail-delta" class="fw-bold mt-1 text-warning">0.00</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-muted fs-8">Sekarang</div>
+                            <div class="fw-bold fs-2" id="ss-detail-curr">0.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('link')
     <li class="breadcrumb-item text-muted">
@@ -124,6 +154,167 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Status Persetujuan Auditor & Reset Requests -->
+            <div class="card shadow-sm border-0 mb-8">
+                <div class="card-header border-0 pt-5">
+                    <h3 class="card-title fw-bold text-dark">
+                        <i class="fas fa-user-shield me-2 text-info"></i>
+                        Status Persetujuan Auditor
+                    </h3>
+                    @if(isset($pendingResetRequests) && $pendingResetRequests->where('status', 'pending')->count() > 0)
+                        <div class="card-toolbar">
+                            <span class="badge badge-danger">{{ $pendingResetRequests->where('status', 'pending')->count() }} Permintaan Reset</span>
+                        </div>
+                    @endif
+                </div>
+                <div class="card-body pt-0">
+                    <!-- Auditor Status Table -->
+                    <div class="table-responsive mb-6">
+                        <table class="table table-row-dashed table-row-gray-300 align-middle">
+                            <thead>
+                                <tr class="fw-bold text-muted bg-light">
+                                    <th class="ps-4" width="5%">No</th>
+                                    <th width="25%">Auditor</th>
+                                    <th width="12%">Peran</th>
+                                    <th width="18%" class="text-center">Desk Evaluation</th>
+                                    <th width="18%" class="text-center">Instrumen Prodi</th>
+                                    <th width="18%" class="text-center">Visitasi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($pengajuanAmis->auditors as $index => $auditor)
+                                    <tr>
+                                        <td class="ps-4">{{ $index + 1 }}</td>
+                                        <td>
+                                            <span class="fw-semibold text-dark">{{ $auditor->auditor->name }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-light-{{ $auditor->role == 'ketua' ? 'primary' : 'warning' }}">
+                                                {{ ucfirst($auditor->role) }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($auditor->is_setuju)
+                                                <span class="badge badge-light-success"><i class="fas fa-check me-1"></i>Disetujui</span>
+                                            @else
+                                                <span class="badge badge-light-secondary"><i class="fas fa-clock me-1"></i>Belum</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($auditor->is_setuju_indikator_prodi)
+                                                <span class="badge badge-light-success"><i class="fas fa-check me-1"></i>Disetujui</span>
+                                            @else
+                                                <span class="badge badge-light-secondary"><i class="fas fa-clock me-1"></i>Belum</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            @if($auditor->is_setuju_visitasi)
+                                                <span class="badge badge-light-success"><i class="fas fa-check me-1"></i>Disetujui</span>
+                                            @else
+                                                <span class="badge badge-light-secondary"><i class="fas fa-clock me-1"></i>Belum</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pending Reset Requests -->
+                    @if(isset($pendingResetRequests) && $pendingResetRequests->where('status', 'pending')->count() > 0)
+                        <div class="notice d-flex bg-light-warning rounded border-warning border border-dashed p-4 mb-4">
+                            <i class="fas fa-exclamation-triangle fs-2 text-warning me-3"></i>
+                            <div class="fw-semibold">
+                                <h5 class="text-dark fw-bold mb-2">Permintaan Reset Persetujuan</h5>
+                                <span class="fs-7 text-gray-700">Auditor berikut mengajukan pembatalan persetujuan dan membutuhkan persetujuan Anda.</span>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-row-dashed table-row-gray-300 align-middle">
+                                <thead>
+                                    <tr class="fw-bold text-muted bg-light">
+                                        <th class="ps-4" width="5%">No</th>
+                                        <th width="20%">Auditor</th>
+                                        <th width="15%">Tahap</th>
+                                        <th width="25%">Alasan</th>
+                                        <th width="15%">Tanggal</th>
+                                        <th width="20%" class="text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($pendingResetRequests->where('status', 'pending') as $index => $resetReq)
+                                        <tr id="reset-row-{{ $resetReq->id }}">
+                                            <td class="ps-4">{{ $index + 1 }}</td>
+                                            <td>
+                                                <span class="fw-semibold text-dark">{{ $resetReq->penugasanAuditor->auditor->name }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-light-info">{{ $resetReq->tahap_label }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-gray-700 fs-7">{{ $resetReq->alasan }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted fs-7">{{ $resetReq->created_at->format('d M Y H:i') }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <button class="btn btn-sm btn-success me-1 btn-approve-reset" data-id="{{ $resetReq->id }}">
+                                                    <i class="fas fa-check me-1"></i>Setujui
+                                                </button>
+                                                <button class="btn btn-sm btn-danger btn-reject-reset" data-id="{{ $resetReq->id }}">
+                                                    <i class="fas fa-times me-1"></i>Tolak
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+
+                    <!-- History of processed requests -->
+                    @if(isset($pendingResetRequests) && $pendingResetRequests->whereIn('status', ['approved', 'rejected'])->count() > 0)
+                        <div class="mt-6">
+                            <h6 class="fw-bold text-gray-600 mb-3">
+                                <i class="fas fa-history me-2"></i>Riwayat Permintaan Reset
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-row-dashed table-row-gray-300 align-middle">
+                                    <thead>
+                                        <tr class="fw-bold text-muted bg-light">
+                                            <th class="ps-4">Auditor</th>
+                                            <th>Tahap</th>
+                                            <th>Alasan</th>
+                                            <th>Status</th>
+                                            <th>Diproses</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($pendingResetRequests->whereIn('status', ['approved', 'rejected']) as $historyReq)
+                                            <tr>
+                                                <td class="ps-4">
+                                                    <span class="fw-semibold fs-7">{{ $historyReq->penugasanAuditor->auditor->name }}</span>
+                                                </td>
+                                                <td><span class="badge badge-light-info fs-8">{{ $historyReq->tahap_label }}</span></td>
+                                                <td><span class="text-gray-600 fs-8">{{ Str::limit($historyReq->alasan, 50) }}</span></td>
+                                                <td>
+                                                    @if($historyReq->status === 'approved')
+                                                        <span class="badge badge-light-success fs-8">Disetujui</span>
+                                                    @else
+                                                        <span class="badge badge-light-danger fs-8">Ditolak</span>
+                                                    @endif
+                                                </td>
+                                                <td><span class="text-muted fs-8">{{ $historyReq->approved_at?->format('d M Y H:i') }}</span></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -330,7 +521,64 @@
                                         break;
                                     }
                                 }
+
+                                $ssRowsWithComparison = collect($sortedGrouped)
+                                    ->filter(fn($g) => $g['has_data'])
+                                    ->map(function($g) use ($ssComparison) {
+                                        $cmp = $ssComparison[$g['kode_satuan']] ?? null;
+                                        return [
+                                            'kode' => $g['kode_satuan'],
+                                            'sasaran' => $g['sasaran'],
+                                            'curr' => $cmp['curr_avg'] ?? null,
+                                            'prev' => $cmp['prev_avg'] ?? null,
+                                            'delta' => $cmp['delta'] ?? null,
+                                        ];
+                                    })
+                                    ->filter(fn($r) => !is_null($r['prev']) && !is_null($r['curr']))
+                                    ->values();
+
+                                $ssTurun = $ssRowsWithComparison
+                                    ->filter(fn($r) => (float)$r['curr'] < (float)$r['prev'])
+                                    ->values();
+
+                                $ssSama = $ssRowsWithComparison
+                                    ->filter(fn($r) => (float)$r['curr'] == (float)$r['prev'])
+                                    ->count();
+
+                                $ssNaik = $ssRowsWithComparison
+                                    ->filter(fn($r) => (float)$r['curr'] > (float)$r['prev'])
+                                    ->count();
                             @endphp
+                            @if($ssRowsWithComparison->count() > 0)
+                                <div class="alert {{ $ssTurun->count() > 0 ? 'alert-danger' : 'alert-success' }} d-flex align-items-start p-4 mb-4">
+                                    <span class="me-3 mt-1">
+                                        <i class="fas {{ $ssTurun->count() > 0 ? 'fa-exclamation-triangle text-danger' : 'fa-check-circle text-success' }} fs-2"></i>
+                                    </span>
+                                    <div class="d-flex flex-column w-100">
+                                        <h5 class="mb-2 {{ $ssTurun->count() > 0 ? 'text-danger' : 'text-success' }}">Rapor Sasaran Strategis</h5>
+                                        @if($ssTurun->count() > 0)
+                                            <span class="mb-2">
+                                                Belum memenuhi aturan: ada <strong>{{ $ssTurun->count() }}</strong> sasaran yang nilainya turun dari periode sebelumnya.
+                                                Minimal nilai sekarang harus sama atau lebih tinggi dari sebelumnya.
+                                            </span>
+                                            <ul class="mb-0 ps-5">
+                                                @foreach($ssTurun as $item)
+                                                    <li>
+                                                        <strong>{{ $item['kode'] }}</strong> - {{ $item['sasaran'] }}
+                                                        ({{ number_format($item['prev'], 2) }} -> {{ number_format($item['curr'], 2) }},
+                                                        turun {{ number_format(abs($item['delta']), 2) }})
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            <span class="mb-0">
+                                                Sudah bagus: tidak ada sasaran yang turun dari periode sebelumnya.
+                                                Ringkasan: naik {{ $ssNaik }}, sama {{ $ssSama }}, turun 0.
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                             @if($hasMissingValues)
                             <div class="alert alert-info d-flex align-items-center p-4 mb-4">
                                 <span class="svg-icon svg-icon-2hx svg-icon-info me-4">
@@ -357,7 +605,9 @@
                                             <th width="10%" class="text-center">Anggota</th>
                                             <th width="10%" class="text-center">Total</th>
                                             <th width="8%" class="text-center">Jumlah</th>
-                                            <th width="15%" class="text-center">Rata-rata</th>
+                                            <th width="12%" class="text-center">Sebelumnya</th>
+                                            <th width="12%" class="text-center">Sekarang</th>
+                                            <th width="16%" class="text-center">Perubahan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -395,17 +645,87 @@
                                                 <td class="text-center">
                                                         <span class="badge badge-light-primary fw-bold">{{ number_format($group['total_nilai'], 2) }}</span>
                                                 </td>
-                                                <td class="text-center">
+                                                    <td class="text-center">
                                                         <span class="badge badge-light-secondary fw-bold">{{ $group['jumlah_penilaian'] }}</span>
                                                 </td>
                                                 <td class="text-center">
-                                                        <div class="d-flex align-items-center justify-content-center">
-                                                            <div class="progress h-8px w-50px me-3">
-                                                                <div class="progress-bar bg-{{ $progressColor }}"
-                                                                     style="width: {{ ($group['rata_rata'] / 4) * 100 }}%"></div>
-                                                            </div>
-                                                            <span class="badge badge-light-{{ $progressColor }} fw-bold">{{ number_format($group['rata_rata'], 2) }}</span>
+                                                    @php
+                                                        $cmp = $ssComparison[$group['kode_satuan']] ?? null;
+                                                    @endphp
+                                                    @if($cmp && !is_null($cmp['prev_avg']))
+                                                        <span class="badge badge-light-dark fw-bold">{{ number_format($cmp['prev_avg'], 2) }}</span>
+                                                    @else
+                                                        <span class="badge badge-light-secondary fw-bold">-</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $cmp = $ssComparison[$group['kode_satuan']] ?? null;
+                                                        $nowBadge = $progressColor;
+                                                        $nowProgressColor = $progressColor;
+                                                        if ($cmp && !is_null($cmp['prev_avg'])) {
+                                                            if ((float) $cmp['curr_avg'] < (float) $cmp['prev_avg']) {
+                                                                $nowBadge = 'danger';
+                                                                $nowProgressColor = 'danger';
+                                                            } elseif ((float) $cmp['curr_avg'] == (float) $cmp['prev_avg']) {
+                                                                $nowBadge = 'warning';
+                                                                $nowProgressColor = 'warning';
+                                                            } else {
+                                                                $nowBadge = 'success';
+                                                                $nowProgressColor = 'success';
+                                                            }
+                                                        }
+                                                    @endphp
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <div class="progress h-8px w-50px me-3">
+                                                            <div class="progress-bar bg-{{ $nowProgressColor }}"
+                                                                 style="width: {{ ($group['rata_rata'] / 4) * 100 }}%"></div>
                                                         </div>
+                                                        <span class="badge badge-light-{{ $nowBadge }} fw-bold">{{ number_format($group['rata_rata'], 2) }}</span>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    @php
+                                                        $cmp = $ssComparison[$group['kode_satuan']] ?? null;
+                                                    @endphp
+                                                    @if($cmp && !is_null($cmp['delta']))
+                                                        @if($cmp['trend'] === 'up')
+                                                            <button type="button" class="btn btn-sm btn-light-success fw-bold py-1 px-2 ss-detail-btn"
+                                                                    data-bs-toggle="modal" data-bs-target="#ssComparisonDetailModal"
+                                                                    data-kode="{{ $group['kode_satuan'] }}"
+                                                                    data-sasaran="{{ $group['sasaran'] }}"
+                                                                    data-prev="{{ number_format($cmp['prev_avg'], 2, '.', '') }}"
+                                                                    data-curr="{{ number_format($cmp['curr_avg'], 2, '.', '') }}"
+                                                                    data-delta="{{ number_format($cmp['delta'], 2, '.', '') }}"
+                                                                    data-trend="up">
+                                                                <i class="fas fa-arrow-up me-1"></i>{{ number_format($cmp['delta'], 2) }}
+                                                            </button>
+                                                        @elseif($cmp['trend'] === 'down')
+                                                            <button type="button" class="btn btn-sm btn-light-danger fw-bold py-1 px-2 ss-detail-btn"
+                                                                    data-bs-toggle="modal" data-bs-target="#ssComparisonDetailModal"
+                                                                    data-kode="{{ $group['kode_satuan'] }}"
+                                                                    data-sasaran="{{ $group['sasaran'] }}"
+                                                                    data-prev="{{ number_format($cmp['prev_avg'], 2, '.', '') }}"
+                                                                    data-curr="{{ number_format($cmp['curr_avg'], 2, '.', '') }}"
+                                                                    data-delta="{{ number_format($cmp['delta'], 2, '.', '') }}"
+                                                                    data-trend="down">
+                                                                <i class="fas fa-arrow-down me-1"></i>{{ number_format(abs($cmp['delta']), 2) }}
+                                                            </button>
+                                                        @else
+                                                            <button type="button" class="btn btn-sm btn-light-warning fw-bold py-1 px-2 ss-detail-btn"
+                                                                    data-bs-toggle="modal" data-bs-target="#ssComparisonDetailModal"
+                                                                    data-kode="{{ $group['kode_satuan'] }}"
+                                                                    data-sasaran="{{ $group['sasaran'] }}"
+                                                                    data-prev="{{ number_format($cmp['prev_avg'], 2, '.', '') }}"
+                                                                    data-curr="{{ number_format($cmp['curr_avg'], 2, '.', '') }}"
+                                                                    data-delta="0.00"
+                                                                    data-trend="same">
+                                                                <i class="fas fa-arrows-left-right me-1"></i>0.00
+                                                            </button>
+                                                        @endif
+                                                    @else
+                                                        <span class="badge badge-light-info fw-bold">Data baru</span>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endif
@@ -1188,6 +1508,113 @@
             downloadLink.click();
             document.body.removeChild(downloadLink);
         }
+
+        document.querySelectorAll('.ss-detail-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const kode = this.getAttribute('data-kode') || '-';
+                const sasaran = this.getAttribute('data-sasaran') || '-';
+                const prev = this.getAttribute('data-prev') || '0.00';
+                const curr = this.getAttribute('data-curr') || '0.00';
+                const deltaRaw = this.getAttribute('data-delta') || '0.00';
+                const trend = this.getAttribute('data-trend') || 'same';
+
+                document.getElementById('ss-detail-kode').textContent = kode;
+                document.getElementById('ss-detail-sasaran').textContent = sasaran;
+                document.getElementById('ss-detail-prev').textContent = prev;
+                document.getElementById('ss-detail-curr').textContent = curr;
+
+                const arrow = document.getElementById('ss-detail-arrow');
+                const delta = document.getElementById('ss-detail-delta');
+                const absDelta = Math.abs(parseFloat(deltaRaw || 0)).toFixed(2);
+
+                arrow.className = 'fas fs-2';
+                if (trend === 'up') {
+                    arrow.classList.add('fa-arrow-up', 'text-success');
+                    delta.className = 'fw-bold mt-1 text-success';
+                    delta.textContent = '+' + absDelta;
+                } else if (trend === 'down') {
+                    arrow.classList.add('fa-arrow-down', 'text-danger');
+                    delta.className = 'fw-bold mt-1 text-danger';
+                    delta.textContent = '-' + absDelta;
+                } else {
+                    arrow.classList.add('fa-arrows-left-right', 'text-warning');
+                    delta.className = 'fw-bold mt-1 text-warning';
+                    delta.textContent = '0.00';
+                }
+            });
+        });
+        // Reset Approval Request handlers
+        $(document).on('click', '.btn-approve-reset', function() {
+            const requestId = $(this).data('id');
+            Swal.fire({
+                title: 'Setujui Reset?',
+                text: 'Persetujuan auditor akan di-reset dan auditor dapat mengedit ulang.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#50cd89',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Setujui',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `{{ url('laporan/reset-approval') }}/${requestId}/approve`,
+                        type: 'POST',
+                        data: { _token: '{{ csrf_token() }}' },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Gagal', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan.', 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-reject-reset', function() {
+            const requestId = $(this).data('id');
+            Swal.fire({
+                title: 'Tolak Permintaan Reset?',
+                input: 'textarea',
+                inputLabel: 'Catatan (opsional)',
+                inputPlaceholder: 'Alasan penolakan...',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Tolak',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `{{ url('laporan/reset-approval') }}/${requestId}/reject`,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            catatan_admin: result.value
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Ditolak', response.message, 'info').then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Gagal', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan.', 'error');
+                        }
+                    });
+                }
+            });
+        });
     </script>
 @endpush
 

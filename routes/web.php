@@ -8,6 +8,7 @@ use App\Http\Controllers\AuditorAuditController;
 use App\Http\Controllers\AuditorController;
 use App\Http\Controllers\AuditorProfilController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardNilaiAmiController;
 use App\Http\Controllers\DokumenAmiController;
 use App\Http\Controllers\EvaluasiAuditeeController;
 use App\Http\Controllers\EvaluasiController;
@@ -38,6 +39,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuditeeLaporanAmiController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\IndikatorRtmController;
 use Illuminate\Http\Request;
 
 // Route untuk halaman maintenance
@@ -94,6 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('/', [IndikatorInstrumenController::class, 'store'])->name('store');
             Route::get('/{indikator}/edit', [IndikatorInstrumenController::class, 'edit'])->name('edit');
             Route::put('/{indikator}', [IndikatorInstrumenController::class, 'update'])->name('update');
+            Route::delete('/{indikator}/prodi', [IndikatorInstrumenController::class, 'removeProdi'])->name('removeProdi');
             Route::delete('/{indikator}', [IndikatorInstrumenController::class, 'nonaktifkan'])->name('nonaktifkan');
             Route::post('/delete-selected', [IndikatorInstrumenController::class, 'nonaktifkanSelected'])->name('nonaktifkanSelected');
             Route::put('/auditor/{id}/restore', [IndikatorInstrumenController::class, 'restore'])->name('restore');
@@ -326,11 +329,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/{id}/berita-acara', [LaporanHasilAuditController::class, 'beritaAcara'])->name('beritaAcara');
             Route::get('/{id}/evaluasi-ami', [LaporanHasilAuditController::class, 'evaluasiAmi'])->name('evaluasiAmi');
             Route::get('/{id}/laporan-ami', [LaporanHasilAuditController::class, 'laporanAmi'])->name('laporanAmi');
+
+            // Reset Approval Requests (Admin side)
+            Route::post('/reset-approval/{id}/approve', [LaporanHasilAuditController::class, 'approveResetRequest'])->name('approveResetRequest');
+            Route::post('/reset-approval/{id}/reject', [LaporanHasilAuditController::class, 'rejectResetRequest'])->name('rejectResetRequest');
         });
 
         Route::prefix('auditor')->name('auditor.')->group(function () {
             Route::get('/', [AuditorController::class, 'index'])->name('index');
         });
+
+        // Dashboard Visualisasi Nilai AMI
+        Route::prefix('dashboard-nilai-ami')->name('dashboardNilaiAmi.')->group(function () {
+            Route::get('/', [DashboardNilaiAmiController::class, 'index'])->name('index');
+            Route::get('/get-prodi-by-fakultas', [DashboardNilaiAmiController::class, 'getProdiByFakultas'])->name('getProdiByFakultas');
+            Route::get('/get-chart-data', [DashboardNilaiAmiController::class, 'getChartData'])->name('getChartData');
+            Route::get('/get-fakultas-summary', [DashboardNilaiAmiController::class, 'getFakultasSummary'])->name('getFakultasSummary');
+        });
+
+        // Indikator RTM
+        Route::prefix('indikator-rtm')->name('indikatorRtm.')->group(function () {
+            Route::get('/', [IndikatorRtmController::class, 'index'])->name('index');
+            Route::get('/fakultas/detail', [IndikatorRtmController::class, 'detailFakultas'])->name('detailFakultas');
+            Route::get('/lam/detail', [IndikatorRtmController::class, 'detailLam'])->name('detailLam');
+            Route::get('/{pengajuan}/detail', [IndikatorRtmController::class, 'detail'])->whereNumber('pengajuan')->name('detail');
+        });
+
     });
     Route::middleware(['role:Auditee'])->group(function () {
 
@@ -343,9 +367,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             });
 
             Route::get('/pengajuan_ami', [AuditeePengajuanAmiController::class, 'index'])->name('pengajuanAmi');
+            Route::post('/pengajuan_ami/upload-rtl-sebelumnya', [AuditeePengajuanAmiController::class, 'uploadPreviousRtl'])->name('pengajuanAmi.uploadPreviousRtl');
+            Route::delete('/pengajuan_ami/delete-rtl-sebelumnya', [AuditeePengajuanAmiController::class, 'deletePreviousRtl'])->name('pengajuanAmi.deletePreviousRtl');
 
             Route::get('/perjanjian_kinerja', [AuditeePengajuanAmiController::class, 'perjanjianKinerja'])->name('pengajuanAmi.perjanjianKinerja');
             Route::post('/upload-perjanjian-kinerja', [AuditeePengajuanAmiController::class, 'uploadPerjanjianKinerja'])->name('pengajuanAmi.uploadPerjanjianKinerja');
+            Route::post('/use-previous-perjanjian-kinerja', [AuditeePengajuanAmiController::class, 'usePreviousPerjanjianKinerja'])->name('pengajuanAmi.usePreviousPerjanjianKinerja');
             Route::delete('/delete-perjanjian-kinerja/{id}', [AuditeePengajuanAmiController::class, 'deletePerjanjianKinerja'])->name('pengajuanAmi.deletePerjanjianKinerja');
 
             Route::get('/pemilihan_ikss', [AuditeePengajuanAmiController::class, 'pemilihanIkss'])->name('pengajuanAmi.pemilihanIkss');
@@ -354,6 +381,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/pengisian_instrumen', [AuditeePengajuanAmiController::class, 'pengisianInstrumen'])->name('pengajuanAmi.pengisianInstrumen');
             Route::post('/submit-all-instrumen', [AuditeePengajuanAmiController::class, 'submitAllInstrumen'])->name('submitAllInstrumen');
+            Route::post('/copy-instrumen-from-previous', [AuditeePengajuanAmiController::class, 'copyInstrumenFromPrevious'])->name('pengajuanAmi.copyInstrumenFromPrevious');
             Route::post('/submit-instrumen-ss/{ss_id}', [AuditeePengajuanAmiController::class, 'submitInstrumenSS'])->name('pengajuanAmi.submitInstrumenSS');
 
             Route::get('/pengisian_instrumen_prodi', [AuditeePengajuanAmiController::class, 'pengisianInstrumenProdi'])->name('pengajuanAmi.pengisianInstrumenProdi');
@@ -385,6 +413,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:Auditor')->group(function () {
         Route::prefix('auditor')->name('auditor.')->group(function () {
             Route::get('/dashboard', [AuditorProfilController::class, 'index'])->name('dashboard');
+            Route::post('/dashboard/ttd', [AuditorProfilController::class, 'updateTtd'])->name('updateTtd');
             Route::get('/download', [AuditorProfilController::class, 'downloadAllFiles'])->name('downloadAllFiles');
 
             Route::prefix('audit')->name('audit.')->group(function () {
@@ -405,6 +434,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/approve', [AuditorAuditController::class, 'approvePenilaianProdi'])->name('approvePenilaianProdi');
     Route::post('/penilaian_instrumen_prodi/{pengajuan}/save-active-kriteria', [AuditorAuditController::class, 'saveActiveKriteria'])->name('saveActiveKriteria');
 
+                // Reset Approval Requests (Auditor side)
+                Route::post('/reset-approval-request', [AuditorAuditController::class, 'submitResetRequest'])->name('submitResetRequest');
+
                 Route::get('/unduh_dokumen/{pengajuan}', [AuditorAuditController::class, 'unduhDokumen'])->name('unduhDokumen');
                 Route::post('/save-kuisioner/{pengajuan}', [AuditorAuditController::class, 'saveKuisioner'])->name('saveKuisioner');
                 Route::prefix('cetak')->group(function () {
@@ -414,6 +446,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                     Route::get('/evaluasi/{pengajuan}/view', [AuditorAuditController::class, 'viewEvaluasiAmi'])->name('viewEvaluasiAmi');
                     Route::get('/daftar-pertanyaan/{pengajuan}', [AuditorAuditController::class, 'daftarPertanyaan'])->name('daftarPertanyaan');
                     Route::post('/laporan-ami/{pengajuan}', [AuditorAuditController::class, 'laporanAmi'])->name('laporanAmi');
+                    Route::post('/laporan-ami/{pengajuan}/metadata', [AuditorAuditController::class, 'saveLaporanAmiMetadata'])->name('saveLaporanAmiMetadata');
                     Route::get('/laporan-ami/{pengajuan}/view', [AuditorAuditController::class, 'viewLaporanAmi'])->name('viewLaporanAmi');
                 });
             });

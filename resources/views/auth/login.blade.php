@@ -50,6 +50,13 @@
             box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
         }
 
+        .login-btn:disabled {
+            transform: none;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
         .form-input:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
         }
@@ -468,7 +475,7 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                <form method="POST" action="{{ route('login') }}" class="space-y-5" id="loginForm">
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Username atau Email</label>
@@ -511,8 +518,17 @@
                         </a>
                     </div>
 
-                    <button type="submit" class="login-btn w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white focus:outline-none">
-                        <i class="fas fa-sign-in-alt mr-2"></i> MASUK
+                    <button type="submit" id="loginButton" class="login-btn w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white focus:outline-none">
+                        <span class="login-btn-default flex items-center">
+                            <i class="fas fa-sign-in-alt mr-2"></i> MASUK
+                        </span>
+                        <span class="login-btn-loading hidden items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                            </svg>
+                            Memproses...
+                        </span>
                     </button>
                 </form>
 
@@ -961,6 +977,39 @@ document.addEventListener('DOMContentLoaded', function() {
             // Make functions available to the window scope if needed
             window.adjustLayout = adjustLayout;
             window.renderDocuments = renderDocuments;
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            const loginButton = document.getElementById('loginButton');
+
+            if (!loginForm || !loginButton) {
+                return;
+            }
+
+            const defaultLabel = loginButton.querySelector('.login-btn-default');
+            const loadingLabel = loginButton.querySelector('.login-btn-loading');
+            let isSubmitting = false;
+
+            loginForm.addEventListener('submit', function (event) {
+                if (isSubmitting) {
+                    event.preventDefault();
+                    return;
+                }
+
+                isSubmitting = true;
+                loginButton.disabled = true;
+                loginButton.setAttribute('aria-busy', 'true');
+
+                if (defaultLabel) {
+                    defaultLabel.classList.add('hidden');
+                }
+
+                if (loadingLabel) {
+                    loadingLabel.classList.remove('hidden');
+                    loadingLabel.classList.add('flex');
+                }
+            });
         });
     </script>
 </body>

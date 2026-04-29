@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -28,5 +29,10 @@ class PeriodeAktif extends Model
     public function pengajuanAmi(): HasMany
     {
         return $this->hasMany(PengajuanAmi::class, 'periode_id', 'id');
+    }
+
+    public function previousPeriode(): BelongsTo
+    {
+        return $this->belongsTo(PeriodeAktif::class, 'previous_periode_id', 'id')->withTrashed();
     }
 }

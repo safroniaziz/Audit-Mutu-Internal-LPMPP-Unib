@@ -7,16 +7,27 @@ use App\Models\PeriodeAktifJadwal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class PeriodeAktifController extends Controller
 {
+    private function hasPreviousPeriodeColumn(): bool
+    {
+        return Schema::hasColumn('periode_aktifs', 'previous_periode_id');
+    }
+
     public function index(){
-        $periodeAktifs = PeriodeAktif::withTrashed()
-                        ->with(['jadwal'])
+        $query = PeriodeAktif::withTrashed()
+                        ->with('jadwal')
                         ->orderByRaw('deleted_at IS NULL DESC')  // Mengurutkan deleted_at yang null di atas
-                        ->orderBy('tahun_ami', 'desc')           // Mengurutkan tahun_ami secara descending
-                        ->get();
+                        ->orderBy('tahun_ami', 'desc');          // Mengurutkan tahun_ami secara descending
+
+        if ($this->hasPreviousPeriodeColumn()) {
+            $query->with('previousPeriode');
+        }
+
+        $periodeAktifs = $query->get();
         return view('periode_aktif.index',[
             'periodeAktifs'    =>  $periodeAktifs,
         ]);
@@ -24,15 +35,24 @@ class PeriodeAktifController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'nomor_surat' => 'required|string',
             'siklus' => 'required|string',
             'tahun_ami' => 'required|string',
-        ], [
+        ];
+
+        if ($this->hasPreviousPeriodeColumn()) {
+            $rules['previous_periode_id'] = 'nullable|exists:periode_aktifs,id';
+        }
+
+        $messages = [
             'nomor_surat.required' => 'Nomor surat wajib diisi.',
             'siklus.required' => 'Siklus wajib diisi.',
             'tahun_ami.required' => 'Tahun AMI wajib diisi.',
-        ]);
+            'previous_periode_id.exists' => 'Periode sebelumnya tidak valid.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return response()->json([
@@ -42,11 +62,17 @@ class PeriodeAktifController extends Controller
 
         PeriodeAktif::whereNull('deleted_at')->update(['deleted_at' => Carbon::now()]);
 
-        $periodeAktif = PeriodeAktif::create([
+        $payload = [
             'nomor_surat' => $request->nomor_surat,
             'siklus' => $request->siklus,
             'tahun_ami' => $request->tahun_ami,
-        ]);
+        ];
+
+        if ($this->hasPreviousPeriodeColumn()) {
+            $payload['previous_periode_id'] = $request->previous_periode_id;
+        }
+
+        $periodeAktif = PeriodeAktif::create($payload);
 
         return response()->json([
             'message' => 'Periode Aktif berhasil ditambahkan!',
@@ -75,15 +101,25 @@ class PeriodeAktifController extends Controller
             return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
         }
 
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'nomor_surat' => 'required|string|unique:periode_aktifs,nomor_surat,' . $periodeAktif->id,
             'siklus' => 'required|string',
             'tahun_ami' => 'required|string',
-        ], [
+        ];
+
+        if ($this->hasPreviousPeriodeColumn()) {
+            $rules['previous_periode_id'] = 'nullable|exists:periode_aktifs,id|not_in:' . $periodeAktif->id;
+        }
+
+        $messages = [
             'nomor_surat.required' => 'Nomor surat harus diisi saat mengedit data.',
             'siklus.required' => 'Siklus harus diisi saat mengedit data.',
             'tahun_ami.required' => 'Tahun AMI harus diisi saat mengedit data.',
-        ]);
+            'previous_periode_id.exists' => 'Periode sebelumnya tidak valid.',
+            'previous_periode_id.not_in' => 'Periode sebelumnya tidak boleh periode yang sama.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return response()->json([
@@ -94,6 +130,11 @@ class PeriodeAktifController extends Controller
         $periodeAktif->nomor_surat = $request->nomor_surat;
         $periodeAktif->siklus = $request->siklus;
         $periodeAktif->tahun_ami = $request->tahun_ami;
+
+        if ($this->hasPreviousPeriodeColumn()) {
+            $periodeAktif->previous_periode_id = $request->previous_periode_id;
+        }
+
         $periodeAktif->save();
 
         return response()->json([

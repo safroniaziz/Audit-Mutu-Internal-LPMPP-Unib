@@ -261,7 +261,8 @@ $('.edit-indikatorInstrumen').click(function() {
             if (response.success) {
                 let data = response.data;
                 // Isi form dalam modal dengan data dari server
-                $('#kt_modal input[name="nama_indikator"]').val(data.nama_indikator);
+                $('#nama_indikator_input').val(data.nama_indikator);
+                $('#threshold_input').val(data.threshold ?? '3.00');
                 // Set nilai select2
                 $('#kategori_select').val(data.kategori).trigger('change');
             }

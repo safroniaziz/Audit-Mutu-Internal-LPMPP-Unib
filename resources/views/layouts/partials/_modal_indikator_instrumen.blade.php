@@ -8,18 +8,43 @@
                 <form id="kt_modal_form" class="form d-flex flex-column" style="flex-grow: 1;">
                     @csrf
                     <input type="hidden" name="_method" id="methodField" value="POST">
-                    <div class="fv-row mb-5">
+                    <input type="hidden" name="scope_prodi_id" id="scope_prodi_id" value="">
+                    <input type="hidden" name="scoped_indikator_id" id="scoped_indikator_id" value="">
+                    <div class="fv-row mb-5" id="nama_indikator_input_wrapper">
                         <label class="fs-5 fw-semibold form-label mb-2">Nama Indikator Instrumen:</label>
-                        <input type="text" name="nama_indikator" class="form-control" />
+                        <input type="text" name="nama_indikator" id="nama_indikator_input" class="form-control" />
+                    </div>
+                    <div class="fv-row mb-5" id="threshold_input_wrapper">
+                        <label class="fs-5 fw-semibold form-label mb-2">Threshold LAM:</label>
+                        <input type="number" step="0.01" min="0" name="threshold" id="threshold_input" class="form-control" value="3.00" />
+                        <small class="text-muted">Default 3.00. Nilai ini berlaku untuk seluruh indikator/kriteria di dalam LAM ini.</small>
                     </div>
 
-                    <div class="fv-row mb-5">
+                    <div class="fv-row mb-5 d-none" id="nama_indikator_scoped_wrapper">
+                        <label class="fs-5 fw-semibold form-label mb-2">Nama Indikator Instrumen:</label>
+                        <select class="form-select" id="nama_indikator_scoped_select"></select>
+                        <input type="hidden" name="nama_indikator" id="nama_indikator_hidden" value="" disabled>
+                    </div>
+
+                    <div class="fv-row mb-5 d-none" id="scope_prodi_info">
+                        <label class="fs-5 fw-semibold form-label mb-2">Program Studi Terpilih:</label>
+                        <input type="text" class="form-control form-control-solid" id="scope_prodi_label" readonly>
+                        <small class="text-muted">Mode ini khusus untuk pengaturan indikator prodi yang sedang difilter.</small>
+                    </div>
+
+                    <div class="fv-row mb-5" id="kategori_select_wrapper">
                         <label class="fs-5 fw-semibold form-label mb-2">Pilih Program Studi:</label>
                         <select class="form-select" name="kategori[]" id="kategori_select" multiple>
                             @foreach ($prodis as $prodi)
-                                <option value="{{ $prodi->id }}">{{ $prodi->nama_unit_kerja }} ({{ $prodi->jenjang }})</option>
+                                @php
+                                    $hasIndikator = in_array((int) $prodi->id, $assignedProdiIds ?? [], true);
+                                @endphp
+                                <option value="{{ $prodi->id }}" data-has-indikator="{{ $hasIndikator ? '1' : '0' }}">
+                                    {{ $prodi->nama_unit_kerja }} ({{ $prodi->jenjang }})
+                                </option>
                             @endforeach
                         </select>
+                        <small class="text-muted">Label abu-abu menandakan prodi belum punya indikator aktif.</small>
                     </div>
 
                     <div class="modal-footer border-top mt-auto" style="padding:10px 0px 10px 0px">

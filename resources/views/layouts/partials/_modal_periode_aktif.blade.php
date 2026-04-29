@@ -29,6 +29,19 @@
                         </select>
                     </div>
 
+                    <div class="fv-row mb-5">
+                        <label class="fs-5 fw-semibold form-label mb-2">Periode Sebelumnya:</label>
+                        <select name="previous_periode_id" id="previous_periode_id" class="form-select form-select-solid">
+                            <option value="">Tidak Ada</option>
+                            @foreach($periodeAktifs as $periode)
+                                <option value="{{ $periode->id }}">
+                                    {{ $periode->nomor_surat }} - Siklus {{ $periode->siklus }} / {{ $periode->tahun_ami }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Digunakan untuk validasi kelengkapan RTL sebelum lanjut ke periode ini.</small>
+                    </div>
+
                     <div class="modal-footer border-top mt-auto" style="padding:10px 0px 10px 0px">
                         <button type="reset" id="cancelModal" class="btn btn-danger btn-sm" style="padding-top: .8rem; padding-bottom: .8rem;">
                             <i class="fa fa-close fs-8"></i> Batalkan
@@ -135,6 +148,7 @@
                             $('#kt_modal input[name="nomor_surat"]').val(data.nomor_surat);
                             $('#kt_modal input[name="siklus"]').val(data.siklus);
                             $('#kt_modal select[name="tahun_ami"]').val(data.tahun_ami);
+                            $('#kt_modal select[name="previous_periode_id"]').val(data.previous_periode_id || '');
                         } else {
                             Swal.fire({
                                 icon: 'error',
@@ -166,6 +180,7 @@
                 // Ubah judul modal dan text button
                 $('#kt_modal .modal-title').text('Tambah Periode Aktif');
                 $('#kt_modal button[type=submit]').html('<i class="ki-duotone ki-check fs-5"></i> Simpan');
+                $('#kt_modal select[name="previous_periode_id"]').val('');
             });
         });
     </script>

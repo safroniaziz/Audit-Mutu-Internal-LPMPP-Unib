@@ -65,6 +65,24 @@
     </style>
 @endpush
 @section('dashboardProfile')
+    @if (session('success'))
+        <div class="alert alert-success d-flex align-items-center p-5 mb-6">
+            <i class="fas fa-check-circle fs-2 text-success me-3"></i>
+            <div class="fw-semibold">{{ session('success') }}</div>
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger d-flex align-items-start p-5 mb-6">
+            <i class="fas fa-exclamation-triangle fs-2 text-danger me-3 mt-1"></i>
+            <div>
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="row g-5 g-xl-8">
         <div class="col-xl-7">
             <!--begin::details View-->
@@ -192,6 +210,39 @@
         </div>
 
         <div class="col-xl-5">
+            <div class="card mb-5">
+                <div class="card-header">
+                    <h3 class="card-title text-primary fw-bold">
+                        <i class="fas fa-signature fs-2 me-2"></i> Tanda Tangan Auditor
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="text-muted fs-7 mb-2">TTD saat ini</div>
+                        <div class="border rounded p-4 text-center bg-light">
+                            @if (Auth::user()->ttd)
+                                <img src="{{ asset('storage/' . Auth::user()->ttd) }}" alt="TTD Auditor" style="max-height: 90px;">
+                            @else
+                                <span class="text-muted">Belum ada tanda tangan</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <form action="{{ route('auditor.updateTtd') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Upload TTD Baru (PNG/JPG, maks 2MB)</label>
+                            <input type="file" name="ttd" accept=".png,.jpg,.jpeg" class="form-control" required>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i> Simpan TTD
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!--begin::Documents Card-->
             <div class="card">
                 <div class="card-header">

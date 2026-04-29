@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('satuan_standars')) {
+            return;
+        }
+
         Schema::create('satuan_standars', function (Blueprint $table) {
             $table->id();
             $table->string('kode_satuan');

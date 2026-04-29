@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('penugasan_auditors', function (Blueprint $table) {
-            $table->boolean('is_setuju_indikator_prodi')->nullable()->after('is_setuju_visitasi');
-        });
+        if (!Schema::hasColumn('penugasan_auditors', 'is_setuju_indikator_prodi')) {
+            Schema::table('penugasan_auditors', function (Blueprint $table) {
+                $table->boolean('is_setuju_indikator_prodi')->nullable()->after('is_setuju_visitasi');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('penugasan_auditors', function (Blueprint $table) {
-            $table->dropColumn('is_setuju_indikator_prodi');
-        });
+        if (Schema::hasColumn('penugasan_auditors', 'is_setuju_indikator_prodi')) {
+            Schema::table('penugasan_auditors', function (Blueprint $table) {
+                $table->dropColumn('is_setuju_indikator_prodi');
+            });
+        }
     }
 };

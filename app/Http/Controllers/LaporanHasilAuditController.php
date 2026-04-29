@@ -10,6 +10,7 @@ use App\Models\PeriodeAktif;
 use App\Models\SatuanStandar;
 use App\Models\Tujuan;
 use App\Models\IndikatorInstrumenKriteria;
+use App\Models\ResetApprovalRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -254,97 +255,68 @@ class LaporanHasilAuditController extends Controller
             ];
         }
 
-        $ikssAuditeeCollection = collect($pengajuanAmis->ikssAuditee);
-        $groupedBySatuanId = $ikssAuditeeCollection->groupBy(function ($ikssAuditee) {
-        return $ikssAuditee->instrumen->indikatorKinerja->satuan_standar_id;
-        });
+        $sortedGrouped = $this->buildSortedGroupedSasaran($pengajuan, $pengajuanAmis, $allSatuanStandar);
 
-        // Initialize results array
-        $sortedGrouped = collect();
+        // Build comparison with previous period for SS only
+        $currentPeriod = PeriodeAktif::withTrashed()->find($pengajuan->periode_id);
+        $previousPeriodId = $currentPeriod?->previous_periode_id;
+        if (!$previousPeriodId && $currentPeriod) {
+            $fallbackPrevious = PeriodeAktif::withTrashed()
+                ->where('id', '!=', $currentPeriod->id)
+                ->where(function ($query) use ($currentPeriod) {
+                    $query->where('tahun_ami', '<', $currentPeriod->tahun_ami)
+                        ->orWhere(function ($sub) use ($currentPeriod) {
+                            $sub->where('tahun_ami', $currentPeriod->tahun_ami)
+                                ->where('id', '<', $currentPeriod->id);
+                        });
+                })
+                ->orderByDesc('tahun_ami')
+                ->orderByDesc('id')
+                ->first();
 
-        // Process each Sasaran Strategis - show all SS but data only for those with prodi elements
-        foreach ($allSatuanStandar as $satuanStandar) {
-            $satuanStandarId = $satuanStandar->id;
-            $hasProdiElements = $satuanStandar->has_prodi_elements;
+            $previousPeriodId = $fallbackPrevious?->id;
+        }
+        $ssComparison = collect();
 
-            // Check if this Sasaran Strategis has audit data
-            if ($groupedBySatuanId->has($satuanStandarId)) {
-                $ikssItems = $groupedBySatuanId[$satuanStandarId];
+        if ($previousPeriodId) {
+            $previousPengajuan = PengajuanAmi::with([
+                'ikssAuditee' => function ($query) {
+                    $query->where('status_target', true);
+                },
+                'ikssAuditee.nilai.auditor',
+                'ikssAuditee.instrumen.indikatorKinerja.satuanStandar',
+                'auditors',
+                'auditee',
+            ])
+            ->where('auditee_id', $pengajuan->auditee_id)
+            ->where('periode_id', $previousPeriodId)
+            ->orderByDesc('id')
+            ->first();
 
-                // Initialize score collectors
-                $allScores = collect();
-                $ketuaScores = collect();
-                $anggotaScores = collect();
+            if ($previousPengajuan) {
+                $previousGrouped = $this->buildSortedGroupedSasaran($previousPengajuan, $previousPengajuan, $allSatuanStandar);
+                $previousByKode = $previousGrouped
+                    ->filter(fn($row) => $row['has_data'])
+                    ->keyBy('kode_satuan');
 
-                foreach ($ikssItems as $ikssItem) {
-                    foreach ($ikssItem->nilai as $nilai) {
-                        if (!is_null($nilai->nilai)) {
-                            // Check if the auditor has a valid role (ketua or pendamping)
-                            $validRole = false;
-                            $isPenugasanKetua = false;
+                $ssComparison = $sortedGrouped
+                    ->filter(fn($row) => $row['has_data'])
+                    ->map(function ($row) use ($previousByKode) {
+                        $prev = $previousByKode->get($row['kode_satuan']);
+                        $prevAvg = $prev ? (float) $prev['rata_rata'] : null;
+                        $currAvg = (float) $row['rata_rata'];
+                        $delta = is_null($prevAvg) ? null : round($currAvg - $prevAvg, 2);
+                        $trend = is_null($delta) ? 'new' : ($delta > 0 ? 'up' : ($delta < 0 ? 'down' : 'same'));
 
-                            // Resolve role using current pengajuan's penugasan list to avoid null auditor relations
-                            foreach ($pengajuan->auditors as $penugasan) {
-                                if ($penugasan->user_id == $nilai->auditor_id) {
-                                    if ($penugasan->role == 'ketua' || $penugasan->role == 'pendamping') {
-                                        $validRole = true;
-                                        $isPenugasanKetua = ($penugasan->role == 'ketua');
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Only process scores for valid roles
-                            if ($validRole) {
-                                $scoreValue = (float)$nilai->nilai;
-                                $allScores->push($scoreValue);
-
-                                if ($isPenugasanKetua) {
-                                    $ketuaScores->push($scoreValue);
-                                } else {
-                                    $anggotaScores->push($scoreValue);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Calculate statistics
-                $totalNilai = $allScores->sum();
-                $totalNilaiKetua = $ketuaScores->sum();
-                $totalNilaiAnggota = $anggotaScores->sum();
-                $avgNilai = $allScores->avg();
-                $countAssessments = $allScores->count();
-
-                // Add to results collection
-                $sortedGrouped->push([
-                    'satuan_standar_id' => $satuanStandarId,
-                    'kode_satuan' => $satuanStandar->kode_satuan,
-                    'sasaran' => $satuanStandar->sasaran,
-                    'total_nilai' => $totalNilai,
-                    'total_nilai_ketua' => $totalNilaiKetua,
-                    'total_nilai_anggota' => $totalNilaiAnggota,
-                    'rata_rata' => $avgNilai,
-                    'jumlah_penilaian' => $countAssessments,
-                    'items' => $ikssItems,
-                    'has_data' => true,
-                    'has_prodi_elements' => $hasProdiElements
-                ]);
-            } else {
-                // Add Sasaran Strategis with no data (but still show all SS)
-                $sortedGrouped->push([
-                    'satuan_standar_id' => $satuanStandarId,
-                    'kode_satuan' => $satuanStandar->kode_satuan,
-                    'sasaran' => $satuanStandar->sasaran,
-                    'total_nilai' => 0,
-                    'total_nilai_ketua' => 0,
-                    'total_nilai_anggota' => 0,
-                    'rata_rata' => 0,
-                    'jumlah_penilaian' => 0,
-                    'items' => collect(),
-                    'has_data' => false,
-                    'has_prodi_elements' => $hasProdiElements
-                ]);
+                        return [
+                            'kode_satuan' => $row['kode_satuan'],
+                            'prev_avg' => $prevAvg,
+                            'curr_avg' => $currAvg,
+                            'delta' => $delta,
+                            'trend' => $trend,
+                        ];
+                    })
+                    ->keyBy('kode_satuan');
             }
         }
 
@@ -414,6 +386,14 @@ class LaporanHasilAuditController extends Controller
             }
         }
 
+        // Get pending reset requests for this pengajuan
+        $pendingResetRequests = ResetApprovalRequest::with(['penugasanAuditor.auditor'])
+            ->whereHas('penugasanAuditor', function ($query) use ($id) {
+                $query->where('pengajuan_ami_id', $id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('laporan.detail', [
             'periodeAktif' => $periodeAktif,
             'pengajuanAmis' => $pengajuanAmis,
@@ -426,7 +406,87 @@ class LaporanHasilAuditController extends Controller
             'auditorEvaluasiData' => $auditorEvaluasiData,
             'kuisioners' => $kuisioners,
             'auditorKuisionerData' => $auditorKuisionerData,
+            'pendingResetRequests' => $pendingResetRequests,
+            'ssComparison' => $ssComparison,
+            'previousPeriodId' => $previousPeriodId,
         ]);
+    }
+
+    private function buildSortedGroupedSasaran($pengajuan, $pengajuanAmis, $allSatuanStandar): \Illuminate\Support\Collection
+    {
+        $ikssAuditeeCollection = collect($pengajuanAmis->ikssAuditee);
+        $groupedBySatuanId = $ikssAuditeeCollection->groupBy(function ($ikssAuditee) {
+            return $ikssAuditee->instrumen->indikatorKinerja->satuan_standar_id;
+        });
+
+        $sortedGrouped = collect();
+
+        foreach ($allSatuanStandar as $satuanStandar) {
+            $satuanStandarId = $satuanStandar->id;
+            $hasProdiElements = (bool) ($satuanStandar->has_prodi_elements ?? false);
+
+            if ($groupedBySatuanId->has($satuanStandarId)) {
+                $ikssItems = $groupedBySatuanId[$satuanStandarId];
+                $allScores = collect();
+                $ketuaScores = collect();
+                $anggotaScores = collect();
+
+                foreach ($ikssItems as $ikssItem) {
+                    foreach ($ikssItem->nilai as $nilai) {
+                        if (!is_null($nilai->nilai)) {
+                            $validRole = false;
+                            $isPenugasanKetua = false;
+
+                            foreach ($pengajuan->auditors as $penugasan) {
+                                if ($penugasan->user_id == $nilai->auditor_id) {
+                                    if ($penugasan->role == 'ketua' || $penugasan->role == 'pendamping') {
+                                        $validRole = true;
+                                        $isPenugasanKetua = ($penugasan->role == 'ketua');
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if ($validRole) {
+                                $scoreValue = (float) $nilai->nilai;
+                                $allScores->push($scoreValue);
+                                $isPenugasanKetua ? $ketuaScores->push($scoreValue) : $anggotaScores->push($scoreValue);
+                            }
+                        }
+                    }
+                }
+
+                $sortedGrouped->push([
+                    'satuan_standar_id' => $satuanStandarId,
+                    'kode_satuan' => $satuanStandar->kode_satuan,
+                    'sasaran' => $satuanStandar->sasaran,
+                    'total_nilai' => $allScores->sum(),
+                    'total_nilai_ketua' => $ketuaScores->sum(),
+                    'total_nilai_anggota' => $anggotaScores->sum(),
+                    'rata_rata' => $allScores->avg(),
+                    'jumlah_penilaian' => $allScores->count(),
+                    'items' => $ikssItems,
+                    'has_data' => true,
+                    'has_prodi_elements' => $hasProdiElements
+                ]);
+            } else {
+                $sortedGrouped->push([
+                    'satuan_standar_id' => $satuanStandarId,
+                    'kode_satuan' => $satuanStandar->kode_satuan,
+                    'sasaran' => $satuanStandar->sasaran,
+                    'total_nilai' => 0,
+                    'total_nilai_ketua' => 0,
+                    'total_nilai_anggota' => 0,
+                    'rata_rata' => 0,
+                    'jumlah_penilaian' => 0,
+                    'items' => collect(),
+                    'has_data' => false,
+                    'has_prodi_elements' => $hasProdiElements
+                ]);
+            }
+        }
+
+        return $sortedGrouped;
     }
 
     public function daftarPertanyaan($id)
@@ -675,5 +735,64 @@ class LaporanHasilAuditController extends Controller
         $pdf = Pdf::loadView('cetak.laporan_ami', $data)
                  ->setOption('isRemoteEnabled', true);
         return $pdf->stream('Laporan_AMI.pdf');
+    }
+
+    /**
+     * Approve a reset approval request
+     */
+    public function approveResetRequest($id)
+    {
+        $resetRequest = ResetApprovalRequest::with('penugasanAuditor')->findOrFail($id);
+
+        if ($resetRequest->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Permintaan ini sudah diproses.'
+            ]);
+        }
+
+        // Reset the approval flag
+        $penugasan = $resetRequest->penugasanAuditor;
+        $flagColumn = $resetRequest->getApprovalFlagColumn();
+        $penugasan->update([$flagColumn => false]);
+
+        // Update request status
+        $resetRequest->update([
+            'status' => 'approved',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan reset berhasil disetujui. Auditor sekarang dapat mengedit ulang.'
+        ]);
+    }
+
+    /**
+     * Reject a reset approval request
+     */
+    public function rejectResetRequest(Request $request, $id)
+    {
+        $resetRequest = ResetApprovalRequest::findOrFail($id);
+
+        if ($resetRequest->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Permintaan ini sudah diproses.'
+            ]);
+        }
+
+        $resetRequest->update([
+            'status' => 'rejected',
+            'approved_by' => Auth::id(),
+            'approved_at' => now(),
+            'catatan_admin' => $request->input('catatan_admin'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan reset ditolak.'
+        ]);
     }
 }

@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\EvaluasiSubmission;
 use App\Models\EvaluasiMasukan;
 use App\Models\InstrumenProdiNilai;
+use App\Models\ResetApprovalRequest;
 use Exception;
 
 class AuditorAuditController extends Controller
@@ -47,7 +48,7 @@ class AuditorAuditController extends Controller
                     });
 
         // Get active period info
-        $activePeriod = PeriodeAktif::whereNull('deleted_at')->first();
+        $activePeriod = PeriodeAktif::whereNull('deleted_at')->latest('id')->first();
 
         return view('dataauditor.daftar_auditee',[
             'auditess'  =>  $auditess,
@@ -206,9 +207,20 @@ class AuditorAuditController extends Controller
 
     public function perjanjianKinerja(PengajuanAmi $pengajuan){
         // Check if audit period is active
-        if (!$this->isAuditPeriodActive($pengajuan)) {
+        $auditPeriodStatus = $this->isAuditPeriodActive($pengajuan);
+        if ($auditPeriodStatus !== 'active') {
+            $errorMessage = 'Jadwal audit tidak tersedia untuk pengajuan ini.';
+
+            if ($auditPeriodStatus === 'inactive_period') {
+                $errorMessage = 'Periode pengajuan ini tidak aktif. Audit hanya bisa dilakukan pada periode aktif saat ini.';
+            } elseif ($auditPeriodStatus === 'not_started') {
+                $errorMessage = 'Jadwal audit belum dimulai untuk pengajuan ini.';
+            } elseif ($auditPeriodStatus === 'ended') {
+                $errorMessage = 'Jadwal audit sudah berakhir. Silakan hubungi administrator untuk memperpanjang jadwal audit.';
+            }
+
             return redirect()->route('auditor.audit.daftarAuditee')
-                ->with('error', 'Jadwal audit sudah berakhir. Silakan hubungi administrator untuk memperpanjang jadwal audit.');
+                ->with('error', $errorMessage);
         }
 
         $auditess = PengajuanAmi::with([
@@ -419,6 +431,15 @@ class AuditorAuditController extends Controller
 
     public function visitasi(PengajuanAmi $pengajuan)
     {
+        $penugasanAuditor = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
+            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Visitasi.');
+        }
+
         // Check visitasi time validation
         $visitasiTimeValidation = $this->checkVisitasiTimeValidation($pengajuan);
 
@@ -436,6 +457,12 @@ class AuditorAuditController extends Controller
 
         // Get visitasi data
         $visitasi = IkssAuditeeVisitasi::where('pengajuan_ami_id', $pengajuan->id)
+                        ->where('auditor_id', Auth::id())
+                        ->get()
+                        ->keyBy('ikss_auditee_id');
+
+        // Get desk evaluation values so nilai can be edited in visitasi
+        $deskEvaluation = IkssAuditeeNilai::where('pengajuan_ami_id', $pengajuan->id)
                         ->where('auditor_id', Auth::id())
                         ->get()
                         ->keyBy('ikss_auditee_id');
@@ -462,6 +489,7 @@ class AuditorAuditController extends Controller
             'groupedIkss' => $groupedIkss,
             'setuju' => $setuju,
             'visitasi' => $visitasi ?? collect(),
+            'deskEvaluation' => $deskEvaluation ?? collect(),
             'visitasiTimeValidation' => $visitasiTimeValidation,
             'isPenilaianProdiApproved' => $isPenilaianProdiApproved
         ]);
@@ -481,7 +509,9 @@ class AuditorAuditController extends Controller
             'kelebihan' => 'required|array',
             'kelebihan.*' => 'required|string',
             'peluang_peningkatan' => 'required|array',
-            'peluang_peningkatan.*' => 'required|string'
+            'peluang_peningkatan.*' => 'required|string',
+            'nilai' => 'nullable|array',
+            'nilai.*' => 'nullable|in:0,1,2,3,4'
         ], [
             'pengajuan_id.required' => 'ID Pengajuan harus diisi.',
             'pengajuan_id.exists' => 'ID Pengajuan tidak valid.',
@@ -505,7 +535,9 @@ class AuditorAuditController extends Controller
 
             'peluang_peningkatan.required' => 'Peluang peningkatan harus diisi.',
             'peluang_peningkatan.array' => 'Format peluang peningkatan tidak valid.',
-            'peluang_peningkatan.*.required' => 'Setiap peluang peningkatan harus diisi.'
+            'peluang_peningkatan.*.required' => 'Setiap peluang peningkatan harus diisi.',
+            'nilai.array' => 'Format nilai tidak valid.',
+            'nilai.*.in' => 'Nilai harus salah satu dari 0, 1, 2, 3, atau 4.'
         ]);
 
         if ($validator->fails()) {
@@ -517,6 +549,18 @@ class AuditorAuditController extends Controller
 
         // Check visitasi time validation
         $pengajuan = PengajuanAmi::find($request->pengajuan_id);
+
+        $penugasanAuditor = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Visitasi.'
+            ], 403);
+        }
+
         $visitasiTimeValidation = $this->checkVisitasiTimeValidation($pengajuan);
 
         if (!$visitasiTimeValidation['is_valid']) {
@@ -566,6 +610,20 @@ class AuditorAuditController extends Controller
                         'auditor_id' => $auditorId,
                     ]));
                 }
+
+                // Sync nilai with desk evaluation row (same source of truth)
+                if (isset($request->nilai[$ikssAuditeeId])) {
+                    $deskNilai = IkssAuditeeNilai::where('pengajuan_ami_id', $pengajuanId)
+                        ->where('ikss_auditee_id', $ikssAuditeeId)
+                        ->where('auditor_id', $auditorId)
+                        ->first();
+
+                    if ($deskNilai) {
+                        $deskNilai->update([
+                            'nilai' => $request->nilai[$ikssAuditeeId]
+                        ]);
+                    }
+                }
             }
 
             // Commit transaksi
@@ -594,6 +652,11 @@ class AuditorAuditController extends Controller
         // Cek apakah ada auditor yang sesuai dengan user yang sedang login
         $auditor = $penugasanAuditor->auditors->firstWhere('user_id', Auth::user()->id);
 
+        if (!$auditor || !(bool) $auditor->is_setuju_indikator_prodi) {
+            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum menyetujui Visitasi.');
+        }
+
         if ($auditor) {
             // Update kolom 'is_setujui' menjadi true
             $auditor->update([
@@ -607,15 +670,20 @@ class AuditorAuditController extends Controller
     public function penilaianInstrumenProdi(PengajuanAmi $pengajuan)
     {
         $unitKerjaId = $pengajuan->auditee_id;
+        $auditorId = Auth::id();
 
         // Get IndikatorInstrumen for this Prodi with proper eager loading
         $indikatorInstrumens = IndikatorInstrumen::with([
-            'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $pengajuan) {
+            'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $pengajuan, $auditorId) {
                 $query->with([
                     'kriteriaInstrumen.indikatorInstrumen',
                     'submission' => function ($submissionQuery) use ($pengajuan) {
                         $submissionQuery->where('unit_kerja_id', $pengajuan->auditee->id)
                                         ->where('periode_id', $pengajuan->periode_id);
+                    },
+                    'nilaiAuditor' => function ($nilaiQuery) use ($pengajuan, $auditorId) {
+                        $nilaiQuery->where('pengajuan_ami_id', $pengajuan->id)
+                                   ->where('auditor_id', $auditorId);
                     }
                 ]);
             }
@@ -624,18 +692,6 @@ class AuditorAuditController extends Controller
                 $query->where('unit_kerja_id', $unitKerjaId);
             })
             ->get();
-
-        // Load nilai auditor separately for better control
-        foreach ($indikatorInstrumens as $indikatorInstrumen) {
-            foreach ($indikatorInstrumen->kriterias as $kriteria) {
-                foreach ($kriteria->instrumenProdi as $instrumenProdi) {
-                    $instrumenProdi->load(['nilaiAuditor' => function($query) use ($pengajuan) {
-                        $query->where('pengajuan_ami_id', $pengajuan->id)
-                              ->where('auditor_id', Auth::id());
-                    }]);
-                }
-            }
-        }
 
         return view('dataauditor.penilaian_instrumen_prodi', [
             'indikatorInstrumens' => $indikatorInstrumens,
@@ -1001,6 +1057,9 @@ class AuditorAuditController extends Controller
             }
         }
 
+        $laporanAmiJadwal = json_decode($pengajuan->laporan_ami_jadwal ?? '[]', true) ?: [];
+        $laporanAmiPresensi = json_decode($pengajuan->laporan_ami_presensi ?? '[]', true) ?: [];
+
         return view('dataauditor.unduh_dokumen',[
             'pengajuan' =>  $pengajuan,
             'pengajuanAmis' => $pengajuanAmis,
@@ -1015,7 +1074,103 @@ class AuditorAuditController extends Controller
             'visitasiData' => $visitasiData,
             'pernyataanKetua' => $pernyataanKetua,
             'pernyataanAnggota' => $pernyataanAnggota,
+            'laporanAmiJadwal' => $laporanAmiJadwal,
+            'laporanAmiPresensi' => $laporanAmiPresensi,
         ]);
+    }
+
+    public function saveLaporanAmiMetadata(Request $request, PengajuanAmi $pengajuan)
+    {
+        $validator = Validator::make($request->all(), [
+            'jadwal_mulai' => 'nullable|array',
+            'jadwal_mulai.*' => 'nullable|date_format:H:i',
+            'jadwal_selesai' => 'nullable|array',
+            'jadwal_selesai.*' => 'nullable|date_format:H:i',
+            'presensi_nama' => 'nullable|array',
+            'presensi_nama.*' => 'nullable|string|max:255',
+            'presensi_peran' => 'nullable|array',
+            'presensi_peran.*' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validasi gagal',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        $defaultKegiatan = [
+            1 => 'Pembukaan & Pertemuan dengan Kaprodi',
+            2 => 'Pertemuan dengan Staf Dosen',
+            3 => 'Pertemuan dengan Karyawan',
+            4 => 'Pertemuan dengan Mahasiswa',
+            5 => 'Pertemuan dengan alumni/pengguna lulusan (jika ada)',
+            6 => 'Penyampaian Temuan & Penutupan',
+        ];
+
+        $jadwalAudit = [];
+        for ($i = 1; $i <= 6; $i++) {
+            $jamMulai = trim((string)($validated['jadwal_mulai'][$i] ?? ''));
+            $jamSelesai = trim((string)($validated['jadwal_selesai'][$i] ?? ''));
+            $jamRange = '';
+
+            if ($jamMulai !== '' && $jamSelesai !== '') {
+                $jamRange = $jamMulai . ' - ' . $jamSelesai;
+            } elseif ($jamMulai !== '') {
+                $jamRange = $jamMulai;
+            } elseif ($jamSelesai !== '') {
+                $jamRange = $jamSelesai;
+            }
+
+            $jadwalAudit[] = [
+                'no' => $i,
+                'jam_mulai' => $jamMulai,
+                'jam_selesai' => $jamSelesai,
+                'jam' => $jamRange,
+                'kegiatan' => $defaultKegiatan[$i],
+            ];
+        }
+
+        $presensiNama = array_values($validated['presensi_nama'] ?? []);
+        $presensiPeran = array_values($validated['presensi_peran'] ?? []);
+        $rowCount = max(count($presensiNama), count($presensiPeran));
+
+        $presensi = [];
+        for ($i = 0; $i < $rowCount; $i++) {
+            $nama = trim((string)($presensiNama[$i] ?? ''));
+            $peran = trim((string)($presensiPeran[$i] ?? ''));
+
+            if ($nama === '' && $peran === '') {
+                continue;
+            }
+
+            $presensi[] = [
+                'no' => count($presensi) + 1,
+                'nama' => $nama,
+                'peran' => $peran,
+            ];
+        }
+
+        $pengajuan->update([
+            'laporan_ami_jadwal' => json_encode($jadwalAudit),
+            'laporan_ami_presensi' => json_encode($presensi),
+        ]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Jadwal Audit dan Presensi Laporan AMI berhasil disimpan.'
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Jadwal Audit dan Presensi Laporan AMI berhasil disimpan.');
     }
 
     public function beritaAcara(Request $request, PengajuanAmi $pengajuan)
@@ -1442,6 +1597,8 @@ class AuditorAuditController extends Controller
             'sortedGrouped'   =>  $sortedGrouped,
             'jawabanKuisioner'   =>  $jawabanKuisioner,
             'kriteriaScores' => $kriteriaScores,
+            'laporanAmiJadwal' => json_decode($pengajuanAmis->laporan_ami_jadwal ?? '[]', true) ?: [],
+            'laporanAmiPresensi' => json_decode($pengajuanAmis->laporan_ami_presensi ?? '[]', true) ?: [],
         ];
         $pdf = PDF::loadView('dataauditor.pdf.laporan_ami', $data)
                   ->setOption('isRemoteEnabled', true);
@@ -1534,6 +1691,19 @@ class AuditorAuditController extends Controller
 
     private function isAuditPeriodActive($pengajuan)
     {
+        // Only the currently active periode can be audited.
+        $activePeriod = \App\Models\PeriodeAktif::whereNull('deleted_at')
+            ->latest('id')
+            ->first();
+
+        if (!$activePeriod) {
+            return 'inactive_period';
+        }
+
+        if ((int) $pengajuan->periode_id !== (int) $activePeriod->id) {
+            return 'inactive_period';
+        }
+
         // Get audit period schedule from periode_aktif_jadwals
         $auditSchedule = \App\Models\PeriodeAktifJadwal::where('periode_aktif_id', $pengajuan->periode_id)
             ->where('jenis', 'audit')
@@ -1563,5 +1733,78 @@ class AuditorAuditController extends Controller
         }
 
         return 'active';
+    }
+
+    /**
+     * Submit a reset approval request from auditor
+     */
+    public function submitResetRequest(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'penugasan_auditor_id' => 'required|exists:penugasan_auditors,id',
+            'tahap' => 'required|in:desk_evaluation,instrumen_prodi,visitasi',
+            'alasan' => 'required|string|min:10|max:500',
+        ], [
+            'alasan.required' => 'Alasan wajib diisi.',
+            'alasan.min' => 'Alasan minimal 10 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first()
+            ], 422);
+        }
+
+        // Verify the penugasan belongs to current user
+        $penugasan = PenugasanAuditor::where('id', $request->penugasan_auditor_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$penugasan) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Penugasan tidak ditemukan.'
+            ], 403);
+        }
+
+        // Check if there's already a pending request for this tahap
+        $existingRequest = ResetApprovalRequest::where('penugasan_auditor_id', $penugasan->id)
+            ->where('tahap', $request->tahap)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingRequest) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sudah ada permintaan reset yang menunggu persetujuan untuk tahap ini.'
+            ]);
+        }
+
+        // Check if the tahap is actually approved (need reset)
+        $flagColumn = match($request->tahap) {
+            'desk_evaluation' => 'is_setuju',
+            'instrumen_prodi' => 'is_setuju_indikator_prodi',
+            'visitasi' => 'is_setuju_visitasi',
+        };
+
+        if (!$penugasan->$flagColumn) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tahap ini belum disetujui, tidak perlu di-reset.'
+            ]);
+        }
+
+        ResetApprovalRequest::create([
+            'penugasan_auditor_id' => $penugasan->id,
+            'tahap' => $request->tahap,
+            'alasan' => $request->alasan,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Permintaan reset berhasil diajukan. Menunggu persetujuan admin.'
+        ]);
     }
 }

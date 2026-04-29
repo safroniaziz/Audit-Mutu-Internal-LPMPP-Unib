@@ -27,14 +27,8 @@
 
                 $groupedInstrumen[$satuanStandar->id]['total_instrumen']++;
 
-                // Check if this instrumen is completed - nilai 0 dianggap valid
-                if (isset($ikssAuditeeData[$instrumen->id]) &&
-                    !is_null($ikssAuditeeData[$instrumen->id]->realisasi) &&
-                    !is_null($ikssAuditeeData[$instrumen->id]->akar) &&
-                    !is_null($ikssAuditeeData[$instrumen->id]->rencana) &&
-                    $ikssAuditeeData[$instrumen->id]->realisasi !== '' &&
-                    $ikssAuditeeData[$instrumen->id]->akar !== '' &&
-                    $ikssAuditeeData[$instrumen->id]->rencana !== '') {
+                // Completion hanya dihitung dari data periode aktif (yang sudah tersimpan).
+                if (in_array((int) $instrumen->id, $completedInstrumenIdsActive ?? [], true)) {
                     $groupedInstrumen[$satuanStandar->id]['completed_instrumen']++;
                 }
             }
@@ -68,8 +62,8 @@
         /* Wizard navigation styles */
         .wizard-nav {
             display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-x: scroll !important;
+            overflow-y: hidden !important;
             padding: 1.5rem 0;
             margin-bottom: 2rem;
             position: relative;
@@ -79,6 +73,14 @@
             /* Force scrollbar to be visible */
             scrollbar-width: thin;
             scrollbar-color: #888 #f1f1f1;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            flex-wrap: nowrap !important;
+            cursor: grab;
+        }
+
+        .wizard-nav:active {
+            cursor: grabbing;
         }
 
         .wizard-nav::-webkit-scrollbar {
@@ -192,6 +194,13 @@
             box-shadow: 0 0 20px 0 rgb(80 205 137 / 30%);
         }
 
+        .wizard-step.active.completed .step-number {
+            background: #009EF7;
+            color: white;
+            border-color: #009EF7;
+            box-shadow: 0 0 20px 0 rgb(0 158 247 / 30%);
+        }
+
         .wizard-step .step-label {
             font-weight: 600;
             font-size: 0.9rem;
@@ -226,6 +235,18 @@
             background: #EEF6FF;
         }
 
+        .wizard-step.active .step-label,
+        .wizard-step.active .step-desc,
+        .wizard-step.active .step-progress {
+            color: #009EF7;
+        }
+
+        .wizard-step.active.completed .step-label,
+        .wizard-step.active.completed .step-desc,
+        .wizard-step.active.completed .step-progress {
+            color: #009EF7;
+        }
+
         .wizard-content {
             display: none;
         }
@@ -238,6 +259,36 @@
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+        }
+
+        /* Field validation styles */
+        .required-field.is-invalid {
+            border: 2px solid #f64e60 !important;
+            background-color: #fff5f8;
+        }
+
+        .required-field.is-invalid:focus {
+            border-color: #f64e60 !important;
+            box-shadow: 0 0 0 0.25rem rgba(246, 78, 96, 0.25) !important;
+        }
+
+        .field-error-badge {
+            display: inline-block;
+            background-color: #f64e60;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .instrumen-card {
+            transition: all 0.3s ease;
+        }
+
+        .instrumen-card.has-error {
+            border-left: 4px solid #f64e60;
+            background-color: #fff5f8;
         }
 
         /* Original styles */
@@ -330,7 +381,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja dan Pemilihan IKSS) karena belum ada pengajuan AMI yang disubmit untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja dan Pemilihan IKSS) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
@@ -347,12 +398,81 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-warning">
-                                    Data pengisian instrumen tidak dapat diubah karena pengajuan AMI sudah disubmit untuk periode ini. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
+                                    Data pengisian instrumen tidak dapat diubah karena penugasan auditor untuk periode ini sudah dibuat. Jika ada perubahan yang diperlukan, silakan hubungi administrator.
                                 </span>
                             </p>
                         </div>
                     </div>
                 </div>
+            @endif
+
+            @if(!empty($defaultDariPeriodeSebelumnya))
+                <div class="alert alert-info d-flex align-items-start p-5 mb-10">
+                    <div class="me-4">
+                        <i class="bi bi-arrow-repeat fs-2 text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="fw-bold text-dark mb-2">Default Dari Periode Sebelumnya</h4>
+                        <div class="fs-6 text-gray-700">
+                            <strong>{{ $defaultFallbackCount ?? 0 }} instrumen</strong> menampilkan nilai default dari
+                            <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong> (prefill).
+                            Nilai ini <strong>belum tersimpan</strong> ke periode aktif sampai Anda klik
+                            <strong>Simpan &amp; Lanjutkan</strong>.
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if(!empty($hasPreviousPeriode) && !$pengajuanAmiExists)
+                @if($canCopyFromPrevious)
+                    <div class="alert alert-success d-flex align-items-start p-5 mb-10">
+                        <div class="me-4">
+                            <i class="bi bi-clipboard-check fs-2 text-success"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-dark mb-1">Salin Semua dari Periode Sebelumnya</h4>
+                            <div class="fs-6 text-gray-700 mb-3">
+                                Pilihan IKSS Anda <strong>sama persis</strong> dengan
+                                <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong>.
+                                Klik tombol di bawah untuk mengisi <em>semua</em> form (Realisasi, Akar Penyebab,
+                                Rencana Perbaikan, URL Sumber) menggunakan data dari periode tersebut sekaligus.
+                                Data baru ini <strong>belum tersimpan</strong> sampai Anda klik
+                                <strong>Simpan &amp; Lanjutkan</strong> di setiap step.
+                            </div>
+                            <button type="button" class="btn btn-success btn-sm px-5" onclick="copyAllFromPrevious()">
+                                <i class="bi bi-clipboard-check me-2"></i>Salin Semua dari Periode Sebelumnya
+                            </button>
+                        </div>
+                    </div>
+                @else
+                    <div class="alert alert-light border border-warning d-flex align-items-start p-5 mb-10">
+                        <div class="me-4">
+                            <i class="bi bi-info-circle fs-2 text-warning"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="fw-bold text-dark mb-1">Tombol Salin dari Periode Sebelumnya Tidak Tersedia</h4>
+                            <div class="fs-6 text-gray-600 mb-2">
+                                Pilihan IKSS periode aktif <strong>berbeda</strong> dengan
+                                <strong>{{ $previousPeriodeLabel ?? 'periode sebelumnya' }}</strong>,
+                                sehingga tidak bisa disalin secara otomatis. Pengisian harus dilakukan manual.
+                            </div>
+                            @if(!empty($ikssAddedInCurrent))
+                                <div class="fs-7 text-gray-600 mb-1">
+                                    <i class="bi bi-plus-circle text-primary me-1"></i>
+                                    <strong>{{ count($ikssAddedInCurrent) }} instrumen baru</strong>
+                                    ditambahkan ke periode aktif yang sebelumnya tidak dipilih.
+                                </div>
+                            @endif
+                            @if(!empty($ikssRemovedInCurrent))
+                                <div class="fs-7 text-gray-600">
+                                    <i class="bi bi-dash-circle text-danger me-1"></i>
+                                    <strong>{{ count($ikssRemovedInCurrent) }} instrumen</strong>
+                                    yang ada di periode sebelumnya sekarang tidak dipilih lagi.
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             @endif
 
             <div class="alert {{ $isAllCompleted ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10 position-relative">
@@ -368,7 +488,9 @@
                                 @if($isAllCompleted)
                                     Semua instrumen telah diisi dengan lengkap. Silakan lanjut ke tahap Unggah Siklus.
                                 @else
-                                    {{ $totalCompleted }} dari {{ $totalInstrumen }} instrumen telah diisi. Silakan lengkapi pengisian instrumen yang tersisa.
+                                    <strong>{{ $totalCompleted }} dari {{ $totalInstrumen }}</strong> instrumen sudah tersimpan di periode aktif.
+                                    Nilai default dari periode sebelumnya tidak dihitung sebagai tersimpan sebelum Anda menekan
+                                    <strong>Simpan &amp; Lanjutkan</strong>.
                                 @endif
                             </span>
                         </p>
@@ -504,10 +626,23 @@
                         <input type="hidden" name="ss_id" value="{{ $ssId }}">
 
                         @foreach($group['instrumen'] as $item)
-                            <div class="card card-bordered mb-10">
+                            @php
+                                $instrumenId = (int) $item['instrumen']->id;
+                                $comparison = $comparisonByInstrumen[$instrumenId] ?? null;
+                                $indikatorText = strip_tags($item['instrumen']->indikator);
+                                // Ambil max 50 karakter dari indikator untuk identifier
+                                $indikatorShort = strlen($indikatorText) > 50 ? substr($indikatorText, 0, 50) . '...' : $indikatorText;
+                            @endphp
+                            <div class="card card-bordered mb-10 instrumen-card" data-instrumen-id="{{ $item['instrumen']->id }}" data-instrumen-num="{{ $loop->iteration }}" data-instrumen-short="{{ $indikatorShort }}">
                                 <div class="card-header bg-light">
-                                    <h3 class="card-title text-gray-800 fw-bold">{{ $loop->iteration }}. {!! str_replace(['<p>', '</p>'], '', $item['instrumen']->indikator) !!}
+                                    <h3 class="card-title text-gray-800 fw-bold instrumen-title">{{ $loop->iteration }}. {!! str_replace(['<p>', '</p>'], '', $item['instrumen']->indikator) !!}
                                     </h3>
+                                    <span class="badge badge-light-info fs-7">{{ $item['indikator']->kode_ikss }}</span>
+                                    @if(!empty($comparison['has_previous']))
+                                        <span class="badge fs-8 {{ !empty($comparison['is_changed']) ? 'badge-light-warning' : 'badge-light-success' }}">
+                                            {{ !empty($comparison['is_changed']) ? 'Berubah dari periode sebelumnya' : 'Sama dengan periode sebelumnya' }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-4">
@@ -530,10 +665,7 @@
                                                             </div>
                                                         @endif
 
-                                                        <div class="mt-2">
-                                                            <input type="file" name="bukti_file[{{ $item['instrumen']->id }}]" class="form-control" id="buktiFile_{{ $item['instrumen']->id }}">
-                                                            <div class="form-text">Upload file bukti disini</div>
-                                                        </div>
+
 
                                                         <div class="mt-3">
                                                             <div class="input-group">
@@ -557,11 +689,20 @@
                                                 <tr>
                                                     <td class="fw-semibold bg-light">Realisasi</td>
                                                     <td>
-                                                        <input type="number" class="form-control" name="realisasi[{{ $item['instrumen']->id }}]"
-                                                            value="{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->realisasi : '' }}"
+                                                        @php
+                                                            $rawRealisasi = isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->realisasi : '';
+                                                            // Strip karakter non-numerik (kecuali titik desimal) agar kompatibel dengan input type=number
+                                                            // Contoh: "86%" → "86", "75.5%" → "75.5", "a" → ""
+                                                            $realisasiDisplay = preg_replace('/[^0-9.]/', '', (string) $rawRealisasi);
+                                                        @endphp
+                                                        <input type="number" class="form-control required-field" name="realisasi[{{ $item['instrumen']->id }}]"
+                                                            value="{{ $realisasiDisplay }}"
                                                             min="0"
                                                             step="0.01"
-                                                            placeholder="Isi disini...">
+                                                            placeholder="Isi disini..."
+                                                            data-instrumen-id="{{ $item['instrumen']->id }}"
+                                                            data-field-name="Realisasi"
+                                                            data-indikator="{{ $item['indikator']->kode_ikss }}">
                                                         <div class="form-text text-muted italic text-xs">Masukkan realisasi dalam bentuk angka</div>
                                                     </td>
                                                 </tr>
@@ -572,12 +713,12 @@
                                     <div class="mb-4">
                                         <h6 class="fw-bold mb-3">Pengukuran</h6>
                                         <h6 class="text-muted fs-7 mb-3">Akar Penyebab (target tidak tercapai)/ Akar Penunjang (target tercapai)</h6>
-                                        <textarea class="form-control" name="akar_penyebab[{{ $item['instrumen']->id }}]" rows="4">{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->akar : '' }}</textarea>
+                                        <textarea class="form-control required-field" name="akar_penyebab[{{ $item['instrumen']->id }}]" rows="4" data-instrumen-id="{{ $item['instrumen']->id }}" data-field-name="Akar Penyebab" data-indikator="{{ $item['indikator']->kode_ikss }}">{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->akar : '' }}</textarea>
                                     </div>
 
                                     <div class="mb-4">
                                         <h6 class="fw-bold mb-3">Rencana Perbaikan dan Tindak lanjut</h6>
-                                        <textarea class="form-control" name="rencana_perbaikan[{{ $item['instrumen']->id }}]" rows="4">{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->rencana : '' }}</textarea>
+                                        <textarea class="form-control required-field" name="rencana_perbaikan[{{ $item['instrumen']->id }}]" rows="4" data-instrumen-id="{{ $item['instrumen']->id }}" data-field-name="Rencana Perbaikan" data-indikator="{{ $item['indikator']->kode_ikss }}">{{ isset($ikssAuditeeData[$item['instrumen']->id]) ? $ikssAuditeeData[$item['instrumen']->id]->rencana : '' }}</textarea>
                                     </div>
 
                                     <div class="mb-4">
@@ -752,6 +893,94 @@
                 }
 
                 activateStep(stepId);
+            });
+
+            const wizardNav = $('.wizard-nav');
+            let isDraggingNav = false;
+            let navStartX = 0;
+            let navStartScrollLeft = 0;
+            let navMoved = false;
+
+            // Unified wheel/trackpad scrolling handler
+            wizardNav.on('wheel', function(e) {
+                const nav = this;
+                if (nav.scrollWidth <= nav.clientWidth) {
+                    return;
+                }
+
+                const deltaX = e.originalEvent.deltaX;
+                const deltaY = e.originalEvent.deltaY;
+
+                // Use deltaX if available (trackpad horizontal scroll), otherwise use deltaY (mouse wheel)
+                if (deltaX !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaX;
+                } else if (deltaY !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaY;
+                }
+            }, { passive: false });
+
+            // Add trackpad swipe support using pointer events
+            let pointerStartX = 0;
+            let pointerStartY = 0;
+            let isPointerDown = false;
+
+            wizardNav.on('pointerdown', function(e) {
+                isPointerDown = true;
+                pointerStartX = e.pageX;
+                pointerStartY = e.pageY;
+                wizardNav.css('cursor', 'grabbing');
+            });
+
+            wizardNav.on('pointerup pointerleave', function(e) {
+                isPointerDown = false;
+                wizardNav.css('cursor', 'grab');
+            });
+
+            wizardNav.on('pointermove', function(e) {
+                if (!isPointerDown) return;
+
+                const deltaX = e.pageX - pointerStartX;
+                const deltaY = e.pageY - pointerStartY;
+
+                // Only scroll if horizontal movement is greater than vertical
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    e.preventDefault();
+                    wizardNav.scrollLeft(wizardNav.scrollLeft() - deltaX);
+                    pointerStartX = e.pageX;
+                }
+            });
+
+            // Keep original drag functionality as backup
+            wizardNav.on('mousedown', function(e) {
+                isDraggingNav = true;
+                navMoved = false;
+                navStartX = e.pageX;
+                navStartScrollLeft = this.scrollLeft;
+                wizardNav.css('cursor', 'grabbing');
+            });
+
+            $(document).on('mousemove', function(e) {
+                if (!isDraggingNav) return;
+                const delta = e.pageX - navStartX;
+                if (Math.abs(delta) > 5) {
+                    navMoved = true;
+                }
+                wizardNav[0].scrollLeft = navStartScrollLeft - delta;
+            });
+
+            $(document).on('mouseup', function() {
+                isDraggingNav = false;
+                wizardNav.css('cursor', 'grab');
+            });
+
+            wizardNav.find('.wizard-step').on('click', function(e) {
+                if (navMoved) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    navMoved = false;
+                }
             });
         });
 
@@ -955,36 +1184,90 @@
         function saveAndNext(currentStepId) {
             const $form = $(`#formInstrumen_${currentStepId}`);
 
+            // Clear previous error styles
+            $('.required-field').removeClass('is-invalid');
+            $('.instrumen-card').removeClass('has-error');
+            $('.field-error-badge').remove();
+
             // Check if all required fields in current step are filled
             let isComplete = true;
             let firstEmptyField = null;
-            let emptyFields = [];
+            let emptyFieldsInfo = [];
 
-            $form.find('input[type="text"], textarea').each(function() {
-                const $field = $(this);
-                const fieldName = $field.attr('name') || 'Unknown field';
+            // Check each instrumen card
+            $form.find('.instrumen-card').each(function() {
+                const $card = $(this);
+                const instrumenNum = $card.data('instrumen-num');
+                const instrumenShort = $card.data('instrumen-short') || 'Unknown';
+                const indikatorKode = $card.find('.required-field').first().data('indikator') || '';
+                let hasEmpty = false;
 
-                if (!$field.val()) {
-                    isComplete = false;
-                    emptyFields.push(fieldName);
-                    if (!firstEmptyField) {
-                        firstEmptyField = $field;
+                // Check each required field in this card
+                $card.find('.required-field').each(function() {
+                    const $field = $(this);
+                    const fieldName = $field.data('field-name') || 'Field';
+
+                    if (!$field.val() || (typeof $field.val() === 'string' && $field.val().trim() === '')) {
+                        isComplete = false;
+                        hasEmpty = true;
+
+                        // Mark field as invalid
+                        $field.addClass('is-invalid');
+
+                        // Add error badge
+                        if (!$field.next('.field-error-badge').length) {
+                            $field.after('<span class="field-error-badge">Wajib diisi</span>');
+                        }
+
+                        if (!firstEmptyField) {
+                            firstEmptyField = $field;
+                        }
+
+                        // Format: Instrumen #1 - IKSS 1.2.1 - Realisasi
+                        const fieldLabel = `Instrumen #${instrumenNum} ${indikatorKode ? '(' + indikatorKode + ')' : ''}`;
+                        emptyFieldsInfo.push(`${fieldLabel} - ${fieldName}`);
                     }
+                });
+
+                if (hasEmpty) {
+                    $card.addClass('has-error');
                 }
             });
 
             if (!isComplete) {
-                console.log('Empty fields:', emptyFields);
+                // Scroll to first empty field
+                if (firstEmptyField) {
+                    $('html, body').animate({
+                        scrollTop: firstEmptyField.offset().top - 150
+                    }, 500);
+                    firstEmptyField.focus();
+                }
+
+                // Show detailed error message
                 Swal.fire({
                     icon: 'warning',
                     title: 'Form Belum Lengkap',
-                    text: 'Harap lengkapi semua field sebelum melanjutkan ke tahap berikutnya.',
-                    footer: `Field yang belum diisi: ${emptyFields.join(', ')}`,
-                    confirmButtonText: 'OK'
+                    html: `
+                        <div class="text-start">
+                            <p class="mb-3">Terdapat <strong class="text-danger">${emptyFieldsInfo.length} field</strong> yang belum diisi:</p>
+                            <div style="max-height: 250px; overflow-y: auto;" class="mb-3 p-2 bg-light rounded">
+                                <ul class="mb-0" style="font-size: 13px;">
+                                    ${emptyFieldsInfo.map(f => `<li class="text-danger mb-1">• ${f}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <p class="text-muted small">Mohon lengkapi semua field yang ditandai dengan <span class="badge bg-danger">border merah</span> sebelum menyimpan.</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#f64e60',
+                    didOpen: () => {
+                        // Scroll modal to top
+                        const swalContainer = document.querySelector('.swal2-container');
+                        if (swalContainer) {
+                            swalContainer.scrollTop = 0;
+                        }
+                    }
                 });
-                if (firstEmptyField) {
-                    firstEmptyField.focus();
-                }
                 return;
             }
 
@@ -1037,6 +1320,199 @@
             $('html, body').animate({
                 scrollTop: $('.wizard-content.active').offset().top - 100
             }, 500);
+        }
+    </script>
+
+    <script>
+        // Data periode sebelumnya dari PHP (untuk tombol salin semua)
+        const previousDataForJs = @json($previousDataForJs ?? []);
+
+        // Instrumen yang sudah tersimpan di DB periode aktif (minimal 1 field non-empty).
+        // Dipakai untuk membedakan "hanya prefill default belum disimpan" vs "sudah diisi & tersimpan".
+        const instrumenIdsWithCurrentData = new Set(@json($instrumenIdsWithCurrentData ?? []));
+
+        /**
+         * Cek apakah sebuah instrumen sudah diisi dan TERSIMPAN di DB periode aktif.
+         * Prefill default dari periode sebelumnya yang belum disimpan dianggap belum diisi.
+         */
+        function instrumenSudahDiisi(instrumenId) {
+            return instrumenIdsWithCurrentData.has(parseInt(instrumenId));
+        }
+
+        /**
+         * Isi satu instrumen dengan data dari periode sebelumnya.
+         * overwrite=true → timpa semua field.
+         * overwrite=false → hanya isi field yang masih kosong.
+         */
+        function fillInstrumen(instrumenId, data, overwrite) {
+            const realisasiInput = document.querySelector(`input[name="realisasi[${instrumenId}]"]`);
+            const akarInput      = document.querySelector(`textarea[name="akar_penyebab[${instrumenId}]"]`);
+            const rencanaInput   = document.querySelector(`textarea[name="rencana_perbaikan[${instrumenId}]"]`);
+            const urlInput       = document.querySelector(`input[name="url_sumber[${instrumenId}]"]`);
+
+            if (realisasiInput && (overwrite || realisasiInput.value.trim() === '')) {
+                realisasiInput.value = data.realisasi ?? '';
+                realisasiInput.dispatchEvent(new Event('input',  { bubbles: true }));
+                realisasiInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            if (akarInput && (overwrite || akarInput.value.trim() === '')) {
+                akarInput.value = data.akar ?? '';
+                akarInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (rencanaInput && (overwrite || rencanaInput.value.trim() === '')) {
+                rencanaInput.value = data.rencana ?? '';
+                rencanaInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (urlInput && (overwrite || urlInput.value.trim() === '')) {
+                urlInput.value = data.url_sumber ?? '';
+                urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+
+        function doFill(overwrite) {
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyalin data...',
+                text: 'Mohon tunggu sebentar.',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            $.ajax({
+                url: '{{ route("auditee.pengajuanAmi.copyInstrumenFromPrevious") }}',
+                type: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    overwrite: overwrite ? 1 : 0,
+                },
+                success: function (response) {
+                    const skippedNote = response.skipped_count > 0
+                        ? `<br><span class="text-muted small">${response.skipped_count} instrumen yang sudah diisi <strong>dilewati</strong>.</span>`
+                        : '';
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Disalin!',
+                        html: `<strong>${response.saved_count} instrumen</strong> berhasil disalin dari periode sebelumnya.${skippedNote}`,
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#198754',
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function (xhr) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: xhr.responseJSON?.message || 'Terjadi kesalahan saat menyalin data.',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545',
+                    });
+                }
+            });
+        }
+
+        function copyAllFromPrevious() {
+            const totalInstrumen = Object.keys(previousDataForJs).length;
+
+            if (totalInstrumen === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Data Tidak Tersedia',
+                    text: 'Tidak ada data dari periode sebelumnya yang bisa disalin.',
+                    confirmButtonText: 'OK',
+                    customClass: { confirmButton: 'btn btn-primary' }
+                });
+                return;
+            }
+
+            // Hitung berapa instrumen yang sudah punya isian di form saat ini
+            let sudahDiisiCount = 0;
+            let belumDiisiCount = 0;
+            for (const instrumenId of Object.keys(previousDataForJs)) {
+                if (instrumenSudahDiisi(instrumenId)) {
+                    sudahDiisiCount++;
+                } else {
+                    belumDiisiCount++;
+                }
+            }
+
+            // Tidak ada yang sudah diisi → konfirmasi simpel, langsung timpa semua
+            if (sudahDiisiCount === 0) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Salin Semua dari Periode Sebelumnya?',
+                    html: `<div class="text-start">
+                        <p class="mb-2">Semua field berikut akan diisi dengan data periode sebelumnya:</p>
+                        <ul class="mb-2 small">
+                            <li>Realisasi</li>
+                            <li>Akar Penyebab</li>
+                            <li>Rencana Perbaikan &amp; Tindak Lanjut</li>
+                            <li>URL Sumber</li>
+                        </ul>
+                        <p class="text-muted small mb-0">Total: <strong>${totalInstrumen} instrumen</strong>.
+                        Perubahan tersimpan setelah klik <strong>Simpan &amp; Lanjutkan</strong>.</p>
+                    </div>`,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Salin Semua',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                }).then((result) => {
+                    if (result.isConfirmed) doFill(true);
+                });
+                return;
+            }
+
+            // Ada sebagian yang sudah diisi → tawarkan 3 pilihan
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sebagian Instrumen Sudah Diisi',
+                html: `<div class="text-start">
+                    <p class="mb-3">Ditemukan instrumen yang sudah memiliki isian:</p>
+                    <div class="d-flex gap-3 mb-3 justify-content-center">
+                        <div class="text-center p-3 rounded border border-success bg-light">
+                            <div class="fs-3 fw-bold text-success">${belumDiisiCount}</div>
+                            <div class="small text-muted">Belum diisi</div>
+                        </div>
+                        <div class="text-center p-3 rounded border border-warning bg-light">
+                            <div class="fs-3 fw-bold text-warning">${sudahDiisiCount}</div>
+                            <div class="small text-muted">Sudah diisi</div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0">Pilih tindakan yang ingin dilakukan:</p>
+                </div>`,
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: `<i class="bi bi-eraser me-1"></i> Salin Hanya yang Kosong (${belumDiisiCount})`,
+                denyButtonText: `<i class="bi bi-arrow-repeat me-1"></i> Timpa Semua (${totalInstrumen})`,
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#198754',
+                denyButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: false,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Salin hanya yang kosong
+                    doFill(false);
+                } else if (result.isDenied) {
+                    // Timpa semua — minta konfirmasi sekali lagi
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Timpa Semua?',
+                        html: `<span class="text-danger fw-bold">${sudahDiisiCount} instrumen yang sudah diisi manual akan ditimpa.</span><br>
+                               <span class="text-muted small">Tindakan ini tidak bisa dibatalkan setelah disimpan.</span>`,
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, Timpa Semua',
+                        cancelButtonText: 'Tidak, Batal',
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                    }).then((r) => {
+                        if (r.isConfirmed) doFill(true);
+                    });
+                }
+            });
         }
     </script>
 @endpush
