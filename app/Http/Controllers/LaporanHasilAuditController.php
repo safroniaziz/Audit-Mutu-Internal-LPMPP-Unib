@@ -539,10 +539,8 @@ class LaporanHasilAuditController extends Controller
                                             ->where('pengajuan_id', $pengajuan->id)
                                             ->get();
 
-        if ($jawabanKuisioner->isEmpty()) {
-            // Jika belum ada jawaban, lakukan validasi
-            return redirect()->back()->with('error', 'Jawaban belum ada');
-        }
+        // Tetap izinkan cetak laporan meskipun kuisioner belum diisi.
+        // Bagian kuisioner di PDF akan kosong.
 
         $periodeAktif = PeriodeAktif::whereNull('deleted_at')->first();
         $tujuans = Tujuan::all();
