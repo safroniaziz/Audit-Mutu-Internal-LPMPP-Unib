@@ -471,38 +471,46 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
                 }
             }
 
-            // 3. Insert the records
+            // 3. Insert or update the records
             foreach ($criteriaList as $criteriaData) {
                 $kriteriaId = $getOrCreateKriteria($criteriaData['kode'], $criteriaData['nama'], $criteriaData['search']);
 
-                $rowsToInsert = [];
                 foreach ($criteriaData['items'] as $item) {
-                    $exists = DB::table('instrumen_prodis')
+                    $existingRow = DB::table('instrumen_prodis')
                         ->where('indikator_instrumen_id', 13)
                         ->where('indikator_instrumen_kriteria_id', $kriteriaId)
                         ->where('indikator', $item['indikator'])
-                        ->exists();
+                        ->first();
 
-                    if (!$exists) {
-                        $rowsToInsert[] = [
+                    if (!$existingRow) {
+                        DB::table('instrumen_prodis')->insert([
                             'indikator_instrumen_id' => 13,
                             'indikator_instrumen_kriteria_id' => $kriteriaId,
                             'elemen' => $item['elemen'],
                             'indikator' => $item['indikator'],
                             'sumber_data' => '-',
-                            'metode_perhitungan' => null,
+                            'metode_perhitungan' => $item['indikator_penilaian'],
                             'target' => '4',
                             'realisasi' => '-',
                             'standar_digunakan' => '-',
                             'indikator_penilaian' => $item['indikator_penilaian'],
                             'created_at' => $now,
                             'updated_at' => $now,
-                        ];
+                        ]);
+                    } else {
+                        DB::table('instrumen_prodis')
+                            ->where('id', $existingRow->id)
+                            ->update([
+                                'elemen' => $item['elemen'],
+                                'metode_perhitungan' => $item['indikator_penilaian'],
+                                'indikator_penilaian' => $item['indikator_penilaian'],
+                                'sumber_data' => '-',
+                                'target' => '4',
+                                'realisasi' => '-',
+                                'standar_digunakan' => '-',
+                                'updated_at' => $now,
+                            ]);
                     }
-                }
-
-                if (!empty($rowsToInsert)) {
-                    DB::table('instrumen_prodis')->insert($rowsToInsert);
                 }
             }
         });
