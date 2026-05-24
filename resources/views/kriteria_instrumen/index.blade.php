@@ -72,7 +72,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
-                            @forelse ($kriterias as $index => $kriteria)
+                            @foreach ($kriterias as $index => $kriteria)
                                 <tr>
                                     <td class="w-10px pe-2 ps-4">
                                         <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
@@ -106,7 +106,7 @@
                                                 <button type="button" class="btn btn-sm btn-light-primary restore-data" data-id="{{ $kriteria->id }}">
                                                     <i class="fas fa-sync-alt fa-sm"></i>&nbsp;Aktifkan
                                                 </button>
-
+ 
                                                 <button type="button" class="btn btn-sm btn-light-danger delete-permanent" data-id="{{ $kriteria->id }}">
                                                     <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
                                                 </button>
@@ -114,7 +114,7 @@
                                                 <button type="button" class="btn btn-sm btn-light-danger nonaktifkan-kriteriaInstrumen" data-id="{{ $kriteria->id }}">
                                                     <i class="fas fa-ban fa-sm"></i>&nbsp;Nonaktifkan
                                                 </button>
-
+ 
                                                 <button type="button" class="btn btn-sm btn-light-danger" disabled>
                                                     <i class="fas fa-trash-alt fa-sm"></i>&nbsp;Hapus
                                                 </button>
@@ -122,11 +122,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">Data tidak tersedia</td>
-                                </tr>
-                                @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

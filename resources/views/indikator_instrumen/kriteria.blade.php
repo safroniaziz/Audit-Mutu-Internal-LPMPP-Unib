@@ -171,7 +171,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
-                            @forelse ($kriterias as $index => $kriteria)
+                            @foreach ($kriterias as $index => $kriteria)
                                 <tr>
                                     <td class="w-10px pe-2 ps-4">
                                         <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
@@ -229,11 +229,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">Data tidak tersedia</td>
-                                </tr>
-                                @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

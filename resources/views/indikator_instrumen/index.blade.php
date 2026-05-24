@@ -350,7 +350,7 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 fw-semibold">
-                            @forelse ($indikators as $index => $indikator)
+                            @foreach ($indikators as $index => $indikator)
                                 <tr>
                                     <td class="w-10px pe-2 ps-4">
                                         <div class="form-check form-check-custom form-check-primary form-check-sm ms-3 me-3">
@@ -428,11 +428,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center">Data tidak tersedia</td>
-                                </tr>
-                                @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
