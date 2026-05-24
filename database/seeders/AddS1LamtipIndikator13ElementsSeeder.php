@@ -284,6 +284,7 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
             'indikator' => '2) Tingkat dan ukuran tempat kerja lulusan. RI = (NI / NL) x 100% , RN = (NN / NL) x 100% , RW = (NW / NL) x 100%. Faktor: a = 5% , b = 20% , c = 90%. NI = Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional. NN = Jumlah lulusan yang bekerja di badan usaha tingkat nasional atau berwirausaha yang berizin. NW = Jumlah lulusan yang bekerja di badan usaha tingkat wilayah/lokal atau berwirausaha tidak berizin. NL = Jumlah lulusan. Ketentuan persentase responden berlaku sama seperti indikator waktu tunggu.',
             'indikator_penilaian' => "4: Jika RI ≥ a, maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
         ],
+    ]
 
     ],
                 [
