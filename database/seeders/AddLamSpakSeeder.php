@@ -12,8 +12,9 @@ class AddLamSpakSeeder extends Seeder
         DB::transaction(function () {
             $now = now();
             $indicatorName = 'INDIKATOR LAM SPAK';
+            $indikatorInstrumenId = 17;
 
-            $indikatorInstrumenId = $this->getOrCreateIndikatorInstrumen($indicatorName, $now);
+            $this->upsertIndikatorInstrumen($indikatorInstrumenId, $indicatorName, $now);
             $rubrik = static fn (string $nilai4, string $nilai3, string $nilai1): string => "4: {$nilai4} 3: {$nilai3} 2: {$nilai3} 1: {$nilai1}";
             $item = static fn (string $teks, string $nilai4, string $nilai3, string $nilai1): array => ['elemen' => $teks, 'indikator' => $teks, 'target' => '4', 'indikator_penilaian' => $rubrik($nilai4, $nilai3, $nilai1)];
 
@@ -302,24 +303,26 @@ class AddLamSpakSeeder extends Seeder
         });
     }
 
-    private function getOrCreateIndikatorInstrumen(string $name, mixed $now): int
+    private function upsertIndikatorInstrumen(int $id, string $name, mixed $now): void
     {
         $indikator = DB::table('indikator_instrumens')
-            ->where('nama_indikator', $name)
+            ->where('id', $id)
             ->first();
 
         if ($indikator) {
             DB::table('indikator_instrumens')
-                ->where('id', $indikator->id)
+                ->where('id', $id)
                 ->update([
+                    'nama_indikator' => $name,
                     'deleted_at' => null,
                     'updated_at' => $now,
                 ]);
 
-            return (int) $indikator->id;
+            return;
         }
 
-        return DB::table('indikator_instrumens')->insertGetId([
+        DB::table('indikator_instrumens')->insert([
+            'id' => $id,
             'nama_indikator' => $name,
             'created_at' => $now,
             'updated_at' => $now,
