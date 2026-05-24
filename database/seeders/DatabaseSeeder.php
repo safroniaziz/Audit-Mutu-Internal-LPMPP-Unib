@@ -39,5 +39,6 @@ class DatabaseSeeder extends Seeder
         $this->call(EvaluasiAuditorSeeder::class);
         $this->call(EvaluasiAuditeeSeeder::class);
         $this->call(AddS1LamtipIndikator13ElementsSeeder::class);
+        $this->call(AddD3FarmasiSeeder::class);
     }
 }
