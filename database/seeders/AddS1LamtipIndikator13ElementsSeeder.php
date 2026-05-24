@@ -41,252 +41,251 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
 
             // Define the criteria list and their elements
             $criteriaList = [
-                <?php
 
 // ============================================================
 // SEEDER LENGKAP KRITERIA 2 - RELEVANSI PENDIDIKAN
 // Total: 32 item
 // ============================================================
 
-    [
-        'kode' => '2',
-        'nama' => 'Kriteria 2 Relevansi Pendidikan',
-        'search' => 'Pendidikan',
-        'items' => [
+[
+    'kode' => '2',
+    'nama' => 'Kriteria 2 Relevansi Pendidikan',
+    'search' => 'Pendidikan',
+    'items' => [
 
-            // ==================== MASUKAN ====================
+        // ==================== MASUKAN ====================
 
-            // 1. No.5 - Kurikulum
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'Kurikulum disusun dengan memperhatikan aspek-aspek berikut: A. Keterlibatan pemangku kepentingan sangat aktif dan terstruktur dalam semua tahapan evaluasi dan pemutakhiran kurikulum outcome based education. Semua masukan dari pemangku kepentingan diterima dan diimplementasikan secara efektif. B. Kesesuaian capaian pembelajaran dengan profil lulusan dan jenjang KKNI/SKKNI. C. Ketepatan struktur, muatan kurikulum dan materi pembelajaran dalam pembentukan capaian pembelajaran mencakup minimal: 1) Capaian pembelajaran lulusan; 2) Masa Tempuh Kurikulum; 3) Metode pembelajaran; 4) Modalitas pembelajaran; 5) Syarat kompetensi dan/atau kualifikasi calon mahasiswa; 6) Penilaian hasil belajar; 7) Materi pembelajaran yang harus ditempuh; dan 8) Tata cara penerimaan mahasiswa pada berbagai tahapan kurikulum. D. Kurikulum mencakup SDG\'s',
-                'indikator_penilaian' => "4: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan empat aspek\n3: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan tiga aspek (aspek B wajib ada).\n2: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan dua aspek (aspek B wajib ada).\n1: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan aspek B.\n0: Tidak terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan seluruh aspek.",
-            ],
-
-            // 2. No.6 - Materi Pembelajaran
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'Materi pembelajaran yang disusun memiliki tingkat kedalaman dan keluasan sesuai jenis, program, dan standar kompetensi lulusan dengan memperhatikan: 1) Perkembangan ilmu pengetahuan dan teknologi yang menjadi dasar keilmuan program studi; 2) Ilmu pengetahuan dan teknologi mutakhir yang relevan dengan program studi; 3) Konsep baru yang dihasilkan dari penelitian terkini; 4) Dunia kerja yang relevan dengan profesi lulusan program studi.',
-                'indikator_penilaian' => "4: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang sangat baik, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi secara sistematis dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi dengan sangat baik.\n3: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang baik, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi dengan baik.\n2: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang cukup, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi.\n1: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang belum mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 3. No.7A - Renstra SDM Dosen
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'UPPS memiliki rencana strategis UPPS dalam pengelolaan SDM dengan mempertimbangkan: A. Ketersediaan (Dosen) Tenaga Pendidik yang berkompeten dan berkualifikasi 1) Kompetensi dosen meliputi kompetensi pedagogik, kepribadian, sosial, dan profesional. 2) Kualifikasi dosen sesuai dengan ketentuan peraturan perundang-undangan, baik jenjang pendidikan maupun jabatan akademiknya.',
-                'indikator_penilaian' => "4: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi 2 (dua) unsur disertai dengan penetapannya.\n3: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi salah satu unsur disertai dengan penetapannya.\n2: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi salah satu unsur namun tidak disertai dengan penetapannya.\n1: Tidak ada Skor antara 0 dan 2.\n0: UPPS belum memiliki Renstra pengembangan dosen.",
-            ],
-
-            // 4. No.7B - Tenaga Kependidikan
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'B. Ketersediaan tenaga kependidikan untuk melaksanakan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.',
-                'indikator_penilaian' => "4: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang sangat baik untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n3: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang baik untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n2: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang cukup untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n1: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang kurang untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 5. No.8A - Kecukupan DTPS
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'A. Kecukupan jumlah DTPS (NDTPS). NDTPS = Jumlah dosen tetap yang ditugaskan sebagai pengampu mata kuliah dengan bidang keahlian yang sesuai dengan kompetensi inti program studi yang diakreditasi.',
-                'indikator_penilaian' => "4: Jika NDTPS ≥ 12 , maka Skor = 4\n3: Jika 3 ≤ NDTPS < 12 , maka Skor = ((2 x NDTPS) + 12) / 9\n2: -\n1: Tidak ada Skor antara 0 dan 2.\n0: Jika NDTPS < 3 , maka Skor = 0",
-            ],
-
-            // 6. No.8B - Keterlibatan Dosen Tidak Tetap
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'B. Keterlibatan Dosen Tidak Tetap. NDTT = Jumlah dosen tidak tetap yang ditugaskan sebagai pengampu mata kuliah di program studi yang diakreditasi. NDT = Jumlah dosen tetap yang ditugaskan sebagai pengampu mata kuliah di program studi yang diakreditasi. PDTT = (NDTT / (NDT + NDTT)) x 100%',
-                'indikator_penilaian' => "4: Jika PDTT ≤ 10% , maka Skor = 4\n3: Jika 10% < PDTT ≤ 40% , maka Skor = (14 - (20 x PDTT)) / 3\n2: -\n1: Tidak ada Skor antara 0 dan 2.\n0: Jika PDTT > 40% , maka Skor = 0",
-            ],
-
-            // 7. No.9 - Penyediaan Akses Sarana Prasarana
-            [
-                'elemen' => 'Masukan',
-                'indikator' => 'Penyediaan akses terhadap sarana dan prasarana yang: a. Mengakomodasi kebutuhan pendidikan mahasiswa; b. Mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan; c. Ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan; d. Menjamin dan menyediakan akses terhadap sarana dan prasarana yang memenuhi ketentuan: keamanan, keselamatan, dan kesehatan; kelengkapan pencegahan dan pemadam kebakaran serta penanggulangan kondisi darurat akibat bencana alam lainnya; dan pengelolaan sampah serta limbah bahan berbahaya dan beracun.',
-                'indikator_penilaian' => "4: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan;\n   c. ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan d. menjamin dan menyediakan akses terhadap sarana dan prasarana yang memenuhi ketentuan: keamanan, keselamatan, dan kesehatan; kelengkapan pencegahan dan pemadam kebakaran serta penanggulangan kondisi darurat akibat bencana alam lainnya; dan pengelolaan sampah serta limbah bahan berbahaya dan beracun.\n3: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan;\n   c. ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan.\n2: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan\n1: Tidak ada Skor antara 0 dan 2\n0: Tidak tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana.",
-            ],
-
-            // 8. No.10 - Laboratorium
-            [
-                'elemen' => 'Masukan',
-                'indikator' => "UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi kriteria: 1. Terdapat kebijakan formal kelembagaan laboratorium\n2. Tersedia sarana dan prasarana\nlaboratorium yang bermutu baik\n3. Memiliki standar pengelolaan\nlaboratorium\n4. Tersedia instrumen/modul\npraktikum\n5. Terdapat bukti sahih\npenggunaan untuk pembelajaran.",
-                'indikator_penilaian' => "4: Ketersediaan sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang\n   memenuhi 5 (lima) kriteria\n3: Ketersediaan sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi 4 (empat) kriteria (kriteria 2 dan 5\n   wajib terpenuhi)\n2: UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi minimal 3 kriteria (kriteria 2 dan 5\n   wajib terpenuhi)\n1: UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang\n   memenuhi kriteria 2 dan 5\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // ==================== PROSES ====================
-
-            // 9. No.11A - RPS Ketersediaan & Kelengkapan
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'A. Ketersediaan dan kelengkapan dokumen rencana pembelajaran semester (RPS)',
-                'indikator_penilaian' => "4: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala serta dapat diakses oleh mahasiswa, dilaksanakan secara konsisten.\n3: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala serta dapat diakses oleh mahasiswa.\n2: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala.\n1: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran atau tidak semua matakuliah memiliki RPS.\n0: Dokumen RPS belum mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran.",
-            ],
-
-            // 10. No.11B - RPS Kedalaman & Keluasan
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'B. Kedalaman dan keluasan RPS sesuai dengan capaian pembelajaran lulusan.',
-                'indikator_penilaian' => "4: Isi materi pembelajaran sesuai dengan RPS, memiliki kedalaman dan keluasan yang relevan untuk mencapai capaian pembelajaran lulusan, serta ditinjau ulang secara berkala.\n3: Isi materi pembelajaran sesuai dengan RPS, memiliki kedalaman dan keluasan yang relevan untuk mencapai capaian pembelajaran lulusan.\n2: Isi materi pembelajaran memiliki kedalaman dan keluasan sesuai dengan capaian pembelajaran lulusan.\n1: Isi materi pembelajaran memiliki kedalaman dan keluasan namun sebagian tidak sesuai dengan capaian pembelajaran lulusan.\n0: Isi materi pembelajaran tidak sesuai dengan capaian pembelajaran lulusan.",
-            ],
-
-            // 11. No.12A - Pelaksanaan Pembelajaran
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'A. Pelaksanaan pembelajaran 1) Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line 2) Kesesuaian metode dan proses pembelajaran dengan capaian pembelajaran 3). Pemantauan dan evaluasi kesesuaian proses pembelajaran terhadap rencana pembelajaran dan hasilnya digunakan untuk perbaikan proses pembelajaran secara berkelanjutan',
-                'indikator_penilaian' => "4: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line dan terdokumentasi dengan baik b. Memiliki bukti sahih yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti sahih adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk menjamin kesesuaian dengan RPS dalam rangka menjaga mutu proses pembelajaran. Hasil monev terdokumentasi dengan baik dan digunakan untuk meningkatkan mutu proses pembelajaran.\n3: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line. b. Memiliki bukti sahih yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti sahih adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk menjamin kesesuaian dengan RPS dalam rangka menjaga mutu proses pembelajaran. Hasil monev terdokumentasi dengan baik.\n2: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu. b. Memiliki bukti yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk mengukur kesesuaian terhadap RPS.\n1: a . Pelaksanaan pembelajaran berlangsung hanya sebagian dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu. b. Tidak memiliki bukti yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Tidak memiliki bukti adanya sistem pemantauan proses pembelajaran namun tidak dilaksanakan secara konsisten.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 12. No.12B - Suasana Akademik
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'B. Pelaksanaan program dan kegiatan diluar kegiatan pembelajaran terstruktur secara berkala untuk meningkatkan suasana akademik. (Contoh: kegiatan himpunan mahasiswa,\nkuliah umum/studium generale,\nseminar ilmiah, bedah buku)',
-                'indikator_penilaian' => "4: Kegiatan ilmiah yang terjadwal dilaksanakan setiap bulan.\n3: Kegiatan ilmiah yang terjadwal dilaksanakan dua s.d tiga bulan sekali\n2: Kegiatan ilmiah yang terjadwal dilaksanakan empat s.d. enam bulan sekali.\n1: Kegiatan ilmiah yang terjadwal dilaksanakan lebih dari enam bulan sekali.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 13. No.13A - Penilaian 8 Prinsip
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'Penilaian A. Mutu pelaksanaan penilaian pembelajaran (proses dan hasil belajar mahasiswa) untuk mengukur ketercapaian capaian pembelajaran berdasarkan prinsip penilaian yang mencakup: 1) Edukatif, 2) Otentik, 3) Objektif, 4) Akuntabel, 5) Transparan, 6) Valid 7) Reliabel 8) Berkeadilan yang dilakukan secara terintegrasi',
-                'indikator_penilaian' => "4: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi dan dilengkapi dengan rubrik/portofolio penilaian minimum 70% jumlah mata kuliah.\n3: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi dan dilengkapi dengan rubrik/portofolio penilaian minimum 50% jumlah mata kuliah.\n2: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi.\n1: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang tidak dilakukan secara terintegrasi.\n0: Tidak terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian.",
-            ],
-
-            // 14. No.13B - Teknik & Instrumen Penilaian
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'B. Pelaksanaan penilaian terdiri atas teknik dan instrumen penilaian. Teknik penilaian terdiri dari: 1) Observasi, 2) Partisipasi, 3) Unjuk kerja, 4) Test tertulis, 5) Test lisan, dan 6) Angket. Instrumen penilaian terdiri dari: 1) Penilaian proses dalam bentuk rubrik, dan/ atau; 2) Penilaian hasil dalam bentuk portofolio, atau 3) Karya disain. Teknik dan instrumen penilaian disosialisasikan kepada mahasiswa',
-                'indikator_penilaian' => "4: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran minimum 75% s.d. 100% dari jumlah mata kuliah.\n3: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran minimum 50 s.d. < 75% dari jumlah mata kuliah.\n2: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran yang dinilai minimum 25 s.d. < 50% dari jumlah mata kuliah.\n1: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran yang dinilai < 25% dari jumlah mata kuliah.\n0: Tidak terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran.",
-            ],
-
-            // 15. No.13C - 7 Unsur Penilaian
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'C. Pelaksanaan penilaian memuat unsur- unsur sebagai berikut: 1) Mempunyai kontrak rencana penilaian, 2) Melaksanakan penilaian sesuai kontrak atau kesepakatan, 3) Memberikan umpan balik dan memberi kesempatan untuk mempertanyakan hasil kepada mahasiswa, 4) Mempunyai dokumentasi penilaian proses dan hasil belajar mahasiswa, 5) Mempunyai prosedur yang mencakup tahap perencanaan, kegiatan pemberian tugas atau soal, observasi kinerja, pengembalian hasil observasi, dan pemberian nilai akhir, 6) Pelaporan penilaian berupa kualifikasi keberhasilan mahasiswa dalam menempuh suatu mata kuliah dalam bentuk huruf dan angka, 7) Mempunyai bukti- bukti rencana dan telah melakukan proses perbaikan berdasar hasil monev penilaian.',
-                'indikator_penilaian' => "4: Terdapat bukti sahih pelaksanaan penilaian mencakup 7 unsur.\n3: Terdapat bukti sahih pelaksanaan penilaian mencakup minimum unsur 1, 4 dan 6 serta 2 unsur lainnya.\n2: Terdapat bukti sahih pelaksanaan penilaian mencakup minimum unsur 1, 4 dan 6.\n1: Terdapat bukti sahih pelaksanaan penilaian hanya mencakup unsur 6.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 16. No.14 - Integrasi Penelitian & PkM
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'Integrasi kegiatan penelitian dan PkM dalam pembelajaran',
-                'indikator_penilaian' => "4: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah minimal > 10.\n3: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah > 5 sampai sampai 10 mata kuliah.\n2: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah > 2 sampai sampai 5 mata kuliah.\n1: Tidak Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran.\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 17. No.15A - Evaluasi Proses Pembelajaran
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'A. Keseluruhan proses pembelajaran diperbaiki dan ditingkatkan secara berkelanjutan oleh Program Studi berdasarkan hasil evaluasi terhadap aspek aspek berikut: 1) Aktivitas pembelajaran pada setiap angkatan; 2) Jumlah mahasiswa aktif pada setiap angkatan; 3) Masa tempuh kurikulum; 4) Masa penyelesaian studi mahasiswa; dan 5) Tingkat serapan lulusan mahasiswa di dunia kerja.',
-                'indikator_penilaian' => "4: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 5 (lima) dari aspek.\n3: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 4 (empat) dari aspek.\n2: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 3 (tiga) dari aspek.\n1: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi belum diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 2 (dua) aspek.\n0: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi belum diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 1 (satu) aspek.",
-            ],
-
-            // 18. No.15B - MBKM
-            [
-                'elemen' => 'Proses',
-                'indikator' => 'B. Kepesertaan mahasiswa yang eligible mengikuti MBKM, Berdampak, atau istilah lain yang relevan (outcome based activity) saat TS',
-                'indikator_penilaian' => "4: Syarat PKMEMBKM ≥ 15%\n3: Syarat PKMEMBKM ≥ 12.5%\n2: Syarat PKMEMBKM ≥ 10%\n1: Syarat PKMEMBKM ≥ 7.5%\n0: Syarat PKMEMBKM ≤ 7.5%",
-            ],
-
-            // ==================== LUARAN ====================
-
-            // 19. No.16 - Analisis CPL
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'Analisis pemenuhan capaian pembelajaran lulusan (CPL) yang diukur dengan metoda yang sahih dan relevan, mencakup aspek: 1) Keserbacakupan; 2) Kedalaman, dan 3) Kebermanfaatan analisis yang ditunjukkan dengan peningkatan CPL dari waktu ke waktu dalam 3 tahun terakhir.',
-                'indikator_penilaian' => "4: Analisis capaian pembelajaran lulusan memenuhi 3 aspek\n3: Analisis capaian pembelajaran lulusan memenuhi 2 aspek\n2: Analisis capaian pembelajaran lulusan memenuhi 1 aspek\n1: Analisis capaian pembelajaran lulusan tidak memenuhi ketiga aspek\n0: tidak dilakukan analisis capaian pembelajaran lulusan",
-            ],
-
-            // 20. No.17 - Rata-rata IPK
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'Rata-rata IPK lulusan dalam 3 tahun terakhir.',
-                'indikator_penilaian' => "4: Jika RIPK ≥ 3,25, maka Skor = 4\n3: Jika 2,00 ≤ RIPK < 3,25, maka Skor = ((8 x RIPK) - 6) / 5\n2: -\n1: Tidak ada skor kurang dari 2\n0: -",
-            ],
-
-            // 21. No.18 - Prestasi Akademik
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'Prestasi mahasiswa di bidang akademik dalam 3 tahun terakhir. RI = NI / NM , RN = NN / NM , RW = NW / NM. Faktor: a = 0,1% , b = 1% , c = 2%. NI = Jumlah prestasi akademik internasional. NN = Jumlah prestasi akademik nasional. NW = Jumlah prestasi akademik regional. NM = Jumlah mahasiswa pada saat TS.',
-                'indikator_penilaian' => "4: Jika RI ≥ a , maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
-            ],
-
-            // 22. No.19 - Prestasi Non Akademik
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'Prestasi mahasiswa di bidang non akademik dalam 3 tahun terakhir. RI = NI / NM , RN = NN / NM , RW = NW / NM. Faktor: a = 0,2% , b = 2% , c = 4%. NI = Jumlah prestasi nonakademik internasional. NN = Jumlah prestasi nonakademik nasional. NW = Jumlah prestasi nonakademik regional. NM = Jumlah mahasiswa pada saat TS.',
-                'indikator_penilaian' => "4: Jika RI ≥ a , maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
-            ],
-
-            // 23. No.20 - Rata-rata Masa Studi
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'Rata-rata masa studi lulusan (tahun).',
-                'indikator_penilaian' => "4: Jika 3,5 < MS ≤ 4,5 , maka Skor = 4\n3:\n   - Jika 3 < MS ≤ 3,5 , maka Skor = (8 x MS) - 24\n   - Jika 4,5 < MS < 7 , maka Skor = (56 - (8 x MS)) / 5\n2: -\n1: -\n0: Jika MS ≤ 3 , maka Skor = 0",
-            ],
-
-            // 24. No.21A - Kelulusan Tepat Waktu
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'UPPS menunjukkan hasil analisis terhadap luaran program pendidikan yang terdiri dari penyelesaian studi lulusan sebagai berikut; A. Kelulusan tepat masa tempuh kurikulum (Mahasiswa Sarjana masuk TS-3 lulus sampai TS). PTW = Persentase kelulusan tepat waktu.',
-                'indikator_penilaian' => "4: Jika PTW ≥ 50% , maka Skor = 4\n3: Jika PTW < 50% , maka Skor = 1 + (6 x PTW)\n2: -\n1: -\n0: Tidak ada Skor kurang dari 1.",
-            ],
-
-            // 25. No.21B - Kelulusan Tepat 2x Waktu
-            [
-                'elemen' => 'Luaran',
-                'indikator' => 'B. Kelulusan tepat 2x waktu tempuh kurikulum (mahasiswa Sarjana masuk TS-7 lulus sampai TS). PPS = Persentase keberhasilan studi.',
-                'indikator_penilaian' => "4: Jika PPS ≥ 85% , maka Skor = 4\n3: Jika 30% ≤ PPS < 85% , maka Skor = ((80 x PPS) - 24) / 11\n2: -\n1: -\n0: Jika PPS < 30%",
-            ],
-
-            // ==================== DAMPAK ====================
-
-            // 26. No.22 - Tracer Study
-            [
-                'elemen' => 'Dampak',
-                'indikator' => 'Pelaksanaan tracer study yang mencakup 5 aspek sebagai berikut: 1) Pelaksanaan tracer study terkoordinasi di tingkat PT/UPPS 2) Kegiatan tracer study dilakukan secara reguler setiap tahun dan terdokumentasi, 3) Isi kuesioner mencakup seluruh pertanyaan inti tracer study DIKTI. 4) Ditargetkan pada seluruh populasi (lulusan TS-4 s.d. TS-2), 5) Hasilnya disosialisasikan dan digunakan untuk pengembangan\nkurikulum dan pembelajaran.',
-                'indikator_penilaian' => "4: Tracer study yang dilakukan PT/UPPS telah mencakup semua aspek\n3: Tracer study yang dilakukan PT/UPPS telah mencakup 4 aspek.\n2: Tracer study yang dilakukan PT/UPPS telah mencakup 3 aspek.\n1: Tracer study yang dilakukan PT/UPPS telah mencakup 2 aspek.\n0: PT/UPPS tidak melaksanakan tracer study.",
-            ],
-
-            // 27. No.23A - Sertifikasi Kompetensi Alumni
-            [
-                'elemen' => 'Dampak',
-                'indikator' => 'Tren alumni PS mendapatkan pengakuan dan apresiasi yang diukur melalui; A. Sertifikasi kompetensi',
-                'indikator_penilaian' => "4: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 30%\n3: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 25%\n2: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 20%\n1: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 15%\n0: Presentase alumni yang memiliki sertifikasi kompetensi ≤ 15%",
-            ],
-
-            // 28. No.23B - Kepuasan Pengguna Lulusan
-            [
-                'elemen' => 'Dampak',
-                'indikator' => 'B. PT/UPPS/PS mengukur tingkat kepuasan pengguna lulusan',
-                'indikator_penilaian' => "Skor = STKi / 7\nTingkat kepuasan aspek ke-i dihitung dengan rumus sebagai berikut:\nTKi = (4 x ai) + (3 x bi) + (2 x ci) + di\ni = 1, 2, ..., 7\nai = persentase \"sangat baik\". bi = persentase \"baik\". ci = persentase \"cukup\". di = persentase \"kurang\".\nKetentuan persentase responden pengguna lulusan:\n- untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) ≥ 300 orang, maka Prmin = 30%.\n- untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) < 300 orang, maka Prmin = 50% - ((NL / 300) x 20%)\nJika persentase responden memenuhi ketentuan diatas, maka Skor akhir = Skor.\nJika persentase responden tidak memenuhi ketentuan diatas, maka berlaku penyesuaian sebagai berikut: Skor akhir = (PJ / Prmin) x Skor.\nNL = Jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2)\nNJ = Jumlah pengguna lulusan yang memberi tanggapan atas studi pelacakan lulusan dalam 3 tahun (TS-4 s.d. TS-2)\nPJ = Persentase pengguna lulusan yang memberi tanggapan = (NL / NJ) x 100%\nPrmin = Persentase responden minimum",
-            ],
-
-            // 29. No.24A - Penurunan Mahasiswa Baru
-            [
-                'elemen' => 'Dampak',
-                'indikator' => 'Program studi melakukan evaluasi dan analisis terhadap aspek berikut: A. Prosentase penurunan mahasiswa baru dalam 5 tahun terakhir (PPM).',
-                'indikator_penilaian' => "4: PPM ≤ 10%\n3: PPM ≤ 15%\n2: PPM ≤ 20%\n1: PPM ≤ 25%\n0: PPM > 25%",
-            ],
-
-            // 30. No.24B - Daya Saing Lulusan (header)
-            [
-                'elemen' => 'Dampak',
-                'indikator' => 'B. Daya saing lulusan',
-                'indikator_penilaian' => "-",
-            ],
-
-            // 31. No.24B1 - Waktu Tunggu Lulusan
-            [
-                'elemen' => 'Dampak',
-                'indikator' => '1) Waktu tunggu lulusan untuk mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2. Ketentuan persentase responden lulusan: untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) ≥ 300 orang, maka Prmin = 30%. Untuk program studi dengan jumlah lulusan < 300 orang, maka Prmin = 50% - ((NL / 300) x 20%). Jika persentase responden memenuhi ketentuan, maka Skor akhir = Skor. Jika tidak memenuhi, maka Skor akhir = (PJ / Prmin) x Skor. NL = Jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2). NJ = Jumlah lulusan yang terlacak. PJ = (NL / NJ) x 100%.',
-                'indikator_penilaian' => "4: Jika WT < 6 bulan, maka Skor = 4.\n3: Jika 6 ≤ WT ≤ 18, maka Skor = (18 – WT) / 3.\n2: -\n1: -\n0: WT > 18 bulan, maka Skor = 0",
-            ],
-
-            // 32. No.24B2 - Tingkat & Ukuran Tempat Kerja Lulusan
-            [
-                'elemen' => 'Dampak',
-                'indikator' => '2) Tingkat dan ukuran tempat kerja lulusan. RI = (NI / NL) x 100% , RN = (NN / NL) x 100% , RW = (NW / NL) x 100%. Faktor: a = 5% , b = 20% , c = 90%. NI = Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional. NN = Jumlah lulusan yang bekerja di badan usaha tingkat nasional atau berwirausaha yang berizin. NW = Jumlah lulusan yang bekerja di badan usaha tingkat wilayah/lokal atau berwirausaha tidak berizin. NL = Jumlah lulusan. Ketentuan persentase responden berlaku sama seperti indikator waktu tunggu.',
-                'indikator_penilaian' => "4: Jika RI ≥ a, maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
-            ],
-
+        // 1. No.5 - Kurikulum
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'Kurikulum disusun dengan memperhatikan aspek-aspek berikut: A. Keterlibatan pemangku kepentingan sangat aktif dan terstruktur dalam semua tahapan evaluasi dan pemutakhiran kurikulum outcome based education. Semua masukan dari pemangku kepentingan diterima dan diimplementasikan secara efektif. B. Kesesuaian capaian pembelajaran dengan profil lulusan dan jenjang KKNI/SKKNI. C. Ketepatan struktur, muatan kurikulum dan materi pembelajaran dalam pembentukan capaian pembelajaran mencakup minimal: 1) Capaian pembelajaran lulusan; 2) Masa Tempuh Kurikulum; 3) Metode pembelajaran; 4) Modalitas pembelajaran; 5) Syarat kompetensi dan/atau kualifikasi calon mahasiswa; 6) Penilaian hasil belajar; 7) Materi pembelajaran yang harus ditempuh; dan 8) Tata cara penerimaan mahasiswa pada berbagai tahapan kurikulum. D. Kurikulum mencakup SDG\'s',
+            'indikator_penilaian' => "4: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan empat aspek\n3: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan tiga aspek (aspek B wajib ada).\n2: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan dua aspek (aspek B wajib ada).\n1: Terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan aspek B.\n0: Tidak terdapat bukti sahih penyusunan kurikulum yang mengimplementasikan seluruh aspek.",
         ],
+
+        // 2. No.6 - Materi Pembelajaran
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'Materi pembelajaran yang disusun memiliki tingkat kedalaman dan keluasan sesuai jenis, program, dan standar kompetensi lulusan dengan memperhatikan: 1) Perkembangan ilmu pengetahuan dan teknologi yang menjadi dasar keilmuan program studi; 2) Ilmu pengetahuan dan teknologi mutakhir yang relevan dengan program studi; 3) Konsep baru yang dihasilkan dari penelitian terkini; 4) Dunia kerja yang relevan dengan profesi lulusan program studi.',
+            'indikator_penilaian' => "4: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang sangat baik, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi secara sistematis dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi dengan sangat baik.\n3: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang baik, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi dengan baik.\n2: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang cukup, mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Seluruh komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi.\n1: Materi pembelajaran disusun dengan tingkat kedalaman dan keluasan yang belum mencakup seluruh komponen: perkembangan ilmu dan teknologi dasar, teknologi mutakhir, hasil penelitian terkini, dan kebutuhan dunia kerja. Komponen terintegrasi dalam materi pembelajaran, relevan dengan standar kompetensi lulusan, dan terdokumentasi.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 3. No.7A - Renstra SDM Dosen
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'UPPS memiliki rencana strategis UPPS dalam pengelolaan SDM dengan mempertimbangkan: A. Ketersediaan (Dosen) Tenaga Pendidik yang berkompeten dan berkualifikasi 1) Kompetensi dosen meliputi kompetensi pedagogik, kepribadian, sosial, dan profesional. 2) Kualifikasi dosen sesuai dengan ketentuan peraturan perundang-undangan, baik jenjang pendidikan maupun jabatan akademiknya.',
+            'indikator_penilaian' => "4: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi 2 (dua) unsur disertai dengan penetapannya.\n3: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi salah satu unsur disertai dengan penetapannya.\n2: UPPS telah memiliki bukti sahih Renstra pengembangan dosen yang memenuhi salah satu unsur namun tidak disertai dengan penetapannya.\n1: Tidak ada Skor antara 0 dan 2.\n0: UPPS belum memiliki Renstra pengembangan dosen.",
+        ],
+
+        // 4. No.7B - Tenaga Kependidikan
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'B. Ketersediaan tenaga kependidikan untuk melaksanakan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.',
+            'indikator_penilaian' => "4: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang sangat baik untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n3: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang baik untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n2: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang cukup untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n1: UPPS memiliki tenaga kependidikan dengan jumlah dan kualifikasi yang kurang untuk kepentingan layanan administrasi, pengelolaan, pengembangan, pengawasan, dan pelayanan teknis.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 5. No.8A - Kecukupan DTPS
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'A. Kecukupan jumlah DTPS (NDTPS). NDTPS = Jumlah dosen tetap yang ditugaskan sebagai pengampu mata kuliah dengan bidang keahlian yang sesuai dengan kompetensi inti program studi yang diakreditasi.',
+            'indikator_penilaian' => "4: Jika NDTPS ≥ 12 , maka Skor = 4\n3: Jika 3 ≤ NDTPS < 12 , maka Skor = ((2 x NDTPS) + 12) / 9\n2: -\n1: Tidak ada Skor antara 0 dan 2.\n0: Jika NDTPS < 3 , maka Skor = 0",
+        ],
+
+        // 6. No.8B - Keterlibatan Dosen Tidak Tetap
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'B. Keterlibatan Dosen Tidak Tetap. NDTT = Jumlah dosen tidak tetap yang ditugaskan sebagai pengampu mata kuliah di program studi yang diakreditasi. NDT = Jumlah dosen tetap yang ditugaskan sebagai pengampu mata kuliah di program studi yang diakreditasi. PDTT = (NDTT / (NDT + NDTT)) x 100%',
+            'indikator_penilaian' => "4: Jika PDTT ≤ 10% , maka Skor = 4\n3: Jika 10% < PDTT ≤ 40% , maka Skor = (14 - (20 x PDTT)) / 3\n2: -\n1: Tidak ada Skor antara 0 dan 2.\n0: Jika PDTT > 40% , maka Skor = 0",
+        ],
+
+        // 7. No.9 - Penyediaan Akses Sarana Prasarana
+        [
+            'elemen' => 'Masukan',
+            'indikator' => 'Penyediaan akses terhadap sarana dan prasarana yang: a. Mengakomodasi kebutuhan pendidikan mahasiswa; b. Mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan; c. Ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan; d. Menjamin dan menyediakan akses terhadap sarana dan prasarana yang memenuhi ketentuan: keamanan, keselamatan, dan kesehatan; kelengkapan pencegahan dan pemadam kebakaran serta penanggulangan kondisi darurat akibat bencana alam lainnya; dan pengelolaan sampah serta limbah bahan berbahaya dan beracun.',
+            'indikator_penilaian' => "4: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan;\n   c. ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan d. menjamin dan menyediakan akses terhadap sarana dan prasarana yang memenuhi ketentuan: keamanan, keselamatan, dan kesehatan; kelengkapan pencegahan dan pemadam kebakaran serta penanggulangan kondisi darurat akibat bencana alam lainnya; dan pengelolaan sampah serta limbah bahan berbahaya dan beracun.\n3: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan;\n   c. ramah terhadap mahasiswa, dosen, dan tenaga kependidikan yang berkebutuhan khusus; dan memadai untuk menyelenggarakan pendidikan dan manajemen pendidikan tinggi sesuai kebutuhan penyelenggaraan dan rencana pengembangan pendidikan.\n2: Tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana yang a. mengakomodasi kebutuhan pendidikan mahasiswa; b. mengakomodasi pelaksanaan tugas dosen, tutor, instruktur, asisten, dan pembimbing sesuai dengan bidang keahlian dan tenaga kependidikan\n1: Tidak ada Skor antara 0 dan 2\n0: Tidak tersedia bukti sahih bahwa UPPS telah menyediakan akses terhadap sarana dan prasarana.",
+        ],
+
+        // 8. No.10 - Laboratorium
+        [
+            'elemen' => 'Masukan',
+            'indikator' => "UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi kriteria: 1. Terdapat kebijakan formal kelembagaan laboratorium\n2. Tersedia sarana dan prasarana\nlaboratorium yang bermutu baik\n3. Memiliki standar pengelolaan\nlaboratorium\n4. Tersedia instrumen/modul\npraktikum\n5. Terdapat bukti sahih\npenggunaan untuk pembelajaran.",
+            'indikator_penilaian' => "4: Ketersediaan sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang\n   memenuhi 5 (lima) kriteria\n3: Ketersediaan sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi 4 (empat) kriteria (kriteria 2 dan 5\n   wajib terpenuhi)\n2: UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang memenuhi minimal 3 kriteria (kriteria 2 dan 5\n   wajib terpenuhi)\n1: UPPS memfasilitasi sumber pembelajaran berupa laboratorium yang mendukung kompetensi inti program studi, yang\n   memenuhi kriteria 2 dan 5\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // ==================== PROSES ====================
+
+        // 9. No.11A - RPS Ketersediaan & Kelengkapan
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'A. Ketersediaan dan kelengkapan dokumen rencana pembelajaran semester (RPS)',
+            'indikator_penilaian' => "4: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala serta dapat diakses oleh mahasiswa, dilaksanakan secara konsisten.\n3: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala serta dapat diakses oleh mahasiswa.\n2: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran. RPS ditinjau dan disesuaikan secara berkala.\n1: Dokumen RPS mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran atau tidak semua matakuliah memiliki RPS.\n0: Dokumen RPS belum mencakup target capaian pembelajaran, bahan kajian, metode pembelajaran, waktu dan tahapan, asesmen hasil capaian pembelajaran.",
+        ],
+
+        // 10. No.11B - RPS Kedalaman & Keluasan
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'B. Kedalaman dan keluasan RPS sesuai dengan capaian pembelajaran lulusan.',
+            'indikator_penilaian' => "4: Isi materi pembelajaran sesuai dengan RPS, memiliki kedalaman dan keluasan yang relevan untuk mencapai capaian pembelajaran lulusan, serta ditinjau ulang secara berkala.\n3: Isi materi pembelajaran sesuai dengan RPS, memiliki kedalaman dan keluasan yang relevan untuk mencapai capaian pembelajaran lulusan.\n2: Isi materi pembelajaran memiliki kedalaman dan keluasan sesuai dengan capaian pembelajaran lulusan.\n1: Isi materi pembelajaran memiliki kedalaman dan keluasan namun sebagian tidak sesuai dengan capaian pembelajaran lulusan.\n0: Isi materi pembelajaran tidak sesuai dengan capaian pembelajaran lulusan.",
+        ],
+
+        // 11. No.12A - Pelaksanaan Pembelajaran
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'A. Pelaksanaan pembelajaran 1) Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line 2) Kesesuaian metode dan proses pembelajaran dengan capaian pembelajaran 3). Pemantauan dan evaluasi kesesuaian proses pembelajaran terhadap rencana pembelajaran dan hasilnya digunakan untuk perbaikan proses pembelajaran secara berkelanjutan',
+            'indikator_penilaian' => "4: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line dan terdokumentasi dengan baik b. Memiliki bukti sahih yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti sahih adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk menjamin kesesuaian dengan RPS dalam rangka menjaga mutu proses pembelajaran. Hasil monev terdokumentasi dengan baik dan digunakan untuk meningkatkan mutu proses pembelajaran.\n3: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu secara on-line dan off-line. b. Memiliki bukti sahih yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti sahih adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk menjamin kesesuaian dengan RPS dalam rangka menjaga mutu proses pembelajaran. Hasil monev terdokumentasi dengan baik.\n2: a. Pelaksanaan pembelajaran berlangsung dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu. b. Memiliki bukti yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Memiliki bukti adanya sistem dan pelaksanaan pemantauan proses pembelajaran yang dilaksanakan secara periodik untuk mengukur kesesuaian terhadap RPS.\n1: a . Pelaksanaan pembelajaran berlangsung hanya sebagian dalam bentuk interaksi antara dosen, mahasiswa, dan sumber belajar dalam lingkungan belajar tertentu. b. Tidak memiliki bukti yang menunjukkan kesesuaian antara proses dan metode pembelajaran yang berlangsung di PS. c. Tidak memiliki bukti adanya sistem pemantauan proses pembelajaran namun tidak dilaksanakan secara konsisten.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 12. No.12B - Suasana Akademik
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'B. Pelaksanaan program dan kegiatan diluar kegiatan pembelajaran terstruktur secara berkala untuk meningkatkan suasana akademik. (Contoh: kegiatan himpunan mahasiswa,\nkuliah umum/studium generale,\nseminar ilmiah, bedah buku)',
+            'indikator_penilaian' => "4: Kegiatan ilmiah yang terjadwal dilaksanakan setiap bulan.\n3: Kegiatan ilmiah yang terjadwal dilaksanakan dua s.d tiga bulan sekali\n2: Kegiatan ilmiah yang terjadwal dilaksanakan empat s.d. enam bulan sekali.\n1: Kegiatan ilmiah yang terjadwal dilaksanakan lebih dari enam bulan sekali.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 13. No.13A - Penilaian 8 Prinsip
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'Penilaian A. Mutu pelaksanaan penilaian pembelajaran (proses dan hasil belajar mahasiswa) untuk mengukur ketercapaian capaian pembelajaran berdasarkan prinsip penilaian yang mencakup: 1) Edukatif, 2) Otentik, 3) Objektif, 4) Akuntabel, 5) Transparan, 6) Valid 7) Reliabel 8) Berkeadilan yang dilakukan secara terintegrasi',
+            'indikator_penilaian' => "4: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi dan dilengkapi dengan rubrik/portofolio penilaian minimum 70% jumlah mata kuliah.\n3: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi dan dilengkapi dengan rubrik/portofolio penilaian minimum 50% jumlah mata kuliah.\n2: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang dilakukan secara terintegrasi.\n1: Terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian yang tidak dilakukan secara terintegrasi.\n0: Tidak terdapat bukti sahih tentang dipenuhinya 8 prinsip penilaian.",
+        ],
+
+        // 14. No.13B - Teknik & Instrumen Penilaian
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'B. Pelaksanaan penilaian terdiri atas teknik dan instrumen penilaian. Teknik penilaian terdiri dari: 1) Observasi, 2) Partisipasi, 3) Unjuk kerja, 4) Test tertulis, 5) Test lisan, dan 6) Angket. Instrumen penilaian terdiri dari: 1) Penilaian proses dalam bentuk rubrik, dan/ atau; 2) Penilaian hasil dalam bentuk portofolio, atau 3) Karya disain. Teknik dan instrumen penilaian disosialisasikan kepada mahasiswa',
+            'indikator_penilaian' => "4: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran minimum 75% s.d. 100% dari jumlah mata kuliah.\n3: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran minimum 50 s.d. < 75% dari jumlah mata kuliah.\n2: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran yang dinilai minimum 25 s.d. < 50% dari jumlah mata kuliah.\n1: Terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran yang dinilai < 25% dari jumlah mata kuliah.\n0: Tidak terdapat bukti sahih yang menunjukkan kesesuaian teknik dan instrumen penilaian terhadap capaian pembelajaran.",
+        ],
+
+        // 15. No.13C - 7 Unsur Penilaian
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'C. Pelaksanaan penilaian memuat unsur- unsur sebagai berikut: 1) Mempunyai kontrak rencana penilaian, 2) Melaksanakan penilaian sesuai kontrak atau kesepakatan, 3) Memberikan umpan balik dan memberi kesempatan untuk mempertanyakan hasil kepada mahasiswa, 4) Mempunyai dokumentasi penilaian proses dan hasil belajar mahasiswa, 5) Mempunyai prosedur yang mencakup tahap perencanaan, kegiatan pemberian tugas atau soal, observasi kinerja, pengembalian hasil observasi, dan pemberian nilai akhir, 6) Pelaporan penilaian berupa kualifikasi keberhasilan mahasiswa dalam menempuh suatu mata kuliah dalam bentuk huruf dan angka, 7) Mempunyai bukti- bukti rencana dan telah melakukan proses perbaikan berdasar hasil monev penilaian.',
+            'indikator_penilaian' => "4: Terdapat bukti sahih pelaksanaan penilaian mencakup 7 unsur.\n3: Terdapat bukti sahih pelaksanaan penilaian mencakup minimum unsur 1, 4 dan 6 serta 2 unsur lainnya.\n2: Terdapat bukti sahih pelaksanaan penilaian mencakup minimum unsur 1, 4 dan 6.\n1: Terdapat bukti sahih pelaksanaan penilaian hanya mencakup unsur 6.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 16. No.14 - Integrasi Penelitian & PkM
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'Integrasi kegiatan penelitian dan PkM dalam pembelajaran',
+            'indikator_penilaian' => "4: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah minimal > 10.\n3: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah > 5 sampai sampai 10 mata kuliah.\n2: Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran yang dtunjukkan dalam RPS Mata Kuliah > 2 sampai sampai 5 mata kuliah.\n1: Tidak Terdapat bukti yang Sahih integrasi hasil Penelitian dan PkM dalam proses pembelajaran.\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 17. No.15A - Evaluasi Proses Pembelajaran
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'A. Keseluruhan proses pembelajaran diperbaiki dan ditingkatkan secara berkelanjutan oleh Program Studi berdasarkan hasil evaluasi terhadap aspek aspek berikut: 1) Aktivitas pembelajaran pada setiap angkatan; 2) Jumlah mahasiswa aktif pada setiap angkatan; 3) Masa tempuh kurikulum; 4) Masa penyelesaian studi mahasiswa; dan 5) Tingkat serapan lulusan mahasiswa di dunia kerja.',
+            'indikator_penilaian' => "4: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 5 (lima) dari aspek.\n3: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 4 (empat) dari aspek.\n2: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi wajib diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 3 (tiga) dari aspek.\n1: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi belum diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 2 (dua) aspek.\n0: Keseluruhan proses pembelajaran yang dilaksanakan Program Studi belum diperbaiki dan ditingkatkan secara berkelanjutan oleh perguruan tinggi berdasarkan hasil evaluasi terhadap 1 (satu) aspek.",
+        ],
+
+        // 18. No.15B - MBKM
+        [
+            'elemen' => 'Proses',
+            'indikator' => 'B. Kepesertaan mahasiswa yang eligible mengikuti MBKM, Berdampak, atau istilah lain yang relevan (outcome based activity) saat TS',
+            'indikator_penilaian' => "4: Syarat PKMEMBKM ≥ 15%\n3: Syarat PKMEMBKM ≥ 12.5%\n2: Syarat PKMEMBKM ≥ 10%\n1: Syarat PKMEMBKM ≥ 7.5%\n0: Syarat PKMEMBKM ≤ 7.5%",
+        ],
+
+        // ==================== LUARAN ====================
+
+        // 19. No.16 - Analisis CPL
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'Analisis pemenuhan capaian pembelajaran lulusan (CPL) yang diukur dengan metoda yang sahih dan relevan, mencakup aspek: 1) Keserbacakupan; 2) Kedalaman, dan 3) Kebermanfaatan analisis yang ditunjukkan dengan peningkatan CPL dari waktu ke waktu dalam 3 tahun terakhir.',
+            'indikator_penilaian' => "4: Analisis capaian pembelajaran lulusan memenuhi 3 aspek\n3: Analisis capaian pembelajaran lulusan memenuhi 2 aspek\n2: Analisis capaian pembelajaran lulusan memenuhi 1 aspek\n1: Analisis capaian pembelajaran lulusan tidak memenuhi ketiga aspek\n0: tidak dilakukan analisis capaian pembelajaran lulusan",
+        ],
+
+        // 20. No.17 - Rata-rata IPK
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'Rata-rata IPK lulusan dalam 3 tahun terakhir.',
+            'indikator_penilaian' => "4: Jika RIPK ≥ 3,25, maka Skor = 4\n3: Jika 2,00 ≤ RIPK < 3,25, maka Skor = ((8 x RIPK) - 6) / 5\n2: -\n1: Tidak ada skor kurang dari 2\n0: -",
+        ],
+
+        // 21. No.18 - Prestasi Akademik
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'Prestasi mahasiswa di bidang akademik dalam 3 tahun terakhir. RI = NI / NM , RN = NN / NM , RW = NW / NM. Faktor: a = 0,1% , b = 1% , c = 2%. NI = Jumlah prestasi akademik internasional. NN = Jumlah prestasi akademik nasional. NW = Jumlah prestasi akademik regional. NM = Jumlah mahasiswa pada saat TS.',
+            'indikator_penilaian' => "4: Jika RI ≥ a , maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
+        ],
+
+        // 22. No.19 - Prestasi Non Akademik
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'Prestasi mahasiswa di bidang non akademik dalam 3 tahun terakhir. RI = NI / NM , RN = NN / NM , RW = NW / NM. Faktor: a = 0,2% , b = 2% , c = 4%. NI = Jumlah prestasi nonakademik internasional. NN = Jumlah prestasi nonakademik nasional. NW = Jumlah prestasi nonakademik regional. NM = Jumlah mahasiswa pada saat TS.',
+            'indikator_penilaian' => "4: Jika RI ≥ a , maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
+        ],
+
+        // 23. No.20 - Rata-rata Masa Studi
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'Rata-rata masa studi lulusan (tahun).',
+            'indikator_penilaian' => "4: Jika 3,5 < MS ≤ 4,5 , maka Skor = 4\n3:\n   - Jika 3 < MS ≤ 3,5 , maka Skor = (8 x MS) - 24\n   - Jika 4,5 < MS < 7 , maka Skor = (56 - (8 x MS)) / 5\n2: -\n1: -\n0: Jika MS ≤ 3 , maka Skor = 0",
+        ],
+
+        // 24. No.21A - Kelulusan Tepat Waktu
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'UPPS menunjukkan hasil analisis terhadap luaran program pendidikan yang terdiri dari penyelesaian studi lulusan sebagai berikut; A. Kelulusan tepat masa tempuh kurikulum (Mahasiswa Sarjana masuk TS-3 lulus sampai TS). PTW = Persentase kelulusan tepat waktu.',
+            'indikator_penilaian' => "4: Jika PTW ≥ 50% , maka Skor = 4\n3: Jika PTW < 50% , maka Skor = 1 + (6 x PTW)\n2: -\n1: -\n0: Tidak ada Skor kurang dari 1.",
+        ],
+
+        // 25. No.21B - Kelulusan Tepat 2x Waktu
+        [
+            'elemen' => 'Luaran',
+            'indikator' => 'B. Kelulusan tepat 2x waktu tempuh kurikulum (mahasiswa Sarjana masuk TS-7 lulus sampai TS). PPS = Persentase keberhasilan studi.',
+            'indikator_penilaian' => "4: Jika PPS ≥ 85% , maka Skor = 4\n3: Jika 30% ≤ PPS < 85% , maka Skor = ((80 x PPS) - 24) / 11\n2: -\n1: -\n0: Jika PPS < 30%",
+        ],
+
+        // ==================== DAMPAK ====================
+
+        // 26. No.22 - Tracer Study
+        [
+            'elemen' => 'Dampak',
+            'indikator' => 'Pelaksanaan tracer study yang mencakup 5 aspek sebagai berikut: 1) Pelaksanaan tracer study terkoordinasi di tingkat PT/UPPS 2) Kegiatan tracer study dilakukan secara reguler setiap tahun dan terdokumentasi, 3) Isi kuesioner mencakup seluruh pertanyaan inti tracer study DIKTI. 4) Ditargetkan pada seluruh populasi (lulusan TS-4 s.d. TS-2), 5) Hasilnya disosialisasikan dan digunakan untuk pengembangan\nkurikulum dan pembelajaran.',
+            'indikator_penilaian' => "4: Tracer study yang dilakukan PT/UPPS telah mencakup semua aspek\n3: Tracer study yang dilakukan PT/UPPS telah mencakup 4 aspek.\n2: Tracer study yang dilakukan PT/UPPS telah mencakup 3 aspek.\n1: Tracer study yang dilakukan PT/UPPS telah mencakup 2 aspek.\n0: PT/UPPS tidak melaksanakan tracer study.",
+        ],
+
+        // 27. No.23A - Sertifikasi Kompetensi Alumni
+        [
+            'elemen' => 'Dampak',
+            'indikator' => 'Tren alumni PS mendapatkan pengakuan dan apresiasi yang diukur melalui; A. Sertifikasi kompetensi',
+            'indikator_penilaian' => "4: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 30%\n3: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 25%\n2: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 20%\n1: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 15%\n0: Presentase alumni yang memiliki sertifikasi kompetensi ≤ 15%",
+        ],
+
+        // 28. No.23B - Kepuasan Pengguna Lulusan
+        [
+            'elemen' => 'Dampak',
+            'indikator' => 'B. PT/UPPS/PS mengukur tingkat kepuasan pengguna lulusan',
+            'indikator_penilaian' => "Skor = STKi / 7\nTingkat kepuasan aspek ke-i dihitung dengan rumus sebagai berikut:\nTKi = (4 x ai) + (3 x bi) + (2 x ci) + di\ni = 1, 2, ..., 7\nai = persentase \"sangat baik\". bi = persentase \"baik\". ci = persentase \"cukup\". di = persentase \"kurang\".\nKetentuan persentase responden pengguna lulusan:\n- untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) ≥ 300 orang, maka Prmin = 30%.\n- untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) < 300 orang, maka Prmin = 50% - ((NL / 300) x 20%)\nJika persentase responden memenuhi ketentuan diatas, maka Skor akhir = Skor.\nJika persentase responden tidak memenuhi ketentuan diatas, maka berlaku penyesuaian sebagai berikut: Skor akhir = (PJ / Prmin) x Skor.\nNL = Jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2)\nNJ = Jumlah pengguna lulusan yang memberi tanggapan atas studi pelacakan lulusan dalam 3 tahun (TS-4 s.d. TS-2)\nPJ = Persentase pengguna lulusan yang memberi tanggapan = (NL / NJ) x 100%\nPrmin = Persentase responden minimum",
+        ],
+
+        // 29. No.24A - Penurunan Mahasiswa Baru
+        [
+            'elemen' => 'Dampak',
+            'indikator' => 'Program studi melakukan evaluasi dan analisis terhadap aspek berikut: A. Prosentase penurunan mahasiswa baru dalam 5 tahun terakhir (PPM).',
+            'indikator_penilaian' => "4: PPM ≤ 10%\n3: PPM ≤ 15%\n2: PPM ≤ 20%\n1: PPM ≤ 25%\n0: PPM > 25%",
+        ],
+
+        // 30. No.24B - Daya Saing Lulusan (header)
+        [
+            'elemen' => 'Dampak',
+            'indikator' => 'B. Daya saing lulusan',
+            'indikator_penilaian' => "-",
+        ],
+
+        // 31. No.24B1 - Waktu Tunggu Lulusan
+        [
+            'elemen' => 'Dampak',
+            'indikator' => '1) Waktu tunggu lulusan untuk mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2. Ketentuan persentase responden lulusan: untuk program studi dengan jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2) ≥ 300 orang, maka Prmin = 30%. Untuk program studi dengan jumlah lulusan < 300 orang, maka Prmin = 50% - ((NL / 300) x 20%). Jika persentase responden memenuhi ketentuan, maka Skor akhir = Skor. Jika tidak memenuhi, maka Skor akhir = (PJ / Prmin) x Skor. NL = Jumlah lulusan dalam 3 tahun (TS-4 s.d. TS-2). NJ = Jumlah lulusan yang terlacak. PJ = (NL / NJ) x 100%.',
+            'indikator_penilaian' => "4: Jika WT < 6 bulan, maka Skor = 4.\n3: Jika 6 ≤ WT ≤ 18, maka Skor = (18 – WT) / 3.\n2: -\n1: -\n0: WT > 18 bulan, maka Skor = 0",
+        ],
+
+        // 32. No.24B2 - Tingkat & Ukuran Tempat Kerja Lulusan
+        [
+            'elemen' => 'Dampak',
+            'indikator' => '2) Tingkat dan ukuran tempat kerja lulusan. RI = (NI / NL) x 100% , RN = (NN / NL) x 100% , RW = (NW / NL) x 100%. Faktor: a = 5% , b = 20% , c = 90%. NI = Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional. NN = Jumlah lulusan yang bekerja di badan usaha tingkat nasional atau berwirausaha yang berizin. NW = Jumlah lulusan yang bekerja di badan usaha tingkat wilayah/lokal atau berwirausaha tidak berizin. NL = Jumlah lulusan. Ketentuan persentase responden berlaku sama seperti indikator waktu tunggu.',
+            'indikator_penilaian' => "4: Jika RI ≥ a, maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -",
+        ],
+
+    ],
                 [
                     'kode' => '3',
                     'nama' => 'Kriteria 3 Relevansi Penelitian',
