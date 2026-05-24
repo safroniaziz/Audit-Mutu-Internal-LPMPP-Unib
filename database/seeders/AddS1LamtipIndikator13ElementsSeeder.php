@@ -463,7 +463,40 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
                 ]
             ];
 
-            // 2. Insert the records
+            // 2. Clean up old/duplicated items that are NOT in our list of items to insert
+            foreach ($criteriaList as $criteriaData) {
+                $kriteriaId = $getOrCreateKriteria($criteriaData['kode'], $criteriaData['nama'], $criteriaData['search']);
+                
+                // Get all indicators we want to keep for this criteria
+                $indicatorsToKeep = array_map(function ($item) {
+                    return $item['indikator'];
+                }, $criteriaData['items']);
+
+                // Find instrumen_prodis for this criteria and indicator 13 that are NOT in the keep list
+                $idsToDelete = DB::table('instrumen_prodis')
+                    ->where('indikator_instrumen_id', 13)
+                    ->where('indikator_instrumen_kriteria_id', $kriteriaId)
+                    ->whereNotIn('indikator', $indicatorsToKeep)
+                    ->pluck('id');
+
+                if ($idsToDelete->isNotEmpty()) {
+                    // Delete child nilais and submissions first
+                    DB::table('instrumen_prodi_nilai')
+                        ->whereIn('instrumen_prodi_id', $idsToDelete)
+                        ->delete();
+
+                    DB::table('instrumen_prodi_submissions')
+                        ->whereIn('instrumen_prodi_id', $idsToDelete)
+                        ->delete();
+
+                    // Delete the instrumen_prodis
+                    DB::table('instrumen_prodis')
+                        ->whereIn('id', $idsToDelete)
+                        ->delete();
+                }
+            }
+
+            // 3. Insert the records
             foreach ($criteriaList as $criteriaData) {
                 $kriteriaId = $getOrCreateKriteria($criteriaData['kode'], $criteriaData['nama'], $criteriaData['search']);
 
