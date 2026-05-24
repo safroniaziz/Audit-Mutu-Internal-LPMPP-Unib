@@ -14,7 +14,38 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
     {
         DB::transaction(function () {
             $now = now();
+            // 1. Clean up only existing elements for the specific criteria we are seeding (Kriteria 2-6) under indicator 13
+            $kriteriaIdsToClean = DB::table('indikator_instrumen_kriterias')
+                ->where('indikator_instrumen_id', 13)
+                ->where(function ($query) {
+                    $query->where('nama_kriteria', 'LIKE', '%Pendidikan%')
+                          ->orWhere('nama_kriteria', 'LIKE', '%Penelitian%')
+                          ->orWhere('nama_kriteria', 'LIKE', '%PkM%')
+                          ->orWhere('nama_kriteria', 'LIKE', '%PKM%')
+                          ->orWhere('nama_kriteria', 'LIKE', '%Akuntabilitas%')
+                          ->orWhere('nama_kriteria', 'LIKE', '%Diferensiasi%');
+                })
+                ->pluck('id');
 
+            if ($kriteriaIdsToClean->isNotEmpty()) {
+                $instrumenProdiIds = DB::table('instrumen_prodis')
+                    ->whereIn('indikator_instrumen_kriteria_id', $kriteriaIdsToClean)
+                    ->pluck('id');
+
+                if ($instrumenProdiIds->isNotEmpty()) {
+                    DB::table('instrumen_prodi_nilais')
+                        ->whereIn('instrumen_prodi_id', $instrumenProdiIds)
+                        ->delete();
+
+                    DB::table('instrumen_prodi_submissions')
+                        ->whereIn('instrumen_prodi_id', $instrumenProdiIds)
+                        ->delete();
+
+                    DB::table('instrumen_prodis')
+                        ->whereIn('id', $instrumenProdiIds)
+                        ->delete();
+                }
+            }
 
             // Helper to get existing criteria ID or create a new one if not found
             $getOrCreateKriteria = function (string $kode, string $nama, string $search) use ($now) {
@@ -470,28 +501,20 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
 
                 $rowsToInsert = [];
                 foreach ($criteriaData['items'] as $item) {
-                    $exists = DB::table('instrumen_prodis')
-                        ->where('indikator_instrumen_id', 13)
-                        ->where('indikator_instrumen_kriteria_id', $kriteriaId)
-                        ->where('indikator', $item['indikator'])
-                        ->exists();
-
-                    if (!$exists) {
-                        $rowsToInsert[] = [
-                            'indikator_instrumen_id' => 13,
-                            'indikator_instrumen_kriteria_id' => $kriteriaId,
-                            'elemen' => $item['elemen'],
-                            'indikator' => $item['indikator'],
-                            'sumber_data' => '-',
-                            'metode_perhitungan' => null,
-                            'target' => '4',
-                            'realisasi' => '-',
-                            'standar_digunakan' => '-',
-                            'indikator_penilaian' => $item['indikator_penilaian'],
-                            'created_at' => $now,
-                            'updated_at' => $now,
-                        ];
-                    }
+                    $rowsToInsert[] = [
+                        'indikator_instrumen_id' => 13,
+                        'indikator_instrumen_kriteria_id' => $kriteriaId,
+                        'elemen' => $item['elemen'],
+                        'indikator' => $item['indikator'],
+                        'sumber_data' => '-',
+                        'metode_perhitungan' => null,
+                        'target' => '4',
+                        'realisasi' => '-',
+                        'standar_digunakan' => '-',
+                        'indikator_penilaian' => $item['indikator_penilaian'],
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
                 }
 
                 if (!empty($rowsToInsert)) {
