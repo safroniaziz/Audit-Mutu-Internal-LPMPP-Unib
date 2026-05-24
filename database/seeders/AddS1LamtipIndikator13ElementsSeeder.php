@@ -148,33 +148,8 @@ class AddS1LamtipIndikator13ElementsSeeder extends Seeder
                         ],
                         [
                             'elemen' => 'Dampak',
-                            'indikator' => 'Tren alumni PS mendapatkan pengakuan dan apresiasi yang diukur melalui; A. Sertifikasi kompetensi',
-                            'indikator_penilaian' => "4: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 30%\n3: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 25%\n2: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 20%\n1: Presentase alumni yang memiliki sertifikasi kompetensi ≥ 15%\n0: Presentase alumni yang memiliki sertifikasi kompetensi ≤ 15%"
-                        ],
-                        [
-                            'elemen' => 'Dampak',
-                            'indikator' => 'B. PT/UPPS/PS mengukur tingkat kepuasan pengguna lulusan',
+                            'indikator' => 'PT/UPPS/PS mengukur tingkat kepuasan pengguna lulusan',
                             'indikator_penilaian' => "4: -\n3: -\n2: -\n1: -\n0: -"
-                        ],
-                        [
-                            'elemen' => 'Dampak',
-                            'indikator' => 'Program studi melakukan evaluasi dan analis terhadap aspek berikut: A. Prosentase penurunan mahasiswa baru dalam 5 tahun terakhir (PPM).',
-                            'indikator_penilaian' => "4: PPM ≤ 10%\n3: PPM ≤ 15%\n2: PPM ≤ 20%\n1: PPM ≤ 25%\n0: PPM > 25%"
-                        ],
-                        [
-                            'elemen' => 'Dampak',
-                            'indikator' => 'B. Daya saing lulusan',
-                            'indikator_penilaian' => "4: Jika WT < 6 bulan, maka Skor = 4.\n3: Jika 6 ≤ WT ≤ 18, maka Skor = (18 – WT) / 3.\n2: -\n1: -\n0: WT > 18 bulan, maka Skor = 0"
-                        ],
-                        [
-                            'elemen' => 'Dampak',
-                            'indikator' => '1) Waktu tunggu lulusan untuk mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2;',
-                            'indikator_penilaian' => "4: -\n3: -\n2: -\n1: -\n0: -"
-                        ],
-                        [
-                            'elemen' => 'Dampak',
-                            'indikator' => '2) Tingkat dan ukuran tempat kerja lulusan',
-                            'indikator_penilaian' => "4: Jika RI ≥ a, maka Skor = 4\n3:\n   - Jika RI < a dan RN ≥ b , maka Skor = 3 + (RI / a)\n   - Jika 0 < RI < a dan 0 < RN < b , maka Skor = 2 + (2 x (RI/a)) + (RN/b) - ((RI x RN)/(a x b))\n2: -\n1:\n   - Jika RI = 0 dan RN = 0 dan RW ≥ c , maka Skor = 2\n   - Jika RI = 0 dan RN = 0 dan RW < c , maka Skor = (2 x RW) / c\n0: -"
                         ]
                     ]
                 ],
