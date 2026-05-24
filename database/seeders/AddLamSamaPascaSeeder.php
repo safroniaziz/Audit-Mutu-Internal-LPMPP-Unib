@@ -18,7 +18,7 @@ class AddLamSamaPascaSeeder extends Seeder
             // Same style as AddPascaLamtikSeeder: lookup existing criteria first, create if missing.
             $getOrCreateKriteria = function (string $kode, string $nama, string $search) use ($now) {
                 $kriteria = DB::table('indikator_instrumen_kriterias')
-                    ->where('indikator_instrumen_id', 4)
+                    ->where('indikator_instrumen_id', 16)
                     ->where(function ($query) use ($search) {
                         $query->where('nama_kriteria', 'LIKE', '%' . $search . '%')
                             ->orWhere('nama_kriteria', 'LIKE', '%' . strtolower($search) . '%')
@@ -31,7 +31,7 @@ class AddLamSamaPascaSeeder extends Seeder
                 }
 
                 return DB::table('indikator_instrumen_kriterias')->insertGetId([
-                    'indikator_instrumen_id' => 4,
+                    'indikator_instrumen_id' => 16,
                     'kode_kriteria' => $kode,
                     'nama_kriteria' => $nama,
                     'created_at' => $now,
@@ -393,11 +393,11 @@ b. persentase jumlah publikasi mahasiswa di jurnal nasional terakreditasi, jurna
             ];
 
             DB::table('instrumen_prodis')
-                ->where('indikator_instrumen_id', 4)
+                ->where('indikator_instrumen_id', 16)
                 ->delete();
 
             DB::table('indikator_instrumen_kriterias')
-                ->where('indikator_instrumen_id', 4)
+                ->where('indikator_instrumen_id', 16)
                 ->delete();
 
             // Insert fresh records.
@@ -410,7 +410,7 @@ b. persentase jumlah publikasi mahasiswa di jurnal nasional terakreditasi, jurna
 
                 foreach ($criteriaData['items'] as $item) {
                     DB::table('instrumen_prodis')->insert([
-                        'indikator_instrumen_id' => 4,
+                        'indikator_instrumen_id' => 16,
                         'indikator_instrumen_kriteria_id' => $kriteriaId,
                         'elemen' => $item['elemen'],
                         'indikator' => $item['indikator'],
