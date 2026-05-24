@@ -309,7 +309,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="sumber_data" class="form-label">Sumber Data</label>
-                            <input type="text" class="form-control" id="sumber_data" name="sumber_data" required>
+                            <input type="text" class="form-control" id="sumber_data" name="sumber_data" value="-" required>
                         </div>
                         <div class="mb-3">
                             <label for="metode_perhitungan" class="form-label">Metode Perhitungan</label>
@@ -317,15 +317,15 @@
                         </div>
                         <div class="mb-3">
                             <label for="target" class="form-label">Target</label>
-                            <input type="text" class="form-control" id="target" name="target" required>
+                            <input type="text" class="form-control" id="target" name="target" value="4" required>
                         </div>
                         <div class="mb-3">
                             <label for="realisasi" class="form-label">Realisasi</label>
-                            <input type="text" class="form-control" id="realisasi" name="realisasi" required>
+                            <input type="text" class="form-control" id="realisasi" name="realisasi" value="-" required>
                         </div>
                         <div class="mb-3">
                             <label for="standar_digunakan" class="form-label">Standar Digunakan</label>
-                            <input type="text" class="form-control" id="standar_digunakan" name="standar_digunakan" required>
+                            <input type="text" class="form-control" id="standar_digunakan" name="standar_digunakan" value="-" required>
                         </div>
                         <div class="mb-3">
                             <label for="uraian" class="form-label">Uraian</label>
