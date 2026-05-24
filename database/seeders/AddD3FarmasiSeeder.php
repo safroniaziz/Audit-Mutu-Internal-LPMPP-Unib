@@ -30,12 +30,14 @@ class AddD3FarmasiSeeder extends Seeder
             $dr = "4: Terpenuhi dengan bukti yang lengkap dan konsisten.\n3: Terpenuhi namun terdapat aspek yang kurang lengkap atau konsisten.\n2: Terpenuhi sebagian dengan bukti yang terbatas.\n1: Belum terpenuhi atau sangat terbatas.\n0: Tidak ada bukti pemenuhan.";
 
             // Helper: buat satu item dengan default rubrik
-            $it = static fn (string $elemen, string $indikator) use ($dr): array => [
-                'elemen'              => $elemen,
-                'indikator'           => $indikator,
-                'target'              => '4',
-                'indikator_penilaian' => $dr,
-            ];
+            $it = function (string $elemen, string $indikator) use ($dr): array {
+                return [
+                    'elemen'              => $elemen,
+                    'indikator'           => $indikator,
+                    'target'              => '4',
+                    'indikator_penilaian' => $dr,
+                ];
+            };
 
             $criteriaList = [
                 [
@@ -727,22 +729,26 @@ class AddD3FarmasiSeeder extends Seeder
                     'updated_at' => $now,
                 ]);
 
+                // Kumpulkan semua rows kriteria ini, lalu bulk insert sekaligus
+                $rows = [];
                 foreach ($criteriaData['items'] as $item) {
-                    DB::table('instrumen_prodis')->insert([
-                        'indikator_instrumen_id' => $indikatorInstrumenId,
+                    $rows[] = [
+                        'indikator_instrumen_id'        => $indikatorInstrumenId,
                         'indikator_instrumen_kriteria_id' => $kriteriaId,
-                        'elemen' => $item['elemen'],
-                        'indikator' => $item['indikator'],
-                        'sumber_data' => '-',
-                        'metode_perhitungan' => $item['indikator_penilaian'],
-                        'target' => (string) ($item['target'] ?? '4'),
-                        'realisasi' => '-',
-                        'standar_digunakan' => '-',
-                        'indikator_penilaian' => $item['indikator_penilaian'],
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+                        'elemen'                        => $item['elemen'],
+                        'indikator'                     => $item['indikator'],
+                        'sumber_data'                   => '-',
+                        'metode_perhitungan'             => $item['indikator_penilaian'],
+                        'target'                        => (string) ($item['target'] ?? '4'),
+                        'realisasi'                     => '-',
+                        'standar_digunakan'             => '-',
+                        'indikator_penilaian'           => $item['indikator_penilaian'],
+                        'created_at'                    => $now,
+                        'updated_at'                    => $now,
+                    ];
                 }
+
+                DB::table('instrumen_prodis')->insert($rows);
             }
         });
     }
