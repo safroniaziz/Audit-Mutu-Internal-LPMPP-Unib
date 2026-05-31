@@ -16,7 +16,7 @@ class AddLamSpakSeeder extends Seeder
 
             $this->upsertIndikatorInstrumen($indikatorInstrumenId, $indicatorName, $now);
             $rubrik = static fn (string $nilai4, string $nilai3, string $nilai1): string => "4: {$nilai4} 3: {$nilai3} 2: {$nilai3} 1: {$nilai1}";
-            $item = static fn (string $teks, string $nilai4, string $nilai3, string $nilai1): array => ['elemen' => $teks, 'indikator' => $teks, 'target' => '4', 'indikator_penilaian' => $rubrik($nilai4, $nilai3, $nilai1)];
+            $item = static fn (string $teks, string $nilai4, string $nilai3, string $nilai1): array => ['elemen' => $teks, 'indikator' => $teks, 'target' => '2', 'indikator_penilaian' => $rubrik($nilai4, $nilai3, $nilai1)];
 
             $criteriaList = [
                 [
@@ -26,110 +26,146 @@ class AddLamSpakSeeder extends Seeder
                         [
                             'elemen' => 'Program Studi memiliki Visi Keilmuan yang memuat keunikan program studi sesuai perkembangan IPTEKS dan kebutuhan pengguna tercermin dalam tujuan pendidikan program studi (program educational objectives), serta mendukung pengembangan program studi dengan data implementasi yang konsisten',
                             'indikator' => 'Program Studi memiliki Visi Keilmuan yang memuat keunikan program studi sesuai perkembangan IPTEKS dan kebutuhan pengguna tercermin dalam tujuan pendidikan program studi (program educational objectives), serta mendukung pengembangan program studi dengan data implementasi yang konsisten',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Program Studi telah menetapkan rumusan Tujuan Pendidikan Program Studi (program educational objectives) yang memuat Visi Keilmuan program studi sesuai dengan perkembangan IPTEKS, kebutuhan pengguna, serta menunjukkan keunikan program studi yang menjadi keunggulan dari program studi sejenis, dievaluasi secara berkala, dan berkelanjutan 3: Program Studi telah menetapkan rumusan Tujuan Pendidikan Program Studi (program educational objectives) yang memuat Visi Keilmuan program studi sesuai dengan perkembangan IPTEKS. 2: Program Studi telah menetapkan rumusan Tujuan Pendidikan Program Studi (program educational objectives) yang memuat Visi Keilmuan program studi sesuai dengan perkembangan IPTEKS. 1: Program Studi Tidak memiliki rumusan Tujuan Pendidikan Program Studi yang memuat Visi Keilmuan program studi ',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Program Studi telah menetapkan rumusan Tujuan Pendidikan Program Studi (program educational objectives) yang memuat Visi Keilmuan program studi sesuai dengan perkembangan IPTEKS, kebutuhan pengguna, serta menunjukkan keunikan program studi yang menjadi keunggulan dari program studi sejenis, dievaluasi secara berkala, dan berkelanjutan
+1: Program Studi telah menetapkan rumusan Tujuan Pendidikan Program Studi (program educational objectives) yang memuat Visi Keilmuan program studi sesuai dengan perkembangan IPTEKS.
+0: Program Studi Tidak memiliki rumusan Tujuan Pendidikan Program Studi yang memuat Visi Keilmuan program studi',
                         ],
                         [
                             'elemen' => 'Kesesuaian Visi, Misi, Tujuan dan Strategi (VMTS) Unit Pengelola Program Studi (UPPS) terhadap VMTS Perguruan Tinggi (PT) dan visi keilmuan Program Studi (PS) yang dikelolanya.',
                             'indikator' => 'Kesesuaian Visi, Misi, Tujuan dan Strategi (VMTS) Unit Pengelola Program Studi (UPPS) terhadap VMTS Perguruan Tinggi (PT) dan visi keilmuan Program Studi (PS) yang dikelolanya.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: 1) Visi yang mencerminkan visi perguruan tinggi dan memayungi visi keilmuan terkait keunikan program studi serta didukung data implementasi yang konsisten, 2) misi, tujuan, dan strategi yang searah dan bersinerji dengan misi, tujuan, dan strategi perguruan tinggi serta mendukung pengembangan program studi dengan data implementasi yang konsisten. 3: UPPS memiliki: 1) visi yang mencerminkan visi perguruan tinggi namun tidak memayungi visi keilmuan terkait program studi, 2) misi, tujuan, dan strategi kurang searah dengan misi, tujuan sasaran, dan strategi perguruan tinggi serta kurang mendukung pengembangan program studi. 2: UPPS memiliki: 1) visi yang mencerminkan visi perguruan tinggi namun tidak memayungi visi keilmuan terkait program studi, 2) misi, tujuan, dan strategi kurang searah dengan misi, tujuan sasaran, dan strategi perguruan tinggi serta kurang mendukung pengembangan program studi. 1: UPPS memiliki misi, tujuan, dan strategi yang tidak terkait dengan strategi perguruan tinggi dan pengembangan program studi.',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: 1) Visi yang mencerminkan visi perguruan tinggi dan memayungi visi keilmuan terkait keunikan program studi serta didukung data implementasi yang konsisten, 2) misi, tujuan, dan strategi yang searah dan bersinerji dengan misi, tujuan, dan strategi perguruan tinggi serta mendukung pengembangan program studi dengan data implementasi yang konsisten.
+1: UPPS memiliki: 1) visi yang mencerminkan visi perguruan tinggi namun tidak memayungi visi keilmuan terkait program studi, 2) misi, tujuan, dan strategi kurang searah dengan misi, tujuan sasaran, dan strategi perguruan tinggi serta kurang mendukung pengembangan program studi.
+0: UPPS memiliki misi, tujuan, dan strategi yang tidak terkait dengan strategi perguruan tinggi dan pengembangan program studi.',
                         ],
                         [
                             'elemen' => 'Profil Lulusan program studi ditetapkan berdasarkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, serta kebutuhan dalam mengembangkan ilmu pengetahuan dan teknologi, dan telah disepakati oleh asosiasi program studi',
                             'indikator' => 'Profil Lulusan program studi ditetapkan berdasarkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, serta kebutuhan dalam mengembangkan ilmu pengetahuan dan teknologi, dan telah disepakati oleh asosiasi program studi',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Profil Lulusan program studi ditetapkan berdasarkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, serta kebutuhan dalam mengembangkan ilmu pengetahuan dan teknologi, dan telah disepakati oleh asosiasi program studi 3: Profil Lulusan program studi ditetapkan namun belum mempertimbangkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, dan/atau tidak mengacu kepada profil yang telah disepakati oleh asosiasi program studi 2: Profil Lulusan program studi ditetapkan namun belum mempertimbangkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, dan/atau tidak mengacu kepada profil yang telah disepakati oleh asosiasi program studi 1: Program studi tidak memiliki Profil Lulusan',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Profil Lulusan program studi ditetapkan berdasarkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, serta kebutuhan dalam mengembangkan ilmu pengetahuan dan teknologi, dan telah disepakati oleh asosiasi program studi
+1: Profil Lulusan program studi ditetapkan namun belum mempertimbangkan hasil kajian terhadap kebutuhan pasar kerja yang dibutuhkan pemerintah dan dunia usaha maupun industri, dan/atau tidak mengacu kepada profil yang telah disepakati oleh asosiasi program studi
+0: Program studi tidak memiliki Profil Lulusan',
                         ],
                         [
                             'elemen' => 'Cakupan kompetensi pada Capaian pembelajaran lulusan yang meliputi: a. penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; b. kecakapan umum yang dibutuhkan sebagai dasar untuk penguasaan ilmu pengetahuan dan teknologi serta bidang kerja yang relevan; c. pengetahuan dan keterampilan yang dibutuhkan untuk dunia kerja dan/atau melanjutkan studi pada jenjang yang lebih tinggi ataupun untuk mendapatkan sertifikasi perofesi; dan; d. kemampuan intelektual untuk berpikir secara mandiri dan kritis sebagai pembelajar sepanjang hayat, e. Kompetensi tambahan yang menunjukkan kekhasan dan daya saing program studi.',
                             'indikator' => 'Cakupan kompetensi pada Capaian pembelajaran lulusan yang meliputi: a. penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; b. kecakapan umum yang dibutuhkan sebagai dasar untuk penguasaan ilmu pengetahuan dan teknologi serta bidang kerja yang relevan; c. pengetahuan dan keterampilan yang dibutuhkan untuk dunia kerja dan/atau melanjutkan studi pada jenjang yang lebih tinggi ataupun untuk mendapatkan sertifikasi perofesi; dan; d. kemampuan intelektual untuk berpikir secara mandiri dan kritis sebagai pembelajar sepanjang hayat, e. Kompetensi tambahan yang menunjukkan kekhasan dan daya saing program studi.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Capaian pembelajaran lulusan mencakup kompetensi yang meliputi seluruh aspek: a. penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; b. kecakapan umum yang dibutuhkan sebagai dasar untuk penguasaan ilmu pengetahuan dan teknologi serta bidang kerja yang relevan; c. pengetahuan dan keterampilan yang dibutuhkan untuk dunia kerja dan/atau melanjutkan studi pada jenjang yang lebih tinggi ataupun untuk mendapatkan sertifikasi profesi; dan; d. kemampuan intelektual untuk berpikir secara mandiri dan kritis sebagai pembelajar sepanjang hayat. e. Kompetensi tambahan yang menunjukkan kekhasan dan daya saing program studi. 3: Capaian pembelajaran lulusan hanya mencakup kompetensi penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik, dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; 2: Capaian pembelajaran lulusan hanya mencakup kompetensi penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik, dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; 1: Program studi tidak menetapkan Capaian pembelajaran lulusan',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Capaian pembelajaran lulusan mencakup kompetensi yang meliputi seluruh aspek: a. penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu; b. kecakapan umum yang dibutuhkan sebagai dasar untuk penguasaan ilmu pengetahuan dan teknologi serta bidang kerja yang relevan; c. pengetahuan dan keterampilan yang dibutuhkan untuk dunia kerja dan/atau melanjutkan studi pada jenjang yang lebih tinggi ataupun untuk mendapatkan sertifikasi profesi; dan; d. kemampuan intelektual untuk berpikir secara mandiri dan kritis sebagai pembelajar sepanjang hayat. e. Kompetensi tambahan yang menunjukkan kekhasan dan daya saing program studi.
+1: Capaian pembelajaran lulusan hanya mencakup kompetensi penguasaan ilmu pengetahuan dan teknologi, kecakapan/ keterampilan spesifik, dan aplikasinya untuk 1 (satu) atau sekumpulan bidang keilmuan tertentu;
+0: Program studi tidak menetapkan Capaian pembelajaran lulusan',
                         ],
                         [
                             'elemen' => 'Kesesuaian Capaian Pembelajaran Lulusan dengan visi dan misi perguruan tinggi, Kerangka Kualifikasi Nasional Indonesia; kebutuhan kompetensi kerja dari dunia kerja; ranah keilmuan program studi (scientific vision); kompetensi utama lulusan (profil lulusan) program studi, dan kurikulum program studi sejenis (asosiasi keilmuan) serta dimutakhirkan secara berkala setiap 4-5 tahun sesuai perkembangan ilmu pengetahuan dan teknologi.',
                             'indikator' => 'Kesesuaian Capaian Pembelajaran Lulusan dengan visi dan misi perguruan tinggi, Kerangka Kualifikasi Nasional Indonesia; kebutuhan kompetensi kerja dari dunia kerja; ranah keilmuan program studi (scientific vision); kompetensi utama lulusan (profil lulusan) program studi, dan kurikulum program studi sejenis (asosiasi keilmuan) serta dimutakhirkan secara berkala setiap 4-5 tahun sesuai perkembangan ilmu pengetahuan dan teknologi.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Terdapat Bukti Sahih Capaian Pembelajaran Lulusan memiliki kesesuaian dengan visi dan misi perguruan tinggi, Kerangka Kualifikasi Nasional Indonesia; kebutuhan kompetensi kerja dari dunia kerja; ranah keilmuan program studi; kompetensi utama lulusan program studi, kurikulum program studi sejenis, dan dimutakhirkan secara berkala setiap 4-5 tahun sesuai perkembangan ilmu pengetahuan dan teknologi. 3: Terdapat Bukti Sahih Capaian Pembelajaran Lulusan memiliki kesesuaian dengan Kerangka Kualifikasi Nasional Indonesia; ranah keilmuan program studi; dan dimutakhirkan secara berkala setiap 4-5 tahun 2: Terdapat Bukti Sahih Capaian Pembelajaran Lulusan memiliki kesesuaian dengan Kerangka Kualifikasi Nasional Indonesia; ranah keilmuan program studi; dan dimutakhirkan secara berkala setiap 4-5 tahun 1: Capaian Pembelajaran Lulusan Tidak sesuai dengan Kerangka Kualifikasi Nasional Indonesia, dan ranah keilmuan program studi',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Terdapat Bukti Sahih Capaian Pembelajaran Lulusan memiliki kesesuaian dengan visi dan misi perguruan tinggi, Kerangka Kualifikasi Nasional Indonesia; kebutuhan kompetensi kerja dari dunia kerja; ranah keilmuan program studi; kompetensi utama lulusan program studi, kurikulum program studi sejenis, dan dimutakhirkan secara berkala setiap 4-5 tahun sesuai perkembangan ilmu pengetahuan dan teknologi.
+1: Terdapat Bukti Sahih Capaian Pembelajaran Lulusan memiliki kesesuaian dengan Kerangka Kualifikasi Nasional Indonesia; ranah keilmuan program studi; dan dimutakhirkan secara berkala setiap 4-5 tahun
+0: Capaian Pembelajaran Lulusan Tidak sesuai dengan Kerangka Kualifikasi Nasional Indonesia, dan ranah keilmuan program studi',
                         ],
                         [
                             'elemen' => 'Mekanisme Penyusunan dan Penetapan, serta Keterlibatan Pemangku kepentingan dalam penyusunan capaian Pembelajaran Lulusan',
                             'indikator' => 'Mekanisme Penyusunan dan Penetapan, serta Keterlibatan Pemangku kepentingan dalam penyusunan capaian Pembelajaran Lulusan',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan yang terdokumentasi serta ada keterlibatan pemangku kepentingan internal (dosen atau mahasiswa) dan eksternal (Asosiasi Program Studi, pakar, lulusan, dan pengguna lulusan). 3: Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan yang hanya melibatkan sebagian pemangku kepentingan internal 2: Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan yang hanya melibatkan sebagian pemangku kepentingan internal 1: Tidak Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan ',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan yang terdokumentasi serta ada keterlibatan pemangku kepentingan internal (dosen atau mahasiswa) dan eksternal (Asosiasi Program Studi, pakar, lulusan, dan pengguna lulusan).
+1: Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan yang hanya melibatkan sebagian pemangku kepentingan internal
+0: Tidak Ada mekanisme dalam penyusunan dan penetapan Capaian Pembelajaran Lulusan',
                         ],
                         [
                             'elemen' => 'Program studi menginformasikan Capaian Pembelajaran Lulusan kepada mahasiswa',
                             'indikator' => 'Program studi menginformasikan Capaian Pembelajaran Lulusan kepada mahasiswa',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajaran Lulusan secara berkala kepada mahasiswa melalui media pembelajaran, yang memenuhi aspek: a. cakupan dan keberlanjutan, b. umpan balik mahasiswa, c. media sosialisasi, dan terdokumentasi dengan baik 3: Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajaran Lulusan kepada mahasiswa melalui media pembelajaran, yang memenuhi aspek: media sosialisasi dan terdokumentasi 2: Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajaran Lulusan kepada mahasiswa melalui media pembelajaran, yang memenuhi aspek: media sosialisasi dan terdokumentasi 1: Tidak Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajarn Lulusan kepada mahasiswa ',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajaran Lulusan secara berkala kepada mahasiswa melalui media pembelajaran, yang memenuhi aspek: a. cakupan dan keberlanjutan, b. umpan balik mahasiswa, c. media sosialisasi, dan terdokumentasi dengan baik
+1: Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajaran Lulusan kepada mahasiswa melalui media pembelajaran, yang memenuhi aspek: media sosialisasi dan terdokumentasi
+0: Tidak Terdapat bukti sahih pelaksanaan sosialisasi Capaian Pembelajarn Lulusan kepada mahasiswa',
                         ],
                         [
                             'elemen' => 'UPPS melaksanakan monitoring dan evaluasi pemenuhan Capaian Pembelajaran Lulusan, dengan menggunakan metode yang sesuai dan terdapat bukti tindak lanjut ',
                             'indikator' => 'UPPS melaksanakan monitoring dan evaluasi pemenuhan Capaian Pembelajaran Lulusan, dengan menggunakan metode yang sesuai dan terdapat bukti tindak lanjut ',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Terdapat bukti sahih pelaksanaan monitoring dan evaluasi pemenuhan ketercapaian Capaian Pembelajarn Lulusan yang meliputi 4 (empat) aspek: (a). ketersediaan instrumen monev pemenuhan ketercapaian Capaian Pembelajaran Lulusan, (b). diukur dengan metode yang sahih dan relevan, (c). bukti pemanfaatan hasil penilaian pemenuhan Capaian Pembelajaran Lulusan digunakan untuk meningkatkan capaian pembelajaran lulusan (d) Terdapat peningkatan Capaian Pembelajaran Lulusan dari waktu ke waktu dalam 3 tahun terakhir. 3: Analisis monitoring dan evaluasi Capaian Pembelajaran Lulusan hanya memenuhi aspek ketersediaan instrumen monitoring dan evaluasi pemenuhan ketercapaian Capaian Pembelajaran Lulusan 2: Analisis monitoring dan evaluasi Capaian Pembelajaran Lulusan hanya memenuhi aspek ketersediaan instrumen monitoring dan evaluasi pemenuhan ketercapaian Capaian Pembelajaran Lulusan 1: UPPS tidak melaksanakan monitoring dan evaluasi Capaian Pembelajaran Lulusan ',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Terdapat bukti sahih pelaksanaan monitoring dan evaluasi pemenuhan ketercapaian Capaian Pembelajarn Lulusan yang meliputi 4 (empat) aspek: (a). ketersediaan instrumen monev pemenuhan ketercapaian Capaian Pembelajaran Lulusan, (b). diukur dengan metode yang sahih dan relevan, (c). bukti pemanfaatan hasil penilaian pemenuhan Capaian Pembelajaran Lulusan digunakan untuk meningkatkan capaian pembelajaran lulusan (d) Terdapat peningkatan Capaian Pembelajaran Lulusan dari waktu ke waktu dalam 3 tahun terakhir.
+1: Analisis monitoring dan evaluasi Capaian Pembelajaran Lulusan hanya memenuhi aspek ketersediaan instrumen monitoring dan evaluasi pemenuhan ketercapaian Capaian Pembelajaran Lulusan
+0: UPPS tidak melaksanakan monitoring dan evaluasi Capaian Pembelajaran Lulusan',
                         ],
                         [
                             'elemen' => 'IPK lulusan. RIPK = Rata-rata IPK lulusan dalam 3 tahun terakhir. ',
                             'indikator' => 'IPK lulusan. RIPK = Rata-rata IPK lulusan dalam 3 tahun terakhir. ',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika RIPK ≥ 3,25 3: Jika RIPK < 3,25 2: Jika RIPK < 3,25 1: tidak ada nilai kurang dari 1',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika RIPK ≥ 3,25
+1: Jika RIPK < 3,25
+0: tidak ada nilai kurang dari 1',
                         ],
                         [
                             'elemen' => 'Prestasi mahasiswa dibidang akademik dalam 3 tahun terakhir.',
                             'indikator' => 'Prestasi mahasiswa dibidang akademik dalam 3 tahun terakhir.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika Jumlah prestasi akademik internasional ≥ 1 dan/atau Jumlah prestasi akademik Nasional ≥ 10% dari Jumlahmahasiswa pada saat TS. 3: Jika Jumlah prestasi akademik internasional = 0; Jumlah prestasi akademik Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi akademik tingkat lokal 2: Jika Jumlah prestasi akademik internasional = 0; Jumlah prestasi akademik Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi akademik tingkat lokal 1: tidak ada prestasi akademik',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika Jumlah prestasi akademik internasional ≥ 1 dan/atau Jumlah prestasi akademik Nasional ≥ 10% dari Jumlahmahasiswa pada saat TS.
+1: Jika Jumlah prestasi akademik internasional = 0; Jumlah prestasi akademik Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi akademik tingkat lokal
+0: tidak ada prestasi akademik',
                         ],
                         [
                             'elemen' => 'Prestasi mahasiswa dibidang Non-akademik dalam 3 tahun terakhir.',
                             'indikator' => 'Prestasi mahasiswa dibidang Non-akademik dalam 3 tahun terakhir.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika Jumlah prestasi Non-akademik tingkat internasional ≥ 1 dan/atau tingkat Nasional ≥ 10% dari Jumlah mahasiswa pada saat TS. 3: Jika Jumlah prestasi Non-akademik tingkat internasional = 0; Jumlah tingkat Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi tingkat lokal 2: Jika Jumlah prestasi Non-akademik tingkat internasional = 0; Jumlah tingkat Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi tingkat lokal 1: Tidak ada prestasi Non-akademik',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika Jumlah prestasi Non-akademik tingkat internasional ≥ 1 dan/atau tingkat Nasional ≥ 10% dari Jumlah mahasiswa pada saat TS.
+1: Jika Jumlah prestasi Non-akademik tingkat internasional = 0; Jumlah tingkat Nasional < 10% dari Jumlah mahasiswa pada saat TS. dan/atau hanya terdapat prestasi tingkat lokal
+0: Tidak ada prestasi Non-akademik',
                         ],
                         [
                             'elemen' => 'Masa studi. MS = Rata-rata masa studi lulusan (tahun).',
                             'indikator' => 'Masa studi. MS = Rata-rata masa studi lulusan (tahun).',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika 3,5 < MS ≤ 4,5 3: Jika 3 < MS ≤ 3,5 Jika 4,5 < MS ≤ 7 2: Jika 3 < MS ≤ 3,5 Jika 4,5 < MS ≤ 7 1: Jika MS ≤ 3 , maka Skor = 0',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika 3,5 < MS ≤ 4,5
+1: Jika 3 < MS ≤ 3,5 Jika 4,5 < MS ≤ 7
+0: Jika MS ≤ 3 , maka Skor = 0',
                         ],
                         [
                             'elemen' => 'Kelulusan tepat waktu. PTW = Persentase kelulusan tepat waktu.',
                             'indikator' => 'Kelulusan tepat waktu. PTW = Persentase kelulusan tepat waktu.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika PTW ≥ 50% 3: Jika PTW < 50% 2: Jika PTW < 50% 1: tidak ada nilai kurang dari 1',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika PTW ≥ 50%
+1: Jika PTW < 50%
+0: tidak ada nilai kurang dari 1',
                         ],
                         [
                             'elemen' => 'Keberhasilan studi. PPS = Persentase keberhasilan studi.',
                             'indikator' => 'Keberhasilan studi. PPS = Persentase keberhasilan studi.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika PPS ≥ 85% 3: Jika 30% ≤ PPS < 85% 2: Jika 30% ≤ PPS < 85% 1: Jika PPS < 30%, maka Skor = 0',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika PPS ≥ 85%
+1: Jika 30% ≤ PPS < 85%
+0: Jika PPS < 30%, maka Skor = 0',
                         ],
                         [
                             'elemen' => 'Waktu tunggu. WT = waktu tunggu lulusan untuk mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2.',
                             'indikator' => 'Waktu tunggu. WT = waktu tunggu lulusan untuk mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika WT < 6 bulan 3: Jika 6 ≤ WT ≤ 18, 2: Jika 6 ≤ WT ≤ 18, 1: WT > 18 bulan, maka Skor = 0',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika WT < 6 bulan
+1: Jika 6 ≤ WT ≤ 18,
+0: WT > 18 bulan, maka Skor = 0',
                         ],
                         [
                             'elemen' => 'Kesesuaian bidang kerja. PBS = Kesesuaian bidang kerja lulusan saat mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2.',
                             'indikator' => 'Kesesuaian bidang kerja. PBS = Kesesuaian bidang kerja lulusan saat mendapatkan pekerjaan pertama dalam 3 tahun, mulai TS-4 s.d. TS-2.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jika PBS ≥ 60% PBS= Jumlah Responden Lulusan Lulusan dalam 3 tahun terakhir 3: Jika PBS < 60% 2: Jika PBS < 60% 1: tidak ada nilai kurang dari 1',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jika PBS ≥ 60% PBS= Jumlah Responden Lulusan Lulusan dalam 3 tahun terakhir
+1: Jika PBS < 60%
+0: tidak ada nilai kurang dari 1',
                         ],
                         [
                             'elemen' => 'Tingkat dan ukuran tempat kerja lulusan.',
                             'indikator' => 'Tingkat dan ukuran tempat kerja lulusan.',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional ≥ 1 3: Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional = 0, pada Tingkat Nasional/Wilayah/Lokal ≥ 1 2: Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional = 0, pada Tingkat Nasional/Wilayah/Lokal ≥ 1 1: tidak ada nilai kurang dari 1',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional ≥ 1
+1: Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional = 0, pada Tingkat Nasional/Wilayah/Lokal ≥ 1
+0: tidak ada nilai kurang dari 1',
                         ],
                         [
                             'elemen' => 'Tingkat Kepuasan pengguna lulusan, terhadap 7 aspek (Etika, Keahlian, Bahasa, Teknologi Informasi, Komunikasi, kerjasama, dan Pengmbangan Diri)',
                             'indikator' => 'Tingkat Kepuasan pengguna lulusan, terhadap 7 aspek (Etika, Keahlian, Bahasa, Teknologi Informasi, Komunikasi, kerjasama, dan Pengmbangan Diri)',
-                            'target' => '4',
-                            'indikator_penilaian' => '4: Rata-rata Tingkat Kepuasan pengguna sangat baik ≥ 75% 3: 75% > Rata-rata Tingkat Kepuasan sangat baik ≥ 25% 2: 75% > Rata-rata Tingkat Kepuasan sangat baik ≥ 25% 1: Rata-rata Tingkat kepuasan sangat baik < 25%',
+                            'target' => '2',
+                            'indikator_penilaian' => '2: Rata-rata Tingkat Kepuasan pengguna sangat baik ≥ 75%
+1: 75% > Rata-rata Tingkat Kepuasan sangat baik ≥ 25%
+0: Rata-rata Tingkat kepuasan sangat baik < 25%',
                         ],
                     ],
                 ],
@@ -254,50 +290,66 @@ class AddLamSpakSeeder extends Seeder
                 return;
             }
 
-            DB::table('instrumen_prodis')
-                ->where('indikator_instrumen_id', $indikatorInstrumenId)
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted_at' => $now,
-                    'updated_at' => $now,
-                ]);
-
-            DB::table('indikator_instrumen_kriterias')
-                ->where('indikator_instrumen_id', $indikatorInstrumenId)
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted_at' => $now,
-                    'updated_at' => $now,
-                ]);
-
             foreach ($criteriaList as $criteriaData) {
                 if (empty($criteriaData['items'])) {
                     continue;
                 }
 
-                $kriteriaId = DB::table('indikator_instrumen_kriterias')->insertGetId([
-                    'indikator_instrumen_id' => $indikatorInstrumenId,
-                    'kode_kriteria' => $criteriaData['kode'],
-                    'nama_kriteria' => $criteriaData['nama'],
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+                // Get or create kriteria — jaga ID lama agar FK dari data user tidak rusak
+                $kriteria = DB::table('indikator_instrumen_kriterias')
+                    ->where('indikator_instrumen_id', $indikatorInstrumenId)
+                    ->where('kode_kriteria', $criteriaData['kode'])
+                    ->whereNull('deleted_at')
+                    ->first();
 
-                foreach ($criteriaData['items'] as $item) {
-                    DB::table('instrumen_prodis')->insert([
+                if ($kriteria) {
+                    $kriteriaId = $kriteria->id;
+                } else {
+                    $kriteriaId = DB::table('indikator_instrumen_kriterias')->insertGetId([
                         'indikator_instrumen_id' => $indikatorInstrumenId,
-                        'indikator_instrumen_kriteria_id' => $kriteriaId,
-                        'elemen' => $item['elemen'],
-                        'indikator' => $item['indikator'],
-                        'sumber_data' => '-',
-                        'metode_perhitungan' => $item['indikator_penilaian'],
-                        'target' => (string) ($item['target'] ?? '4'),
-                        'realisasi' => '-',
-                        'standar_digunakan' => '-',
-                        'indikator_penilaian' => $item['indikator_penilaian'],
+                        'kode_kriteria' => $criteriaData['kode'],
+                        'nama_kriteria' => $criteriaData['nama'],
                         'created_at' => $now,
                         'updated_at' => $now,
                     ]);
+                }
+
+                // Ambil row existing per kriteria (urut by id = urut insert asli)
+                $existingItems = DB::table('instrumen_prodis')
+                    ->where('indikator_instrumen_kriteria_id', $kriteriaId)
+                    ->whereNull('deleted_at')
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($criteriaData['items'] as $index => $item) {
+                    if (isset($existingItems[$index])) {
+                        // Update kolom definisi saja — data user tidak disentuh
+                        DB::table('instrumen_prodis')
+                            ->where('id', $existingItems[$index]->id)
+                            ->update([
+                                'elemen'              => $item['elemen'],
+                                'indikator'           => $item['indikator'],
+                                'metode_perhitungan'  => $item['indikator_penilaian'],
+                                'target'              => (string) ($item['target'] ?? '2'),
+                                'indikator_penilaian' => $item['indikator_penilaian'],
+                                'updated_at'          => $now,
+                            ]);
+                    } else {
+                        DB::table('instrumen_prodis')->insert([
+                            'indikator_instrumen_id'          => $indikatorInstrumenId,
+                            'indikator_instrumen_kriteria_id' => $kriteriaId,
+                            'elemen'                          => $item['elemen'],
+                            'indikator'                       => $item['indikator'],
+                            'sumber_data'                     => '-',
+                            'metode_perhitungan'              => $item['indikator_penilaian'],
+                            'target'                          => (string) ($item['target'] ?? '2'),
+                            'realisasi'                       => '-',
+                            'standar_digunakan'               => '-',
+                            'indikator_penilaian'             => $item['indikator_penilaian'],
+                            'created_at'                      => $now,
+                            'updated_at'                      => $now,
+                        ]);
+                    }
                 }
             }
         });
