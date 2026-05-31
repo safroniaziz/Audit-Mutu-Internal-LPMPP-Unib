@@ -366,8 +366,10 @@
                                 // 4. Penilaian
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
                                     const penilaianEditor = window.editorInstances['kt_docs_ckeditor_penilaian'];
-                                    penilaianEditor.setData((data.indikator_penilaian || '').replace(/\n/g, '<br>'));
-                                    console.log('✅ Penilaian populated:', data.indikator_penilaian);
+                                    const rawPenilaian = data.indikator_penilaian || '';
+                                    const htmlPenilaian = rawPenilaian.includes('<') ? rawPenilaian : rawPenilaian.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    penilaianEditor.setData(htmlPenilaian);
+                                    console.log('✅ Penilaian populated:', rawPenilaian);
                                 } else {
                                     console.log('❌ Penilaian editor not ready');
                                 }
@@ -375,8 +377,10 @@
                                 // 5. Metode
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_metode']) {
                                     const metodeEditor = window.editorInstances['kt_docs_ckeditor_metode'];
-                                    metodeEditor.setData((data.metode_perhitungan || '').replace(/\n/g, '<br>'));
-                                    console.log('✅ Metode populated:', data.metode_perhitungan);
+                                    const rawMetode = data.metode_perhitungan || '';
+                                    const htmlMetode = rawMetode.includes('<') ? rawMetode : rawMetode.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    metodeEditor.setData(htmlMetode);
+                                    console.log('✅ Metode populated:', rawMetode);
                                 } else {
                                     console.log('❌ Metode editor not ready');
                                 }

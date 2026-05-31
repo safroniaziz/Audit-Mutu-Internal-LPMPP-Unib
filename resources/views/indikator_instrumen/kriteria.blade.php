@@ -1243,7 +1243,9 @@
                         const data = window.editElemenData;
                         const fieldName = elementId.replace('edit_', '');
                         if (data[fieldName]) {
-                            editor.setData(data[fieldName]);
+                            const raw = data[fieldName];
+                            const html = raw.includes('<') ? raw : raw.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                            editor.setData(html);
                         }
                     }
                 }).catch(error => {
