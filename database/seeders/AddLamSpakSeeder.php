@@ -290,66 +290,45 @@ class AddLamSpakSeeder extends Seeder
                 return;
             }
 
+            // Soft-delete semua row lama untuk indikator 17, lalu insert ulang fresh.
+            DB::table('instrumen_prodis')
+                ->where('indikator_instrumen_id', $indikatorInstrumenId)
+                ->whereNull('deleted_at')
+                ->update(['deleted_at' => $now]);
+
+            DB::table('indikator_instrumen_kriterias')
+                ->where('indikator_instrumen_id', $indikatorInstrumenId)
+                ->whereNull('deleted_at')
+                ->update(['deleted_at' => $now]);
+
             foreach ($criteriaList as $criteriaData) {
                 if (empty($criteriaData['items'])) {
                     continue;
                 }
 
-                // Get or create kriteria — jaga ID lama agar FK dari data user tidak rusak
-                $kriteria = DB::table('indikator_instrumen_kriterias')
-                    ->where('indikator_instrumen_id', $indikatorInstrumenId)
-                    ->where('kode_kriteria', $criteriaData['kode'])
-                    ->whereNull('deleted_at')
-                    ->first();
+                $kriteriaId = DB::table('indikator_instrumen_kriterias')->insertGetId([
+                    'indikator_instrumen_id' => $indikatorInstrumenId,
+                    'kode_kriteria'          => $criteriaData['kode'],
+                    'nama_kriteria'          => $criteriaData['nama'],
+                    'created_at'             => $now,
+                    'updated_at'             => $now,
+                ]);
 
-                if ($kriteria) {
-                    $kriteriaId = $kriteria->id;
-                } else {
-                    $kriteriaId = DB::table('indikator_instrumen_kriterias')->insertGetId([
-                        'indikator_instrumen_id' => $indikatorInstrumenId,
-                        'kode_kriteria' => $criteriaData['kode'],
-                        'nama_kriteria' => $criteriaData['nama'],
-                        'created_at' => $now,
-                        'updated_at' => $now,
+                foreach ($criteriaData['items'] as $item) {
+                    DB::table('instrumen_prodis')->insert([
+                        'indikator_instrumen_id'          => $indikatorInstrumenId,
+                        'indikator_instrumen_kriteria_id' => $kriteriaId,
+                        'elemen'                          => $item['elemen'],
+                        'indikator'                       => $item['indikator'],
+                        'sumber_data'                     => '-',
+                        'metode_perhitungan'              => $item['indikator_penilaian'],
+                        'target'                          => (string) ($item['target'] ?? '2'),
+                        'realisasi'                       => '-',
+                        'standar_digunakan'               => '-',
+                        'indikator_penilaian'             => $item['indikator_penilaian'],
+                        'created_at'                      => $now,
+                        'updated_at'                      => $now,
                     ]);
-                }
-
-                // Ambil row existing per kriteria (urut by id = urut insert asli)
-                $existingItems = DB::table('instrumen_prodis')
-                    ->where('indikator_instrumen_kriteria_id', $kriteriaId)
-                    ->whereNull('deleted_at')
-                    ->orderBy('id')
-                    ->get();
-
-                foreach ($criteriaData['items'] as $index => $item) {
-                    if (isset($existingItems[$index])) {
-                        // Update kolom definisi saja — data user tidak disentuh
-                        DB::table('instrumen_prodis')
-                            ->where('id', $existingItems[$index]->id)
-                            ->update([
-                                'elemen'              => $item['elemen'],
-                                'indikator'           => $item['indikator'],
-                                'metode_perhitungan'  => $item['indikator_penilaian'],
-                                'target'              => (string) ($item['target'] ?? '2'),
-                                'indikator_penilaian' => $item['indikator_penilaian'],
-                                'updated_at'          => $now,
-                            ]);
-                    } else {
-                        DB::table('instrumen_prodis')->insert([
-                            'indikator_instrumen_id'          => $indikatorInstrumenId,
-                            'indikator_instrumen_kriteria_id' => $kriteriaId,
-                            'elemen'                          => $item['elemen'],
-                            'indikator'                       => $item['indikator'],
-                            'sumber_data'                     => '-',
-                            'metode_perhitungan'              => $item['indikator_penilaian'],
-                            'target'                          => (string) ($item['target'] ?? '2'),
-                            'realisasi'                       => '-',
-                            'standar_digunakan'               => '-',
-                            'indikator_penilaian'             => $item['indikator_penilaian'],
-                            'created_at'                      => $now,
-                            'updated_at'                      => $now,
-                        ]);
-                    }
                 }
             }
         });
