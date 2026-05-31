@@ -15,8 +15,8 @@ class AddLamSpakSeeder extends Seeder
             $indikatorInstrumenId = 17;
 
             $this->upsertIndikatorInstrumen($indikatorInstrumenId, $indicatorName, $now);
-            $rubrik = static fn (string $nilai4, string $nilai3, string $nilai1): string => "4: {$nilai4} 3: {$nilai3} 2: {$nilai3} 1: {$nilai1}";
-            $item = static fn (string $teks, string $nilai4, string $nilai3, string $nilai1): array => ['elemen' => $teks, 'indikator' => $teks, 'target' => '2', 'indikator_penilaian' => $rubrik($nilai4, $nilai3, $nilai1)];
+            $rubrik = static fn (string $nilai2, string $nilai1, string $nilai0): string => "2: {$nilai2}\n1: {$nilai1}\n0: {$nilai0}";
+            $item = static fn (string $teks, string $nilai2, string $nilai1, string $nilai0): array => ['elemen' => $teks, 'indikator' => $teks, 'target' => '2', 'indikator_penilaian' => $rubrik($nilai2, $nilai1, $nilai0)];
 
             $criteriaList = [
                 [
