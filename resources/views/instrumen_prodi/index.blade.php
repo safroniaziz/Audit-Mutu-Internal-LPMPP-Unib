@@ -367,7 +367,13 @@
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
                                     const penilaianEditor = window.editorInstances['kt_docs_ckeditor_penilaian'];
                                     const rawPenilaian = data.indikator_penilaian || '';
-                                    const htmlPenilaian = rawPenilaian.includes('<') ? rawPenilaian : rawPenilaian.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    let htmlPenilaian;
+                                    if (rawPenilaian.includes('<')) {
+                                        htmlPenilaian = rawPenilaian;
+                                    } else {
+                                        const normP = rawPenilaian.replace(/ (\d+: )/g, '\n$1');
+                                        htmlPenilaian = normP.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    }
                                     penilaianEditor.setData(htmlPenilaian);
                                     console.log('✅ Penilaian populated:', rawPenilaian);
                                 } else {
@@ -378,7 +384,13 @@
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_metode']) {
                                     const metodeEditor = window.editorInstances['kt_docs_ckeditor_metode'];
                                     const rawMetode = data.metode_perhitungan || '';
-                                    const htmlMetode = rawMetode.includes('<') ? rawMetode : rawMetode.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    let htmlMetode;
+                                    if (rawMetode.includes('<')) {
+                                        htmlMetode = rawMetode;
+                                    } else {
+                                        const normM = rawMetode.replace(/ (\d+: )/g, '\n$1');
+                                        htmlMetode = normM.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                                    }
                                     metodeEditor.setData(htmlMetode);
                                     console.log('✅ Metode populated:', rawMetode);
                                 } else {

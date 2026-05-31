@@ -1244,7 +1244,14 @@
                         const fieldName = elementId.replace('edit_', '');
                         if (data[fieldName]) {
                             const raw = data[fieldName];
-                            const html = raw.includes('<') ? raw : raw.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                            let html;
+                            if (raw.includes('<')) {
+                                html = raw;
+                            } else {
+                                // Handle both \n-separated and space-separated "N: text" patterns
+                                const normalized = raw.replace(/ (\d+: )/g, '\n$1');
+                                html = normalized.split('\n').filter(l => l.trim()).map(l => `<p>${l}</p>`).join('');
+                            }
                             editor.setData(html);
                         }
                     }
