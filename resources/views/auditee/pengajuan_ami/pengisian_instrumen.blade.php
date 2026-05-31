@@ -381,7 +381,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja dan Pemilihan IKSS) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pengisian Instrumen Prodi, dan Pemilihan IKSS) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
@@ -504,7 +504,7 @@
                         </a>
                     @endif
                     @if ($isAllCompleted)
-                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm px-4 btn-success">
+                        <a href="{{ route('auditee.pengajuanAmi.unggahSiklus') }}" class="btn btn-sm px-4 btn-success">
                             <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                         </a>
                     @else

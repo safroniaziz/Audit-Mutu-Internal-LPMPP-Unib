@@ -191,7 +191,7 @@
                             <strong>{{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'Selamat!' : 'Catatan:' }}</strong>
                             <span class="fw-semibold {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'text-success' : 'text-danger' }}">
                                 @if($perjanjianKinerja && $perjanjianKinerja->file_path)
-                                    Dokumen Perjanjian Kinerja program studi Anda telah diunggah. Silakan lanjut ke proses Pemilihan IKSS.
+                                    Dokumen Perjanjian Kinerja program studi Anda telah diunggah. Silakan lanjut ke proses Pengisian Instrumen Prodi.
                                 @else
                                     Silakan unggah dokumen Perjanjian Kinerja program studi Anda. Dokumen ini akan menjadi dasar untuk proses audit mutu internal selanjutnya.
                                 @endif
@@ -206,7 +206,7 @@
                             <i class="fas fa-arrow-left me-2"></i>Kembali ke Dashboard
                         </a>
                     @endif
-                    <a href="{{ route('auditee.pengajuanAmi.pemilihanIkss') }}" class="btn btn-sm btn-primary px-4">
+                    <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm btn-primary px-4">
                         <i class="fas fa-arrow-right me-2"></i>Proses Selanjutnya
                     </a>
                 </div>

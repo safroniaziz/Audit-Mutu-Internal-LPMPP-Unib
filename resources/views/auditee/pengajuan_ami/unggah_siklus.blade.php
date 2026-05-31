@@ -114,14 +114,14 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, Pengisian Instrumen, dan Pengisian Instrumen Prodi) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pengisian Instrumen Prodi, Pemilihan IKSS, dan Pengisian Instrumen) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
                     </div>
                     <div class="ms-auto">
-                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm btn-light-primary px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen Prodi
+                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumen') }}" class="btn btn-sm btn-light-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen
                         </a>
                     </div>
                 </div>

@@ -226,9 +226,9 @@
                                 ['key' => 'profil', 'label' => 'Profil'],
                                 ['key' => 'rtl_sebelumnya', 'label' => 'RTL Periode Sebelumnya'],
                                 ['key' => 'perjanjian_kinerja', 'label' => 'Perjanjian Kinerja'],
+                                ['key' => 'pengisian_instrumen_prodi', 'label' => 'Pengisian Instrumen Prodi'],
                                 ['key' => 'pemilihan_ikss', 'label' => 'Pemilihan IKSS'],
                                 ['key' => 'pengisian_instrumen', 'label' => 'Pengisian Instrumen'],
-                                ['key' => 'pengisian_instrumen_prodi', 'label' => 'Pengisian Instrumen Prodi'],
                                 ['key' => 'unggah_siklus', 'label' => 'Unggah Siklus'],
                             ];
                         @endphp
@@ -352,7 +352,7 @@
                                             </span>
                                         @elseif(isset($hasPreviousRtl) && !$hasPreviousRtl)
                                             <span class="fw-semibold text-danger">
-                                                Unggah dokumen RTL periode sebelumnya ({{ $previousPeriodeLabel ?? 'periode sebelumnya' }}) terlebih dahulu. Tahapan Perjanjian Kinerja, Pemilihan IKSS, Pengisian Instrumen, Pengisian Instrumen Prodi, dan Unggah Siklus akan terkunci.
+                                                Unggah dokumen RTL periode sebelumnya ({{ $previousPeriodeLabel ?? 'periode sebelumnya' }}) terlebih dahulu. Tahapan Perjanjian Kinerja, Pengisian Instrumen Prodi, Pemilihan IKSS, Pengisian Instrumen, dan Unggah Siklus akan terkunci.
                                             </span>
                                         @else
                                             <span class="fw-semibold text-success">

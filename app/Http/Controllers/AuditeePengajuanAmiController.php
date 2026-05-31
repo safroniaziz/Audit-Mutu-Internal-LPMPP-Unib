@@ -198,9 +198,9 @@ class AuditeePengajuanAmiController extends Controller
             'profil' => $profilComplete,
             'rtl_sebelumnya' => $hasPreviousRtl,
             'perjanjian_kinerja' => $hasPerjanjianKinerja,
+            'pengisian_instrumen_prodi' => $hasPengisianInstrumenProdi,
             'pemilihan_ikss' => $hasPemilihanIkss,
             'pengisian_instrumen' => $hasPengisianInstrumen,
-            'pengisian_instrumen_prodi' => $hasPengisianInstrumenProdi,
             'unggah_siklus' => $hasUnggahSiklus,
         ];
 

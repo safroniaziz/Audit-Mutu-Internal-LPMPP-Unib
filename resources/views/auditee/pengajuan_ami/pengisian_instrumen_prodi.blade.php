@@ -356,7 +356,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pemilihan IKSS, dan Pengisian Instrumen) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
@@ -399,42 +399,42 @@
             @endif
 
             <div class="alert {{ $isAllCompleted ? 'alert-success' : 'alert-danger' }} d-flex align-items-start p-5 mb-10 position-relative">
-                    <div class="me-4">
-                        <i class="bi {{ $isAllCompleted ? 'bi-check-circle-fill fs-2 text-success' : 'bi-exclamation-triangle-fill fs-2 text-danger' }}"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h4 class="fw-bold text-dark mb-2">{{ $isAllCompleted ? '✨ Pengisian Instrumen Selesai' : '📝 Pengisian Instrumen' }}</h4>
-                        <div class="fs-6 text-gray-700">
-                            <p class="mt-4">
-                                <strong>{{ $isAllCompleted ? 'Selamat!' : 'Status:' }}</strong>
-                                <span class="fw-semibold {{ $isAllCompleted ? 'text-success' : 'text-danger' }}">
-                                    @if($isAllCompleted)
-                                        Semua instrumen telah diisi dengan lengkap. Silakan lanjut ke tahap Unggah Siklus.
-                                    @else
-                                        {{ $completedInstrumen }} dari {{ $totalInstrumen }} instrumen telah diisi. Silakan lengkapi pengisian instrumen yang tersisa.
-                                    @endif
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="ms-auto d-flex gap-2">
-                        @if (!$pengajuanAmiExists)
-                            <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumen') }}" class="btn btn-sm btn-light-primary px-4">
-                                <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen
-                            </a>
-                        @endif
-                        @if ($isAllCompleted)
-                            <a href="{{ route('auditee.pengajuanAmi.unggahSiklus') }}" class="btn btn-sm px-4 btn-success">
-                                <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
-                            </a>
-                        @else
-                            <a href="#" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
-                                <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
-                            </a>
-                        @endif
+                <div class="me-4">
+                    <i class="bi {{ $isAllCompleted ? 'bi-check-circle-fill fs-2 text-success' : 'bi-exclamation-triangle-fill fs-2 text-danger' }}"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h4 class="fw-bold text-dark mb-2">{{ $isAllCompleted ? '✨ Pengisian Instrumen Prodi Selesai' : '📝 Pengisian Instrumen Prodi' }}</h4>
+                    <div class="fs-6 text-gray-700">
+                        <p class="mt-4">
+                            <strong>{{ $isAllCompleted ? 'Selamat!' : 'Status:' }}</strong>
+                            <span class="fw-semibold {{ $isAllCompleted ? 'text-success' : 'text-danger' }}">
+                                @if($isAllCompleted)
+                                    Semua instrumen prodi telah diisi dengan lengkap. Silakan lanjut ke tahap Pemilihan IKSS.
+                                @else
+                                    {{ $completedInstrumen }} dari {{ $totalInstrumen }} instrumen prodi telah diisi. Silakan lengkapi pengisian instrumen prodi yang tersisa.
+                                @endif
+                            </span>
+                        </p>
                     </div>
                 </div>
+
+                <div class="ms-auto d-flex gap-2">
+                    @if (!$pengajuanAmiExists)
+                        <a href="{{ route('auditee.pengajuanAmi.perjanjianKinerja') }}" class="btn btn-sm btn-light-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Perjanjian Kinerja
+                        </a>
+                    @endif
+                    @if ($isAllCompleted)
+                        <a href="{{ route('auditee.pengajuanAmi.pemilihanIkss') }}" class="btn btn-sm px-4 btn-success">
+                            <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                        </a>
+                    @else
+                        <a href="#" class="btn btn-sm px-4 btn-secondary disabled" style="cursor: not-allowed; opacity: 0.65;">
+                            <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
+                        </a>
+                    @endif
+                </div>
+            </div>
 
                 <!-- Wizard Navigation -->
                 <div class="wizard-nav mb-5" style="overflow-x: scroll !important;">
