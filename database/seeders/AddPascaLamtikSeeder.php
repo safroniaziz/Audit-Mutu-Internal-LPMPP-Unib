@@ -515,13 +515,6 @@ class AddPascaLamtikSeeder extends Seeder
                             'indikator_penilaian' => "4: Terdapat bukti sahih ketersediaan layanan kemahasiswaan di bidang akademik dan nonakademik mulai dari penerimaan mahasiswa baru, penyiapan mahasiswa dan layanan untuk berbagai kegiatan akademik dan nonakademik dengan akses dan mutu layanan yang sangat baik.\n3: Terdapat bukti sahih ketersediaan layanan kemahasiswaan di bidang akademik dan nonakademik mulai dari penerimaan mahasiswa baru, penyiapan mahasiswa dan layanan untuk berbagai kegiatan akademik dan nonakademik dengan akses dan mutu layanan yang baik.\n2: Layanan kemahasiswaan di bidang akademik dan nonakademik dapat diakses mahasiswa namun belum memadai.\n1: Layanan kemahasiswaan di bidang akademik dan nonakademik belum memadai.\n0: Tidak ada Skor kurang dari 1.",
                         ],
 
-                        // 42. Pengembangan Dosen (header kosong)
-                        [
-                            'elemen' => 'Proses',
-                            'indikator' => 'Upaya pengembangan dosen UPPS merencanakan dan mengembangkan DTPS yang masuk rencana pengembangan PT (Renstra PT) secara konsisten meliputi 4 aspek: kualifikasi dan kecukupan, jenjang pendidikan, pendidikan profesi, dan sertifikasi kompetensi',
-                            'indikator_penilaian' => "-",
-                        ],
-
                         // 43. Pengembangan Dosen (detail)
                         [
                             'elemen' => 'Proses',
