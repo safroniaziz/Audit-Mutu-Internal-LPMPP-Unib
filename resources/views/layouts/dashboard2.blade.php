@@ -568,6 +568,36 @@
                                                                             ->exists();
                                                     }
 
+                                                    $instrumenProdiIds = collect();
+                                                    $sudahMengisiInstrumenProdi = false;
+                                                    if ($periodeAktif) {
+                                                        $indikatorInstrumens = App\Models\IndikatorInstrumen::with('kriterias.instrumenProdi')
+                                                            ->whereHas('prodis', function ($query) use ($unitKerjaId) {
+                                                                $query->where('unit_kerja_id', $unitKerjaId);
+                                                            })
+                                                            ->get();
+
+                                                        $instrumenProdiIds = $indikatorInstrumens
+                                                            ->flatMap(fn ($indikator) => $indikator->kriterias->flatMap(fn ($kriteria) => $kriteria->instrumenProdi->pluck('id')))
+                                                            ->unique()
+                                                            ->values();
+
+                                                        if ($instrumenProdiIds->isNotEmpty()) {
+                                                            $completedInstrumenProdi = App\Models\InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
+                                                                ->where('periode_id', $periodeAktif->id)
+                                                                ->whereIn('instrumen_prodi_id', $instrumenProdiIds)
+                                                                ->whereNotNull('realisasi')
+                                                                ->where('realisasi', '!=', '')
+                                                                ->whereNotNull('akar_penyebab')
+                                                                ->where('akar_penyebab', '!=', '')
+                                                                ->whereNotNull('rencana_perbaikan')
+                                                                ->where('rencana_perbaikan', '!=', '')
+                                                                ->count();
+
+                                                            $sudahMengisiInstrumenProdi = $completedInstrumenProdi === $instrumenProdiIds->count();
+                                                        }
+                                                    }
+
                                                 @endphp
 
                                                 @if (Route::is('auditee.dashboard*'))
@@ -615,9 +645,20 @@
                                                         @endphp
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                              title="{{ !$hasPerjanjianKinerja ? '<strong>Tidak dapat diakses</strong><br>Unggah Perjanjian Kinerja terlebih dahulu' : '' }}">
-                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pemilihanIkss') ? 'active' : '' }} {{ !$hasPerjanjianKinerja ? 'disabled' : '' }}"
-                                                               href="{{ !$hasPerjanjianKinerja ? 'javascript:void(0);' : route('auditee.pengajuanAmi.pemilihanIkss') }}"
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumenProdi') ? 'active' : '' }} {{ !$hasPerjanjianKinerja ? 'disabled' : '' }}"
+                                                               href="{{ !$hasPerjanjianKinerja ? 'javascript:void(0);' : route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}"
                                                                style="{{ !$hasPerjanjianKinerja ? 'pointer-events: none; color: grey;' : '' }}">
+                                                                <i class="fas fa-file-alt me-2"></i> Pengisian Instrumen Prodi
+                                                            </a>
+                                                        </div>
+                                                    </li>
+
+                                                    <li class="nav-item mt-2">
+                                                        <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
+                                                             title="{{ !$sudahMengisiInstrumenProdi ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pengisian instrumen prodi terlebih dahulu' : '' }}">
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pemilihanIkss') ? 'active' : '' }} {{ !$sudahMengisiInstrumenProdi ? 'disabled' : '' }}"
+                                                               href="{{ $sudahMengisiInstrumenProdi ? route('auditee.pengajuanAmi.pemilihanIkss') : 'javascript:void(0);' }}"
+                                                               style="{{ !$sudahMengisiInstrumenProdi ? 'pointer-events: none; color: grey;' : '' }}">
                                                                 <i class="fas fa-cogs me-2"></i> Pemilihan IKSS
                                                             </a>
                                                         </div>
@@ -626,8 +667,8 @@
                                                     <li class="nav-item mt-2">
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
                                                              title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pemilihan IKSS di semua Sasaran Strategis terlebih dahulu' : '' }}">
-                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumen') ? 'active' : '' }}"
-                                                               href="{{ $sudahMengisiIkss ? route('auditee.pengajuanAmi.pengisianInstrumen') : 'javascript:void(0);' }}"
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumen') ? 'active' : '' }} {{ !$sudahMengisiIkss ? 'disabled' : '' }}"
+                                                               href="{{ !$sudahMengisiIkss ? 'javascript:void(0);' : route('auditee.pengajuanAmi.pengisianInstrumen') }}"
                                                                style="{{ !$sudahMengisiIkss ? 'pointer-events: none; color: grey;' : '' }}">
                                                                 <i class="fas fa-clipboard-list me-2"></i> Pengisian Instrumen
                                                             </a>
@@ -636,21 +677,10 @@
 
                                                     <li class="nav-item mt-2">
                                                         <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
-                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pengisian instrumen prodi terlebih dahulu' : '' }}">
-                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.pengisianInstrumenProdi') ? 'active' : '' }} {{ !$sudahMengisiInstrumen ? 'disabled' : '' }}"
-                                                               href="{{ !$sudahMengisiIkss ? 'javascript:void(0);' : route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}"
-                                                               style="{{ !$sudahMengisiIkss ? 'pointer-events: none; color: grey;' : '' }}">
-                                                                <i class="fas fa-file-alt me-2"></i> Pengisian Instrumen Prodi
-                                                            </a>
-                                                        </div>
-                                                    </li>
-
-                                                    <li class="nav-item mt-2">
-                                                        <div class="d-inline-block" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true"
-                                                             title="{{ !$sudahMengisiIkss ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pengisian instrumen terlebih dahulu' : '' }}">
+                                                             title="{{ !$sudahMengisiInstrumen ? '<strong>Tidak dapat diakses</strong><br>Selesaikan pengisian instrumen terlebih dahulu' : '' }}">
                                                             <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditee.pengajuanAmi.unggahSiklus') ? 'active' : '' }} {{ !$sudahMengisiInstrumen ? 'disabled' : '' }}"
-                                                               href="{{ !$sudahMengisiIkss ? 'javascript:void(0);' : route('auditee.pengajuanAmi.unggahSiklus') }}"
-                                                               style="{{ !$sudahMengisiIkss ? 'pointer-events: none; color: grey;' : '' }}">
+                                                               href="{{ !$sudahMengisiInstrumen ? 'javascript:void(0);' : route('auditee.pengajuanAmi.unggahSiklus') }}"
+                                                               style="{{ !$sudahMengisiInstrumen ? 'pointer-events: none; color: grey;' : '' }}">
                                                                 <i class="fas fa-clipboard-list me-2"></i> Unggah Siklus
                                                             </a>
                                                         </div>
@@ -1716,14 +1746,14 @@
                                 icon: 'info',
                                 width: '600px',
                                 showCancelButton: true,
-                                confirmButtonText: '<i class="fas fa-arrow-right me-2"></i>Ke Halaman Pemilihan IKSS',
+                                confirmButtonText: '<i class="fas fa-arrow-right me-2"></i>Ke Pengisian Instrumen Prodi',
                                 cancelButtonText: '<i class="fas fa-times me-2"></i>Tutup',
                                 confirmButtonColor: '#3085d6',
                                 cancelButtonColor: '#6c757d'
                             }).then((result) => {
                                 if (result.isConfirmed) {
-                                    // Redirect to IKSS selection page
-                                    window.location.href = '{{ route("auditee.pengajuanAmi.pemilihanIkss") }}';
+                                    // Redirect to the first step before IKSS in the current flow.
+                                    window.location.href = '{{ route("auditee.pengajuanAmi.pengisianInstrumenProdi") }}';
                                 }
                             });
                         } else {

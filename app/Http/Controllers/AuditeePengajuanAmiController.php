@@ -1556,7 +1556,7 @@ class AuditeePengajuanAmiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'redirect_url' => route('auditee.pengajuanAmi.perjanjianKinerja')
+                'redirect_url' => route('auditee.pengajuanAmi.pengisianInstrumenProdi')
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -1623,7 +1623,7 @@ class AuditeePengajuanAmiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Perjanjian Kinerja berhasil diunggah!',
-                'redirect_url' => route('auditee.pengajuanAmi.perjanjianKinerja')
+                'redirect_url' => route('auditee.pengajuanAmi.pengisianInstrumenProdi')
             ]);
 
         } catch (\Exception $e) {
