@@ -366,7 +366,7 @@
                                 // 4. Penilaian
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_penilaian']) {
                                     const penilaianEditor = window.editorInstances['kt_docs_ckeditor_penilaian'];
-                                    penilaianEditor.setData(data.indikator_penilaian || '');
+                                    penilaianEditor.setData((data.indikator_penilaian || '').replace(/\n/g, '<br>'));
                                     console.log('✅ Penilaian populated:', data.indikator_penilaian);
                                 } else {
                                     console.log('❌ Penilaian editor not ready');
@@ -375,7 +375,7 @@
                                 // 5. Metode
                                 if (window.editorInstances && window.editorInstances['kt_docs_ckeditor_metode']) {
                                     const metodeEditor = window.editorInstances['kt_docs_ckeditor_metode'];
-                                    metodeEditor.setData(data.metode_perhitungan || '');
+                                    metodeEditor.setData((data.metode_perhitungan || '').replace(/\n/g, '<br>'));
                                     console.log('✅ Metode populated:', data.metode_perhitungan);
                                 } else {
                                     console.log('❌ Metode editor not ready');
