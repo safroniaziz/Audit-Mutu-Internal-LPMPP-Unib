@@ -399,7 +399,10 @@ class IndikatorInstrumenController extends Controller
     {
         try {
             $indikator = IndikatorInstrumen::with(['kriterias.instrumenProdi' => function($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->orderByRaw('CASE WHEN instrumen_prodis.sort_order IS NULL THEN 1 ELSE 0 END')
+                    ->orderBy('instrumen_prodis.sort_order')
+                    ->orderByDesc('instrumen_prodis.created_at')
+                    ->orderByDesc('instrumen_prodis.id');
             }])->withTrashed()->findOrFail($id);
 
             return view('indikator_instrumen.kriteria', [

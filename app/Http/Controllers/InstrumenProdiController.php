@@ -6,6 +6,7 @@ use App\Models\IndikatorInstrumen;
 use App\Models\IndikatorInstrumenKriteria;
 use App\Models\InstrumenProdi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
@@ -59,6 +60,7 @@ class InstrumenProdiController extends Controller
         $instrumen = new InstrumenProdi();
         $instrumen->indikator_instrumen_id = $request->indikator_instrumen_id;
         $instrumen->indikator_instrumen_kriteria_id = $request->indikator_instrumen_kriteria_id;
+        $instrumen->sort_order = $this->nextSortOrder($request->indikator_instrumen_kriteria_id);
         $instrumen->elemen = $request->elemen;
         $instrumen->indikator = $request->indikator;
         $instrumen->sumber_data = $request->sumber_data;
@@ -135,8 +137,14 @@ class InstrumenProdiController extends Controller
             ], 422);
         }
 
+        $oldKriteriaId = (int) $instrumen->indikator_instrumen_kriteria_id;
+        $newKriteriaId = (int) $request->indikator_instrumen_kriteria_id;
+
         $instrumen->indikator_instrumen_id = $request->indikator_instrumen_id;
         $instrumen->indikator_instrumen_kriteria_id = $request->indikator_instrumen_kriteria_id;
+        if ($oldKriteriaId !== $newKriteriaId || is_null($instrumen->sort_order)) {
+            $instrumen->sort_order = $this->nextSortOrder($newKriteriaId);
+        }
         $instrumen->elemen = $request->elemen;
         $instrumen->indikator = $request->indikator;
         $instrumen->sumber_data = $request->sumber_data;
@@ -153,6 +161,55 @@ class InstrumenProdiController extends Controller
         return response()->json([
             'message' => 'Instrumen Prodi berhasil diperbarui!',
             'data' => $instrumen
+        ]);
+    }
+
+    public function reorder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'kriteria_id' => 'required|integer|exists:indikator_instrumen_kriterias,id',
+            'ordered_ids' => 'required|array|min:1',
+            'ordered_ids.*' => 'integer|exists:instrumen_prodis,id',
+        ], [
+            'kriteria_id.required' => 'Kriteria instrumen wajib diisi.',
+            'kriteria_id.exists' => 'Kriteria instrumen tidak ditemukan.',
+            'ordered_ids.required' => 'Urutan elemen wajib diisi.',
+            'ordered_ids.array' => 'Format urutan elemen tidak valid.',
+            'ordered_ids.*.exists' => 'Elemen instrumen tidak ditemukan.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $kriteriaId = (int) $request->kriteria_id;
+        $orderedIds = collect($request->ordered_ids)
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $ownedCount = InstrumenProdi::where('indikator_instrumen_kriteria_id', $kriteriaId)
+            ->whereIn('id', $orderedIds)
+            ->count();
+
+        if ($ownedCount !== $orderedIds->count()) {
+            return response()->json([
+                'message' => 'Urutan elemen tidak sesuai dengan kriteria yang dipilih.'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($orderedIds, $kriteriaId) {
+            foreach ($orderedIds as $index => $id) {
+                InstrumenProdi::where('id', $id)
+                    ->where('indikator_instrumen_kriteria_id', $kriteriaId)
+                    ->update(['sort_order' => $index + 1]);
+            }
+        });
+
+        return response()->json([
+            'message' => 'Urutan elemen berhasil disimpan.'
         ]);
     }
 
@@ -191,7 +248,9 @@ class InstrumenProdiController extends Controller
     public function restore($id)
     {
         $instrumen = InstrumenProdi::withTrashed()->findOrFail($id);
+        $instrumen->sort_order = $this->nextSortOrder($instrumen->indikator_instrumen_kriteria_id);
         $instrumen->restore();  // Mengembalikan data yang terhapus
+        $instrumen->save();
 
         return response()->json(['message' => 'Instrumen Prodi berhasil dipulihkan!']);
     }
@@ -218,5 +277,12 @@ class InstrumenProdiController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    private function nextSortOrder($kriteriaId): int
+    {
+        return ((int) InstrumenProdi::where('indikator_instrumen_kriteria_id', $kriteriaId)
+            ->withTrashed()
+            ->max('sort_order')) + 1;
     }
 }

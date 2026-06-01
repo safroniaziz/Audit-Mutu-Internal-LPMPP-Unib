@@ -53,6 +53,31 @@
             gap: 0.25rem;
             margin-bottom: 0.25rem;
         }
+        .elemen-sortable-list {
+            min-height: 24px;
+        }
+        .elemen-sortable-list.saving {
+            opacity: 0.65;
+            pointer-events: none;
+        }
+        .elemen-sortable-item {
+            cursor: default;
+            transition: background-color 0.15s ease, opacity 0.15s ease;
+        }
+        .elemen-sortable-item.dragging {
+            opacity: 0.45;
+        }
+        .elemen-drag-handle {
+            align-items: center;
+            color: #7e8299;
+            cursor: grab;
+            display: inline-flex;
+            justify-content: center;
+            min-width: 18px;
+        }
+        .elemen-drag-handle:active {
+            cursor: grabbing;
+        }
         .elemen-badge {
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
@@ -182,10 +207,13 @@
                                     <td>{{ $kriteria->nama_kriteria }}</td>
                                     <td>
                                         @if($kriteria->instrumenProdi->isNotEmpty())
-                                            <div class="d-flex flex-column gap-1">
-                                                @foreach($kriteria->instrumenProdi as $index => $instrumen)
-                                                    <div class="elemen-item">
-                                                        <span class="badge badge-light-secondary elemen-badge" style="min-width: 25px; text-align: center;">{{ $index + 1 }}</span>
+                                            <div class="d-flex flex-column gap-1 elemen-sortable-list" data-kriteria-id="{{ $kriteria->id }}">
+                                                @foreach($kriteria->instrumenProdi as $elemenIndex => $instrumen)
+                                                    <div class="elemen-item elemen-sortable-item" data-id="{{ $instrumen->id }}">
+                                                        <span class="elemen-drag-handle" title="Geser untuk mengubah urutan">
+                                                            <i class="fas fa-grip-vertical"></i>
+                                                        </span>
+                                                        <span class="badge badge-light-secondary elemen-badge elemen-number" style="min-width: 25px; text-align: center;">{{ $elemenIndex + 1 }}</span>
                                                         <span class="badge badge-light-primary elemen-badge">{{ $instrumen->elemen }}</span>
                                                         <button type="button" class="btn btn-xs btn-link p-0 edit-elemen"
                                                                 data-id="{{ $instrumen->id }}"
@@ -624,6 +652,110 @@
                 });
             });
         });
+
+        let draggedElemen = null;
+
+        $(document).on('mousedown', '.elemen-drag-handle', function() {
+            $(this).closest('.elemen-sortable-item').attr('draggable', 'true');
+        });
+
+        $(document).on('dragstart', '.elemen-sortable-item', function(e) {
+            draggedElemen = this;
+            $(this).addClass('dragging');
+            e.originalEvent.dataTransfer.effectAllowed = 'move';
+        });
+
+        $(document).on('dragend', '.elemen-sortable-item', function() {
+            $(this).removeClass('dragging').removeAttr('draggable');
+            draggedElemen = null;
+        });
+
+        $(document).on('dragover', '.elemen-sortable-list', function(e) {
+            if (!draggedElemen || $(draggedElemen).closest('.elemen-sortable-list')[0] !== this) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const afterElement = getDragAfterElement(this, e.originalEvent.clientY);
+            if (!afterElement) {
+                this.appendChild(draggedElemen);
+            } else {
+                this.insertBefore(draggedElemen, afterElement);
+            }
+        });
+
+        $(document).on('drop', '.elemen-sortable-list', function(e) {
+            if (!draggedElemen || $(draggedElemen).closest('.elemen-sortable-list')[0] !== this) {
+                return;
+            }
+
+            e.preventDefault();
+            refreshElemenNumbers($(this));
+            saveElemenOrder($(this));
+        });
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('.elemen-sortable-item:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                }
+
+                return closest;
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        function refreshElemenNumbers($list) {
+            $list.find('.elemen-number').each(function(index) {
+                $(this).text(index + 1);
+            });
+        }
+
+        function saveElemenOrder($list) {
+            const orderedIds = $list.find('.elemen-sortable-item').map(function() {
+                return $(this).data('id');
+            }).get();
+
+            if (orderedIds.length <= 1) {
+                return;
+            }
+
+            $list.addClass('saving');
+
+            $.ajax({
+                url: "{{ route('instrumenProdi.reorder') }}",
+                type: 'POST',
+                data: {
+                    kriteria_id: $list.data('kriteria-id'),
+                    ordered_ids: orderedIds
+                },
+                success: function(response) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: response.message || 'Urutan elemen tersimpan.',
+                        showConfirmButton: false,
+                        timer: 1600
+                    });
+                },
+                error: function() {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: 'Urutan elemen gagal disimpan. Silakan muat ulang halaman dan coba lagi.',
+                        icon: 'error'
+                    });
+                },
+                complete: function() {
+                    $list.removeClass('saving');
+                }
+            });
+        }
 
         // Handle tambah kriteria
         $('#formTambahKriteria').on('submit', function(e) {

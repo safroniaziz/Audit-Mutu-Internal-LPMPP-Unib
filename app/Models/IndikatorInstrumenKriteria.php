@@ -31,6 +31,10 @@ class IndikatorInstrumenKriteria extends Model
      */
     public function instrumenProdi(): HasMany
     {
-        return $this->hasMany(InstrumenProdi::class, 'indikator_instrumen_kriteria_id', 'id');
+        return $this->hasMany(InstrumenProdi::class, 'indikator_instrumen_kriteria_id', 'id')
+            ->orderByRaw('CASE WHEN instrumen_prodis.sort_order IS NULL THEN 1 ELSE 0 END')
+            ->orderBy('instrumen_prodis.sort_order')
+            ->orderByDesc('instrumen_prodis.created_at')
+            ->orderByDesc('instrumen_prodis.id');
     }
 }

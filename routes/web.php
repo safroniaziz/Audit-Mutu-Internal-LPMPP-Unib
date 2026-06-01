@@ -118,6 +118,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('instrumen-prodi')->name('instrumenProdi.')->group(function () {
             Route::get('/', [InstrumenProdiController::class, 'index'])->name('index');
             Route::post('/', [InstrumenProdiController::class, 'store'])->name('store');
+            Route::post('/reorder', [InstrumenProdiController::class, 'reorder'])->name('reorder');
             Route::get('/{instrumen}/edit', [InstrumenProdiController::class, 'edit'])->name('edit');
             Route::put('/{instrumen}', [InstrumenProdiController::class, 'update'])->name('update');
             Route::delete('/{instrumen}', [InstrumenProdiController::class, 'nonaktifkan'])->name('nonaktifkan');
