@@ -75,13 +75,13 @@ class RequestValidator
         }
 
         $file = $request->file($fieldName);
-        $maxSize = 450 * 1024; // 450KB
+        $maxSize = 350 * 1024; // 350KB
 
         if ($file->getSize() > $maxSize) {
             return [
                 'success' => false,
-                'message' => "Ukuran file {$fieldName} terlalu besar. Maksimal 450KB.",
-                'max_size' => '450KB',
+                'message' => "Ukuran file {$fieldName} terlalu besar. Maksimal 350KB.",
+                'max_size' => '350KB',
                 'current_size' => self::formatBytes($file->getSize()),
                 'error_code' => 'FILE_TOO_LARGE'
             ];

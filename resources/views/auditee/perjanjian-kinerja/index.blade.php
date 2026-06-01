@@ -23,7 +23,7 @@
                     <!--begin::Description-->
                     <p class="text-gray-400 fs-4 fw-semibold py-7">
                         Silakan unggah dokumen Perjanjian Kinerja Anda.<br/>
-                        Format yang diperbolehkan: PDF, DOC, DOCX (Maks. 10MB)
+                        Format yang diperbolehkan: PDF, DOC, DOCX (Maks. 350KB)
                     </p>
                     <!--end::Description-->
 
@@ -86,6 +86,17 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('file')?.addEventListener('change', function(e) {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
+            if (file.size > 350 * 1024) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Terlalu Besar',
+                    text: 'Ukuran file maksimal 350KB.',
+                    showConfirmButton: true
+                });
+                e.target.value = '';
+                return;
+            }
+
             const formData = new FormData();
             formData.append('file', file);
 

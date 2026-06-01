@@ -191,9 +191,9 @@
                             <strong>{{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'Selamat!' : 'Catatan:' }}</strong>
                             <span class="fw-semibold {{ $perjanjianKinerja && $perjanjianKinerja->file_path ? 'text-success' : 'text-danger' }}">
                                 @if($perjanjianKinerja && $perjanjianKinerja->file_path)
-                                    Dokumen Perjanjian Kinerja program studi Anda telah diunggah. Silakan lanjut ke proses Pengisian Instrumen Prodi.
+                                    Dokumen Perjanjian Kinerja program studi Anda telah diunggah. Silakan lanjut ke proses Pemilihan IKSS.
                                 @else
-                                    Silakan unggah dokumen Perjanjian Kinerja program studi Anda. Dokumen ini akan menjadi dasar untuk proses audit mutu internal selanjutnya.
+                                    Silakan unggah dokumen Perjanjian Kinerja program studi Anda setelah Pengisian Instrumen Prodi selesai.
                                 @endif
                             </span>
                         </p>
@@ -202,19 +202,19 @@
                 @if($perjanjianKinerja && $perjanjianKinerja->file_path)
                 <div class="ms-auto d-flex gap-2">
                     @if(!$pengajuanAmiExists)
-                        <a href="{{ route('auditee.pengajuanAmi') }}" class="btn btn-sm btn-light-primary px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Dashboard
+                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm btn-light-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen Prodi
                         </a>
                     @endif
-                    <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm btn-primary px-4">
+                    <a href="{{ route('auditee.pengajuanAmi.pemilihanIkss') }}" class="btn btn-sm btn-primary px-4">
                         <i class="fas fa-arrow-right me-2"></i>Proses Selanjutnya
                     </a>
                 </div>
                 @else
                 <div class="ms-auto">
                     @if(!$pengajuanAmiExists)
-                        <a href="{{ route('auditee.pengajuanAmi') }}" class="btn btn-sm btn-light-primary px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Dashboard
+                        <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}" class="btn btn-sm btn-light-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen Prodi
                         </a>
                     @endif
                 </div>
@@ -335,7 +335,7 @@
                                     </button>
                                     <input type="file" name="file_perjanjian" id="fileInput" style="display: none;" accept=".pdf" {{ !$canUpload ? 'disabled' : '' }}>
                                     <p class="text-gray-500 mt-3 mb-0">
-                                        <small>Format yang didukung: PDF saja (Maks. 10MB)</small>
+                                        <small>Format yang didukung: PDF saja (Maks. 350KB)</small>
                                     </p>
                                 </div>
                                 <div class="file-list" id="fileList">
@@ -363,8 +363,17 @@
 @push('scripts')
 <script>
     $(document).ready(function() {
-        // File size validation (10MB)
-        const MAX_FILE_SIZE = 10 * 1024 * 1024;
+        @if (session('sequence_guard_message'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tahapan Belum Selesai',
+                text: @json(session('sequence_guard_message')),
+                confirmButtonText: 'OK'
+            });
+        @endif
+
+        // File size validation (350KB)
+        const MAX_FILE_SIZE = 350 * 1024;
         // Allowed file types - hanya PDF
         const ALLOWED_TYPES = ['application/pdf'];
 
@@ -509,7 +518,7 @@
                 // Validate file size
                 if (file.size > MAX_FILE_SIZE) {
                     Swal.fire({
-                        text: "Ukuran file terlalu besar. Maksimal 10MB.",
+                        text: "Ukuran file terlalu besar. Maksimal 350KB.",
                         icon: "error",
                         buttonsStyling: false,
                         confirmButtonText: "Ok",

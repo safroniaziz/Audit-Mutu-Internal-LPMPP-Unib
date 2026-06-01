@@ -147,6 +147,52 @@ class AuditeePengajuanAmiController extends Controller
         ], 422);
     }
 
+    private function hasCompletedInstrumenProdi(int $unitKerjaId, ?PeriodeAktif $periodeAktif): bool
+    {
+        if (!$periodeAktif) {
+            return false;
+        }
+
+        $indikatorInstrumens = IndikatorInstrumen::with('kriterias.instrumenProdi')
+            ->whereHas('prodis', function ($query) use ($unitKerjaId) {
+                $query->where('unit_kerja_id', $unitKerjaId);
+            })
+            ->get();
+
+        $instrumenProdiIds = $indikatorInstrumens
+            ->flatMap(fn ($indikator) => $indikator->kriterias->flatMap(fn ($kriteria) => $kriteria->instrumenProdi->pluck('id')))
+            ->unique()
+            ->values();
+
+        if ($instrumenProdiIds->isEmpty()) {
+            return false;
+        }
+
+        $completedInstrumenProdi = InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
+            ->where('periode_id', $periodeAktif->id)
+            ->whereIn('instrumen_prodi_id', $instrumenProdiIds)
+            ->whereNotNull('realisasi')
+            ->where('realisasi', '!=', '')
+            ->whereNotNull('akar_penyebab')
+            ->where('akar_penyebab', '!=', '')
+            ->whereNotNull('rencana_perbaikan')
+            ->where('rencana_perbaikan', '!=', '')
+            ->count();
+
+        return $completedInstrumenProdi === $instrumenProdiIds->count();
+    }
+
+    private function hasCurrentPerjanjianKinerja(int $unitKerjaId, ?PeriodeAktif $periodeAktif): bool
+    {
+        if (!$periodeAktif) {
+            return false;
+        }
+
+        return PerjanjianKinerja::where('auditee_id', $unitKerjaId)
+            ->where('periode_id', $periodeAktif->id)
+            ->exists();
+    }
+
     public function index(){
         $unitKerjaId = Auth::user()->unit_kerja_id;
         $periodeAktif = $this->getActivePeriode();
@@ -165,9 +211,7 @@ class AuditeePengajuanAmiController extends Controller
         $hasUnggahSiklus = false;
 
         if ($periodeAktif) {
-            $hasPerjanjianKinerja = PerjanjianKinerja::where('auditee_id', $unitKerjaId)
-                ->where('periode_id', $periodeAktif->id)
-                ->exists();
+            $hasPerjanjianKinerja = $this->hasCurrentPerjanjianKinerja($unitKerjaId, $periodeAktif);
 
             $hasPemilihanIkss = IkssAuditee::where('auditee_id', $unitKerjaId)
                 ->where('periode_id', $periodeAktif->id)
@@ -180,9 +224,7 @@ class AuditeePengajuanAmiController extends Controller
                 ->whereNotNull('rencana')
                 ->exists();
 
-            $hasPengisianInstrumenProdi = InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
-                ->where('periode_id', $periodeAktif->id)
-                ->exists();
+            $hasPengisianInstrumenProdi = $this->hasCompletedInstrumenProdi($unitKerjaId, $periodeAktif);
 
             $hasUnggahSiklus = SiklusPengajuanAmi::query()
                 ->join('pengajuan_amis as pa', 'siklus_pengajuan_amis.pengajuan_ami_id', '=', 'pa.id')
@@ -224,11 +266,12 @@ class AuditeePengajuanAmiController extends Controller
         }
 
         $request->validate([
-            'file_rtl' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
+            'file_rtl' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:350',
         ], [
             'file_rtl.required' => 'File RTL wajib diunggah.',
+            'file_rtl.file' => 'File RTL harus berupa file.',
             'file_rtl.mimes' => 'Format file RTL harus pdf/doc/docx/xls/xlsx/jpg/jpeg/png.',
-            'file_rtl.max' => 'Ukuran file RTL maksimal 10MB.',
+            'file_rtl.max' => 'Ukuran file RTL maksimal 350KB.',
         ]);
 
         $unitKerjaId = Auth::user()->unit_kerja_id;
@@ -425,6 +468,18 @@ class AuditeePengajuanAmiController extends Controller
         $periodeAktif = $this->getActivePeriode();
         if ($redirect = $this->blockIfPreviousRtlMissing($unitKerjaId, $periodeAktif)) {
             return $redirect;
+        }
+
+        if (!$this->hasCompletedInstrumenProdi($unitKerjaId, $periodeAktif)) {
+            return redirect()
+                ->route('auditee.pengajuanAmi.pengisianInstrumenProdi')
+                ->with('sequence_guard_message', 'Selesaikan Pengisian Instrumen Prodi terlebih dahulu sebelum Pemilihan IKSS.');
+        }
+
+        if (!$this->hasCurrentPerjanjianKinerja($unitKerjaId, $periodeAktif)) {
+            return redirect()
+                ->route('auditee.pengajuanAmi.perjanjianKinerja')
+                ->with('sequence_guard_message', 'Unggah Perjanjian Kinerja terlebih dahulu sebelum Pemilihan IKSS.');
         }
 
         // Check if there's already a submitted pengajuan_ami for this auditee in current period
@@ -1197,7 +1252,7 @@ class AuditeePengajuanAmiController extends Controller
             'akar_penyebab.*' => 'required|string',
             'rencana_perbaikan.*' => 'required|string',
             'bukti_file' => 'nullable|array',
-            'bukti_file.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
+            'bukti_file.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:350',
             'url_sumber.*' => 'required|string',
         ], [
             'periode_id.required' => 'Periode harus dipilih.',
@@ -1210,7 +1265,7 @@ class AuditeePengajuanAmiController extends Controller
             'rencana_perbaikan.*.required' => 'Rencana perbaikan wajib diisi.',
             'bukti_file.*.file' => 'File bukti harus berupa file.',
             'bukti_file.*.mimes' => 'Format file harus salah satu dari: pdf, doc, docx, xls, xlsx, jpg, jpeg, png.',
-            'bukti_file.*.max' => 'Ukuran file maksimal 10MB.',
+            'bukti_file.*.max' => 'Ukuran file maksimal 350KB.',
             'url_sumber.*.required' => 'URL sumber wajib diisi.',
         ]);
         if ($validator->fails()) {
@@ -1324,7 +1379,12 @@ class AuditeePengajuanAmiController extends Controller
 
         $request->validate([
             'auditee_id' => 'required',
-            'files.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
+            'files.*' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:350',
+        ], [
+            'files.*.required' => 'File wajib diunggah.',
+            'files.*.file' => 'File yang diunggah harus berupa file.',
+            'files.*.mimes' => 'Format file harus salah satu dari: pdf, doc, docx, xls, xlsx, jpg, jpeg, png.',
+            'files.*.max' => 'Ukuran file maksimal 350KB.',
         ]);
 
         // Mendapatkan periode aktif
@@ -1432,6 +1492,12 @@ class AuditeePengajuanAmiController extends Controller
             return $redirect;
         }
 
+        if (!$this->hasCurrentPerjanjianKinerja($unitKerjaId, $periodeAktif) && !$this->hasCompletedInstrumenProdi($unitKerjaId, $periodeAktif)) {
+            return redirect()
+                ->route('auditee.pengajuanAmi.pengisianInstrumenProdi')
+                ->with('sequence_guard_message', 'Selesaikan Pengisian Instrumen Prodi terlebih dahulu sebelum Perjanjian Kinerja.');
+        }
+
         // Check if there's already a submitted pengajuan_ami for this auditee in current period
         $pengajuanAmiExists = $this->isLockedByAuditorAssignment($unitKerjaId, $periodeAktif);
 
@@ -1500,6 +1566,13 @@ class AuditeePengajuanAmiController extends Controller
                 ->where('periode_id', $periodeAktif->id)
                 ->first();
 
+            if (!$existingCurrent && !$this->hasCompletedInstrumenProdi($unitKerjaId, $periodeAktif)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selesaikan Pengisian Instrumen Prodi terlebih dahulu sebelum Perjanjian Kinerja.'
+                ], 422);
+            }
+
             $previousPerjanjian = $this->getPreviousPeriodPerjanjianKinerja($unitKerjaId, $periodeAktif);
             if (!$previousPerjanjian) {
                 return response()->json([
@@ -1556,7 +1629,7 @@ class AuditeePengajuanAmiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'redirect_url' => route('auditee.pengajuanAmi.pengisianInstrumenProdi')
+                'redirect_url' => route('auditee.pengajuanAmi.pemilihanIkss')
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -1575,12 +1648,12 @@ class AuditeePengajuanAmiController extends Controller
         }
 
         $request->validate([
-            'file_perjanjian' => 'required|file|mimes:pdf|max:10240',
+            'file_perjanjian' => 'required|file|mimes:pdf|max:350',
         ], [
             'file_perjanjian.required' => 'File perjanjian kinerja wajib diunggah.',
             'file_perjanjian.file' => 'Data harus berupa file.',
             'file_perjanjian.mimes' => 'Format file harus PDF saja.',
-            'file_perjanjian.max' => 'Ukuran file maksimal 10MB.',
+            'file_perjanjian.max' => 'Ukuran file maksimal 350KB.',
         ]);
 
         try {
@@ -1603,6 +1676,17 @@ class AuditeePengajuanAmiController extends Controller
                 ->where('periode_id', $periodeAktif->id)
                 ->first();
 
+            $existingPerjanjianKinerja = PerjanjianKinerja::where('auditee_id', $unitKerjaId)
+                ->where('periode_id', $periodeAktif->id)
+                ->first();
+
+            if (!$existingPerjanjianKinerja && !$this->hasCompletedInstrumenProdi($unitKerjaId, $periodeAktif)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selesaikan Pengisian Instrumen Prodi terlebih dahulu sebelum Perjanjian Kinerja.'
+                ], 422);
+            }
+
             // Store the file
             $file = $request->file('file_perjanjian');
             $path = $file->store('perjanjian_kinerja', 'public');
@@ -1623,7 +1707,7 @@ class AuditeePengajuanAmiController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Perjanjian Kinerja berhasil diunggah!',
-                'redirect_url' => route('auditee.pengajuanAmi.pengisianInstrumenProdi')
+                'redirect_url' => route('auditee.pengajuanAmi.pemilihanIkss')
             ]);
 
         } catch (\Exception $e) {
@@ -1722,7 +1806,7 @@ class AuditeePengajuanAmiController extends Controller
             'rencana_perbaikan' => 'required|array',
             'rencana_perbaikan.*' => 'required|string',
             'bukti_file' => 'array',
-            'bukti_file.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:10240',
+            'bukti_file.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:350',
             'url_sumber.*' => 'nullable|string',
         ], [
             'periode_id.required' => 'Periode harus dipilih.',
@@ -1734,7 +1818,7 @@ class AuditeePengajuanAmiController extends Controller
             'rencana_perbaikan.*.required' => 'Rencana perbaikan wajib diisi.',
             'bukti_file.*.file' => 'File bukti harus berupa file.',
             'bukti_file.*.mimes' => 'Format file harus salah satu dari: pdf, doc, docx, xls, xlsx, jpg, jpeg, png.',
-            'bukti_file.*.max' => 'Ukuran file maksimal 10MB.',
+            'bukti_file.*.max' => 'Ukuran file maksimal 350KB.',
             'url_sumber.*.string' => 'URL sumber harus berupa string.',
         ]);
 
@@ -2006,6 +2090,24 @@ class AuditeePengajuanAmiController extends Controller
         $sizeValidation = $this->validateRequestSize($request);
         if ($sizeValidation) {
             return $sizeValidation;
+        }
+
+        $validator = Validator::make($request->all(), [
+            'dokumen' => 'nullable|array',
+            'dokumen.*' => 'nullable|array',
+            'dokumen.*.*' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:350',
+        ], [
+            'dokumen.*.*.file' => 'File bukti harus berupa file.',
+            'dokumen.*.*.mimes' => 'Format file harus salah satu dari: pdf, doc, docx, xls, xlsx, jpg, jpeg, png.',
+            'dokumen.*.*.max' => 'Ukuran file maksimal 350KB.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
         try {

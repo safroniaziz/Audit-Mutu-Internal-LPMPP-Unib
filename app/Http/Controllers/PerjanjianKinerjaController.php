@@ -26,12 +26,12 @@ class PerjanjianKinerjaController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|file|mimes:pdf,doc,docx|max:10240'
+            'file' => 'required|file|mimes:pdf,doc,docx|max:350'
         ], [
             'file.required' => 'File wajib diunggah.',
             'file.file' => 'File harus berupa dokumen.',
             'file.mimes' => 'Format file harus PDF, DOC, atau DOCX.',
-            'file.max' => 'Ukuran file maksimal 10MB.'
+            'file.max' => 'Ukuran file maksimal 350KB.'
         ]);
 
         if ($validator->fails()) {

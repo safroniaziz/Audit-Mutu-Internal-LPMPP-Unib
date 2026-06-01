@@ -381,7 +381,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pengisian Instrumen Prodi, dan Pemilihan IKSS) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Pengisian Instrumen Prodi, Perjanjian Kinerja, dan Pemilihan IKSS) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
@@ -480,7 +480,7 @@
                     <i class="bi {{ $isAllCompleted ? 'bi-check-circle-fill fs-2 text-success' : 'bi-exclamation-triangle-fill fs-2 text-danger' }}"></i>
                 </div>
                 <div class="flex-grow-1">
-                    <h4 class="fw-bold text-dark mb-2">{{ $isAllCompleted ? '✨ Pengisian Instrumen Selesai' : '📝 Pengisian Instrumen' }}</h4>
+                    <h4 class="fw-bold text-dark mb-2">{{ $isAllCompleted ? '✨ Pengisian Indikator Selesai' : '📝 Pengisian Indikator' }}</h4>
                     <div class="fs-6 text-gray-700">
                         <p class="mt-4">
                             <strong>{{ $isAllCompleted ? 'Selamat!' : 'Status:' }}</strong>
@@ -561,7 +561,7 @@
             <!-- Progress Bar -->
             <div class="d-flex flex-column mb-10">
                 <div class="d-flex align-items-center mb-2">
-                    <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Instrumen</span>
+                    <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Indikator</span>
                 </div>
                 <div class="d-flex align-items-center mb-2">
                     <span class="fs-6 fw-semibold text-gray-600">

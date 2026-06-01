@@ -356,7 +356,7 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data Pengisian Instrumen Prodi selama belum ada penugasan auditor untuk periode ini. Setelah tahap ini selesai, lanjutkan ke Perjanjian Kinerja.
                                 </span>
                             </p>
                         </div>
@@ -409,7 +409,7 @@
                             <strong>{{ $isAllCompleted ? 'Selamat!' : 'Status:' }}</strong>
                             <span class="fw-semibold {{ $isAllCompleted ? 'text-success' : 'text-danger' }}">
                                 @if($isAllCompleted)
-                                    Semua instrumen prodi telah diisi dengan lengkap. Silakan lanjut ke tahap Pemilihan IKSS.
+                                    Semua instrumen prodi telah diisi dengan lengkap. Silakan lanjut ke tahap Perjanjian Kinerja.
                                 @else
                                     {{ $completedInstrumen }} dari {{ $totalInstrumen }} instrumen prodi telah diisi. Silakan lengkapi pengisian instrumen prodi yang tersisa.
                                 @endif
@@ -420,12 +420,12 @@
 
                 <div class="ms-auto d-flex gap-2">
                     @if (!$pengajuanAmiExists)
-                        <a href="{{ route('auditee.pengajuanAmi.perjanjianKinerja') }}" class="btn btn-sm btn-light-primary px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Perjanjian Kinerja
+                        <a href="{{ route('auditee.pengajuanAmi') }}" class="btn btn-sm btn-light-primary px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Kembali ke Dashboard
                         </a>
                     @endif
                     @if ($isAllCompleted)
-                        <a href="{{ route('auditee.pengajuanAmi.pemilihanIkss') }}" class="btn btn-sm px-4 btn-success">
+                        <a href="{{ route('auditee.pengajuanAmi.perjanjianKinerja') }}" class="btn btn-sm px-4 btn-success">
                             <i class="fas fa-arrow-right me-2"></i> Proses Selanjutnya
                         </a>
                     @else
@@ -521,7 +521,7 @@
                 <!-- Progress Bar -->
                 <div class="d-flex flex-column mb-10">
                     <div class="d-flex align-items-center mb-2">
-                        <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Instrumen</span>
+                        <span class="fs-4 fw-bold text-gray-800 me-2">Progress Pengisian Indikator</span>
                     </div>
                     <div class="d-flex align-items-center mb-2">
                         <span class="fs-6 fw-semibold text-gray-600">
@@ -637,8 +637,8 @@
                                                                             </div>
                                                                         @endif
                                                                         <div class="mt-2">
-                                                                            <input type="file" name="dokumen[{{ $instrumenProdi->id }}][]" class="form-control">
-                                                                            <div class="form-text text-muted italic text-xs">Upload file bukti disini (PDF, DOC, DOCX, XLS, XLSX)</div>
+                                                                            <input type="file" name="dokumen[{{ $instrumenProdi->id }}][]" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+                                                                            <div class="form-text text-muted italic text-xs">Upload file bukti disini (PDF, DOC, DOCX, XLS, XLSX, JPG, PNG; maks. 350KB)</div>
                                                                         </div>
 
                                                                         <div class="mt-3">
@@ -761,6 +761,15 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+    @if (session('sequence_guard_message'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tahapan Belum Selesai',
+            text: @json(session('sequence_guard_message')),
+            confirmButtonText: 'OK'
+        });
+    @endif
+
     const wizardNav = $('.wizard-nav');
     let isDraggingNav = false;
     let navStartX = 0;
@@ -941,6 +950,23 @@ $(document).ready(function() {
             Swal.fire({
                 title: 'Form Belum Lengkap',
                 text: 'Mohon lengkapi semua field yang wajib diisi (Realisasi, Akar Penyebab, Rencana Perbaikan)',
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        let oversizedFile = null;
+        form.find('input[type="file"]').each(function() {
+            const files = Array.from(this.files || []);
+            oversizedFile = files.find(file => file.size > 350 * 1024);
+            return !oversizedFile;
+        });
+
+        if (oversizedFile) {
+            Swal.fire({
+                title: 'File Terlalu Besar',
+                text: `File "${oversizedFile.name}" melebihi batas maksimal 350KB.`,
                 icon: 'warning',
                 confirmButtonText: 'OK'
             });

@@ -160,7 +160,7 @@
                                         <div class="col-lg-8">
                                             <label class="form-label fw-semibold">Dokumen RTL</label>
                                             <input type="file" name="file_rtl" id="fileRtlPrevious" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" required>
-                                            <small class="text-muted">Format: PDF/DOC/DOCX/XLS/XLSX/JPG/PNG, max 10MB.</small>
+                                            <small class="text-muted">Format: PDF/DOC/DOCX/XLS/XLSX/JPG/PNG, max 350KB.</small>
                                         </div>
                                         <div class="col-lg-4 d-flex gap-2">
                                             <button type="submit" class="btn btn-warning w-100" id="btnUploadRtlPrevious">
@@ -225,10 +225,10 @@
                             $steps = [
                                 ['key' => 'profil', 'label' => 'Profil'],
                                 ['key' => 'rtl_sebelumnya', 'label' => 'RTL Periode Sebelumnya'],
-                                ['key' => 'perjanjian_kinerja', 'label' => 'Perjanjian Kinerja'],
                                 ['key' => 'pengisian_instrumen_prodi', 'label' => 'Pengisian Instrumen Prodi'],
+                                ['key' => 'perjanjian_kinerja', 'label' => 'Perjanjian Kinerja'],
                                 ['key' => 'pemilihan_ikss', 'label' => 'Pemilihan IKSS'],
-                                ['key' => 'pengisian_instrumen', 'label' => 'Pengisian Instrumen'],
+                                ['key' => 'pengisian_instrumen', 'label' => 'Pengisian Indikator'],
                                 ['key' => 'unggah_siklus', 'label' => 'Unggah Siklus'],
                             ];
                         @endphp
@@ -352,11 +352,11 @@
                                             </span>
                                         @elseif(isset($hasPreviousRtl) && !$hasPreviousRtl)
                                             <span class="fw-semibold text-danger">
-                                                Unggah dokumen RTL periode sebelumnya ({{ $previousPeriodeLabel ?? 'periode sebelumnya' }}) terlebih dahulu. Tahapan Perjanjian Kinerja, Pengisian Instrumen Prodi, Pemilihan IKSS, Pengisian Instrumen, dan Unggah Siklus akan terkunci.
+                                                Unggah dokumen RTL periode sebelumnya ({{ $previousPeriodeLabel ?? 'periode sebelumnya' }}) terlebih dahulu. Tahapan Pengisian Instrumen Prodi, Perjanjian Kinerja, Pemilihan IKSS, Pengisian Indikator, dan Unggah Siklus akan terkunci.
                                             </span>
                                         @else
                                             <span class="fw-semibold text-success">
-                                                Profil Anda sudah lengkap. Silakan klik tombol "Proses Selanjutnya" untuk mengunggah Perjanjian Kinerja.
+                                                Profil Anda sudah lengkap. Silakan klik tombol "Proses Selanjutnya" untuk mengisi Instrumen Prodi.
                                             </span>
                                         @endif
                                     </p>
@@ -367,7 +367,7 @@
                                 @php
                                     $canProceed = $completionPercentage >= 100 && (isset($hasPreviousRtl) ? $hasPreviousRtl : true);
                                 @endphp
-                                <a href="{{ route('auditee.pengajuanAmi.perjanjianKinerja') }}"
+                                <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumenProdi') }}"
                                    class="btn btn-sm px-4 {{ $canProceed ? 'btn-primary' : 'btn-secondary disabled' }}"
                                    style="{{ $canProceed ? '' : 'pointer-events: none; opacity: 0.7;' }}"
                                 >
@@ -621,6 +621,17 @@
 
             $('#uploadRtlPreviousForm').on('submit', function(event) {
                 event.preventDefault();
+
+                const rtlFile = $('#fileRtlPrevious')[0]?.files?.[0];
+                if (rtlFile && rtlFile.size > 350 * 1024) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Terlalu Besar',
+                        text: 'Ukuran file maksimal 350KB.',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
 
                 const formData = new FormData(this);
                 const submitBtn = $('#btnUploadRtlPrevious');

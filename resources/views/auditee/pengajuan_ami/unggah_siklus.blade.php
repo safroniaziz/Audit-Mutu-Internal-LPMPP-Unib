@@ -114,14 +114,14 @@
                             <p class="mt-2">
                                 <strong>Informasi:</strong>
                                 <span class="fw-semibold text-info">
-                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Perjanjian Kinerja, Pengisian Instrumen Prodi, Pemilihan IKSS, dan Pengisian Instrumen) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
+                                    Anda masih dapat mengubah dan memperbarui data pada tahap sebelumnya (Pengisian Instrumen Prodi, Perjanjian Kinerja, Pemilihan IKSS, dan Pengisian Indikator) selama belum ada penugasan auditor untuk periode ini. Gunakan tombol navigasi untuk kembali ke tahap sebelumnya jika diperlukan.
                                 </span>
                             </p>
                         </div>
                     </div>
                     <div class="ms-auto">
                         <a href="{{ route('auditee.pengajuanAmi.pengisianInstrumen') }}" class="btn btn-sm btn-light-primary px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Pengisian Instrumen
+                            <i class="fas fa-arrow-left me-2"></i>Pengisian Indikator
                         </a>
                     </div>
                 </div>
@@ -178,9 +178,9 @@
                                                         <button type="button" id="browseFilesBtn" class="btn btn-sm btn-primary" @if($siklus && isset($siklus->is_desetujui) && $siklus->is_desetujui) disabled @endif>
                                                             <i class="bi bi-folder2-open me-2"></i>Pilih File
                                                         </button>
-                                                        <input type="file" name="files[]" id="fileInput" multiple style="display: none;" @if($siklus && isset($siklus->is_desetujui) && $siklus->is_desetujui) disabled @endif>
+                                                        <input type="file" name="files[]" id="fileInput" multiple style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" @if($siklus && isset($siklus->is_desetujui) && $siklus->is_desetujui) disabled @endif>
                                                         <p class="text-gray-500 mt-3 mb-0">
-                                                            <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 10MB per file)</small>
+                                                            <small>Format yang didukung: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Maks. 350KB per file)</small>
                                                         </p>
                                                     </div>
                                                     <div class="file-list" id="fileList">
@@ -268,8 +268,8 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // File size validation (10MB)
-            const MAX_FILE_SIZE = 10 * 1024 * 1024;
+            // File size validation (350KB)
+            const MAX_FILE_SIZE = 350 * 1024;
             // Allowed file types
             const ALLOWED_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                                 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -339,7 +339,7 @@
 
                     // Validate file size
                     if (file.size > MAX_FILE_SIZE) {
-                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 10MB.`);
+                        toastr.error(`File "${file.name}" terlalu besar. Ukuran maksimum adalah 350KB.`);
                         continue;
                     }
 
