@@ -112,7 +112,7 @@
             <div class="col-12">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header border-0 pt-5">
-                        <h4 class="card-title fw-bold">Detail Indikator Bermasalah per Prodi</h4>
+                        <h4 class="card-title fw-bold">Detail Indikator Belum Mencapai Threshold</h4>
                     </div>
                     <div class="card-body pt-2">
                         @php
@@ -135,6 +135,7 @@
                                         <th class="text-center">Kurang</th>
                                         <th class="text-center">Status</th>
                                         <th>Prodi yang Mendapatkan</th>
+                                        <th class="text-end">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -160,10 +161,47 @@
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-icon btn-light-danger toggle-monitoring" data-target="#monitoring-{{ $loop->index }}" title="Isi Monitoring & RTL">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr id="monitoring-{{ $loop->index }}" class="collapse-row d-none bg-light-danger bg-opacity-10">
+                                            <td colspan="8" class="p-5">
+                                                <form class="monitoring-form" data-kriteria-id="{{ $row['kriteria_id'] }}">
+                                                    <div class="row g-4">
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold fs-7 text-gray-800">Monitoring 1</label>
+                                                            <textarea name="monitoring_1" class="form-control form-control-solid" rows="3" placeholder="Isi monitoring 1...">{{ $row['monitoring_1'] }}</textarea>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold fs-7 text-gray-800">Monitoring 2</label>
+                                                            <textarea name="monitoring_2" class="form-control form-control-solid" rows="3" placeholder="Isi monitoring 2...">{{ $row['monitoring_2'] }}</textarea>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold fs-7 text-gray-800">Monitoring 3</label>
+                                                            <textarea name="monitoring_3" class="form-control form-control-solid" rows="3" placeholder="Isi monitoring 3...">{{ $row['monitoring_3'] }}</textarea>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold fs-7 text-gray-800">Hasil RTL</label>
+                                                            <textarea name="hasil_rtl" class="form-control form-control-solid" rows="3" placeholder="Isi hasil RTL...">{{ $row['hasil_rtl'] }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex justify-content-end mt-4">
+                                                        <button type="button" class="btn btn-sm btn-light-danger btn-delete-monitoring me-2">
+                                                            <i class="fas fa-trash me-1"></i> Hapus
+                                                        </button>
+                                                        <button type="submit" class="btn btn-sm btn-primary btn-save-monitoring">
+                                                            <i class="fas fa-save me-1"></i> Simpan
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="7" class="text-center text-success py-6">Tidak ada indikator yang berada di bawah threshold.</td>
+                                            <td colspan="8" class="text-center text-success py-6">Tidak ada indikator yang berada di bawah threshold.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -309,6 +347,125 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Toggle monitoring form
+    $('.toggle-monitoring').on('click', function() {
+        const target = $(this).data('target');
+        $(target).toggleClass('d-none');
+        $(this).toggleClass('btn-light-danger btn-danger');
+        $(this).find('i').toggleClass('fa-edit fa-chevron-up');
+    });
+
+    // Save monitoring data via AJAX
+    $('.monitoring-form').on('submit', function(e) {
+        e.preventDefault();
+        const form = $(this);
+        const submitBtn = form.find('.btn-save-monitoring');
+        const kriteriaId = form.data('kriteria-id');
+
+        submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Menyimpan...');
+
+        $.ajax({
+            url: "{{ route('indikatorRtm.saveMonitoring') }}",
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                fakultas: "{{ $fakultas }}",
+                period_id: "{{ $periodId }}",
+                kriteria_id: kriteriaId,
+                monitoring_1: form.find('textarea[name="monitoring_1"]').val(),
+                monitoring_2: form.find('textarea[name="monitoring_2"]').val(),
+                monitoring_3: form.find('textarea[name="monitoring_3"]').val(),
+                hasil_rtl: form.find('textarea[name="hasil_rtl"]').val()
+            },
+            success: function(response) {
+                submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan');
+                if (response.success) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: response.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: response.message || 'Terjadi kesalahan.',
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function(xhr) {
+                submitBtn.prop('disabled', false).html('<i class="fas fa-save me-1"></i> Simpan');
+                Swal.fire({
+                    title: 'Gagal!',
+                    text: xhr.responseJSON?.message || 'Gagal menyimpan data monitoring.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    // Delete monitoring data via AJAX
+    $('.btn-delete-monitoring').on('click', function() {
+        const deleteBtn = $(this);
+        const form = deleteBtn.closest('form');
+        const kriteriaId = form.data('kriteria-id');
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: 'Data monitoring dan RTL untuk indikator ini akan dihapus!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Menghapus...');
+                $.ajax({
+                    url: "{{ route('indikatorRtm.deleteMonitoring') }}",
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        fakultas: "{{ $fakultas }}",
+                        period_id: "{{ $periodId }}",
+                        kriteria_id: kriteriaId
+                    },
+                    success: function(response) {
+                        deleteBtn.prop('disabled', false).html('<i class="fas fa-trash me-1"></i> Hapus');
+                        if (response.success) {
+                            form.find('textarea').val(''); // Clear all textareas
+                            Swal.fire({
+                                title: 'Terhapus!',
+                                text: response.message,
+                                icon: 'success',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: response.message || 'Terjadi kesalahan.',
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        deleteBtn.prop('disabled', false).html('<i class="fas fa-trash me-1"></i> Hapus');
+                        Swal.fire({
+                            title: 'Gagal!',
+                            text: xhr.responseJSON?.message || 'Gagal menghapus data monitoring.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    });
 });
 </script>
 @endpush

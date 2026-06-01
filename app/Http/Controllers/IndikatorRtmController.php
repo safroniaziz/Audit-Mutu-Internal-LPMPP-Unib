@@ -289,6 +289,7 @@ class IndikatorRtmController extends Controller
                     $key = ($lam['nama'] ?? '-') . '||' . ($row['kode'] ?? '-') . '||' . ($row['nama'] ?? '-');
                     if (!isset($indikatorAgg[$key])) {
                         $indikatorAgg[$key] = [
+                            'kriteria_id' => $row['id'],
                             'lam_nama' => $lam['nama'] ?? '-',
                             'threshold' => (float) ($row['threshold'] ?? self::THRESHOLD),
                             'indikator_kode' => $row['kode'] ?? null,
@@ -315,8 +316,13 @@ class IndikatorRtmController extends Controller
             }
         }
 
+        $monitoringData = \App\Models\RtmMonitoringFakultas::where('fakultas', $fakultas)
+            ->where('periode_id', $periodId)
+            ->get()
+            ->keyBy('kriteria_id');
+
         $indikatorFakultas = collect($indikatorAgg)
-            ->map(function ($item) {
+            ->map(function ($item) use ($monitoringData) {
                 $item['prodi_mendapatkan'] = array_values($item['prodi_mendapatkan']);
                 $item['prodi_bawah'] = array_values($item['prodi_bawah']);
                 $item['nilai_rata_rata'] = $item['total_penilaian'] > 0
@@ -329,6 +335,15 @@ class IndikatorRtmController extends Controller
                 $item['persen_bawah'] = $item['total_penilaian'] > 0
                     ? round(($item['total_bawah'] / $item['total_penilaian']) * 100, 1)
                     : 0;
+
+                // Bind monitoring data
+                $kriteriaId = $item['kriteria_id'] ?? null;
+                $mon = $monitoringData->get($kriteriaId);
+                $item['monitoring_1'] = $mon ? $mon->monitoring_1 : null;
+                $item['monitoring_2'] = $mon ? $mon->monitoring_2 : null;
+                $item['monitoring_3'] = $mon ? $mon->monitoring_3 : null;
+                $item['hasil_rtl'] = $mon ? $mon->hasil_rtl : null;
+
                 return $item;
             })
             ->sortByDesc('total_bawah')
@@ -355,6 +370,85 @@ class IndikatorRtmController extends Controller
             'totalBawahThreshold' => $rtmData->sum('total_bawah_threshold'),
             'totalMinimalThreshold' => $rtmData->sum('total_minimal_threshold'),
         ]);
+    }
+
+    public function saveMonitoring(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'fakultas' => 'required|string',
+            'period_id' => 'required|integer',
+            'kriteria_id' => 'required|integer',
+            'monitoring_1' => 'nullable|string',
+            'monitoring_2' => 'nullable|string',
+            'monitoring_3' => 'nullable|string',
+            'hasil_rtl' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+            ], 422);
+        }
+
+        try {
+            $monitoring = \App\Models\RtmMonitoringFakultas::updateOrCreate(
+                [
+                    'fakultas' => $request->fakultas,
+                    'periode_id' => $request->period_id,
+                    'kriteria_id' => $request->kriteria_id,
+                ],
+                [
+                    'monitoring_1' => $request->monitoring_1,
+                    'monitoring_2' => $request->monitoring_2,
+                    'monitoring_3' => $request->monitoring_3,
+                    'hasil_rtl' => $request->hasil_rtl,
+                ]
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data monitoring berhasil disimpan.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function deleteMonitoring(Request $request)
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'fakultas' => 'required|string',
+            'period_id' => 'required|integer',
+            'kriteria_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal: ' . implode(', ', $validator->errors()->all())
+            ], 422);
+        }
+
+        try {
+            \App\Models\RtmMonitoringFakultas::where('fakultas', $request->fakultas)
+                ->where('periode_id', $request->period_id)
+                ->where('kriteria_id', $request->kriteria_id)
+                ->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data monitoring berhasil dihapus.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function detailLam(Request $request)

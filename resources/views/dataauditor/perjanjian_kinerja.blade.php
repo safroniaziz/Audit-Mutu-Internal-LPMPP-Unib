@@ -119,37 +119,50 @@
                         $deskApproved = (bool)($currentAuditor->is_setuju ?? false);
                         $isPenilaianProdiApproved = (bool)($isPenilaianProdiApproved ?? false);
                     @endphp
-                    @if(isset($auditess->audit_status))
-                        @if($auditess->audit_status['status'] === 'completed')
-                            <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-info btn-xs">
-                                <i class="ki-duotone ki-document fs-3 me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                                Lihat Hasil Audit
-                            </a>
-                        @elseif($auditess->audit_status['status'] === 'visitasi_waiting')
-                            @if(!$isPenilaianProdiApproved)
-                                <a href="{{ route('auditor.audit.penilaianInstrumenProdi',[$auditess->id]) }}" class="btn btn-primary btn-xs">
-                                    <i class="fas fa-arrow-right fs-3 me-2"></i>
-                                    Lanjut ke Penilaian Instrumen Prodi
-                                </a>
+                    @if(isset($auditess->audit_status) && $auditess->audit_status['status'] === 'completed')
+                        <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-info btn-xs">
+                            <i class="ki-duotone ki-document fs-3 me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            Lihat Hasil Audit
+                        </a>
+                    @elseif(!$isPenilaianProdiApproved)
+                        <a href="{{ route('auditor.audit.penilaianInstrumenProdi',[$auditess->id]) }}" class="btn btn-success btn-xs">
+                            <i class="ki-duotone ki-rocket fs-3 me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            @if(isset($auditess->audit_status) && $auditess->audit_status['status'] !== 'new')
+                                Lanjutkan Penilaian Instrumen Prodi
                             @else
+                                Mulai Penilaian Instrumen Prodi
+                            @endif
+                        </a>
+                    @elseif(!$deskApproved)
+                        <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-success btn-xs">
+                            <i class="ki-duotone ki-rocket fs-3 me-2">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                            Lanjutkan Desk Evaluation
+                        </a>
+                    @else
+                        @if(isset($auditess->audit_status))
+                            @if($auditess->audit_status['status'] === 'visitasi_waiting')
                                 <button class="btn btn-warning btn-xs" disabled>
                                     <i class="fas fa-clock fs-3 me-2"></i>
                                     Menunggu Jadwal Visitasi
                                 </button>
-                            @endif
-                        @elseif($auditess->audit_status['status'] === 'visitasi_expired')
-                            <button class="btn btn-danger btn-xs" disabled>
-                                <i class="fas fa-exclamation-triangle fs-3 me-2"></i>
-                                Jadwal Visitasi Berakhir
-                            </button>
-                        @elseif($auditess->audit_status['status'] === 'visitasi_ready')
-                            @if(!$isPenilaianProdiApproved)
-                                <a href="{{ route('auditor.audit.penilaianInstrumenProdi',[$auditess->id]) }}" class="btn btn-success btn-xs">
-                                    <i class="fas fa-file-alt fs-3 me-2"></i>
-                                    Mulai Penilaian Instrumen Prodi
+                            @elseif($auditess->audit_status['status'] === 'visitasi_expired')
+                                <button class="btn btn-danger btn-xs" disabled>
+                                    <i class="fas fa-exclamation-triangle fs-3 me-2"></i>
+                                    Jadwal Visitasi Berakhir
+                                </button>
+                            @elseif($auditess->audit_status['status'] === 'visitasi_ready')
+                                <a href="{{ route('auditor.audit.visitasi',[$auditess->id]) }}" class="btn btn-success btn-xs">
+                                    <i class="fas fa-clipboard-list fs-3 me-2"></i>
+                                    Mulai Visitasi
                                 </a>
                             @else
                                 <a href="{{ route('auditor.audit.visitasi',[$auditess->id]) }}" class="btn btn-success btn-xs">
@@ -157,31 +170,12 @@
                                     Mulai Visitasi
                                 </a>
                             @endif
-                        @elseif($auditess->audit_status['status'] !== 'new')
-                            <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-warning btn-xs">
-                                <i class="ki-duotone ki-document fs-3 me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                                Lanjutkan Audit
-                            </a>
                         @else
-                            <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-success btn-xs">
-                                <i class="ki-duotone ki-rocket fs-3 me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                                Mulai Proses Audit
+                            <a href="{{ route('auditor.audit.visitasi',[$auditess->id]) }}" class="btn btn-success btn-xs">
+                                <i class="fas fa-clipboard-list fs-3 me-2"></i>
+                                Mulai Visitasi
                             </a>
                         @endif
-                    @else
-                        <a href="{{ route('auditor.audit.deskEvaluation',[$auditess->id]) }}" class="btn btn-success btn-xs">
-                            <i class="ki-duotone ki-rocket fs-3 me-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                            Mulai Proses Audit
-                        </a>
                     @endif
                 </div>
             </div>

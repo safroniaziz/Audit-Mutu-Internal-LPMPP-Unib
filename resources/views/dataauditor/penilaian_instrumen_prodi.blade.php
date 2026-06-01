@@ -556,9 +556,9 @@
 @section('dashboardProfile')
     <!-- Back Button -->
     <div class="mb-5">
-        <a href="{{ route('auditor.audit.deskEvaluation', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
+        <a href="{{ route('auditor.audit.perjanjianKinerja', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>
-            Kembali ke Desk Evaluation
+            Kembali ke Perjanjian Kinerja
         </a>
     </div>
 
@@ -605,8 +605,8 @@
                     @if($currentAuditor)
                         @if($isAllCompleted)
                             @if($isPenilaianProdiApproved)
-                                <a href="{{ route('auditor.audit.visitasi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Visitasi
+                                <a href="{{ route('auditor.audit.deskEvaluation', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Desk Evaluation
                                 </a>
                                 @if($hasPendingResetRequest)
                                     <button type="button" class="btn btn-sm px-4 btn-warning" disabled>
@@ -1167,8 +1167,8 @@
                                 text: 'Penilaian Instrumen Prodi berhasil disetujui.',
                                 icon: 'success'
                             }).then(() => {
-                                // After approval, go to visitasi (next step)
-                                window.location.href = '{{ route("auditor.audit.visitasi", $pengajuan->id) }}';
+                                // After approval, go to desk evaluation (next step)
+                                window.location.href = '{{ route("auditor.audit.deskEvaluation", $pengajuan->id) }}';
                             });
                         } else {
                             Swal.fire({
@@ -1218,10 +1218,10 @@
                                 title: 'Disetujui!',
                                 text: 'Penilaian Instrumen Prodi berhasil disetujui.',
                                 icon: 'success'
-                                                    }).then(() => {
-                            // After approval, always go to visitasi (next step)
-                            window.location.href = '{{ route("auditor.audit.visitasi", $pengajuan->id) }}';
-                        });
+                            }).then(() => {
+                                // After approval, always go to desk evaluation (next step)
+                                window.location.href = '{{ route("auditor.audit.deskEvaluation", $pengajuan->id) }}';
+                            });
                         } else {
                             Swal.fire({
                                 title: 'Gagal!',

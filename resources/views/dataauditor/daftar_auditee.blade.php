@@ -452,17 +452,12 @@
                                     <div class="d-flex gap-2">
                                         @php
                                             $currentAuditor = collect($auditee->auditors)->where('user_id', Auth::user()->id)->first();
+                                            $prodiApproved = (bool)($currentAuditor->is_setuju_indikator_prodi ?? false);
                                             $deskApproved = (bool)($currentAuditor->is_setuju ?? false);
-                                            $statusVisitasiWaiting = is_array($auditee->audit_status ?? null) && (($auditee->audit_status['status'] ?? null) === 'visitasi_waiting');
+                                            $visitasiApproved = (bool)($currentAuditor->is_setuju_visitasi ?? false);
                                         @endphp
 
-                                        @if($statusVisitasiWaiting && !$deskApproved)
-                                            <a href="{{ route('auditor.audit.deskEvaluation', $auditee->id) }}"
-                                               class="btn btn-sm btn-primary flex-grow-1">
-                                                <i class="fas fa-arrow-right me-1"></i>
-                                                Lanjut ke Desk Evaluation
-                                            </a>
-                                        @elseif(!$auditee->is_audit_period_active)
+                                        @if(!$auditee->is_audit_period_active)
                                             <button class="btn btn-sm btn-secondary flex-grow-1" disabled>
                                                 <i class="fas fa-calendar-times me-1"></i>
                                                 @if($auditee->audit_period_status === 'not_started')
@@ -475,17 +470,35 @@
                                                     Jadwal Audit Tidak Tersedia
                                                 @endif
                                             </button>
+                                        @elseif($auditee->overall_audit_status === 'new')
+                                            <a href="{{ route('auditor.audit.perjanjianKinerja', $auditee->id) }}"
+                                               class="btn btn-sm btn-primary flex-grow-1">
+                                                <i class="fas fa-arrow-right me-1"></i>
+                                                Mulai Audit
+                                            </a>
+                                        @elseif(!$prodiApproved)
+                                            <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $auditee->id) }}"
+                                               class="btn btn-sm btn-primary flex-grow-1">
+                                                <i class="fas fa-arrow-right me-1"></i>
+                                                Lanjut ke Penilaian Instrumen Prodi
+                                            </a>
+                                        @elseif(!$deskApproved)
+                                            <a href="{{ route('auditor.audit.deskEvaluation', $auditee->id) }}"
+                                               class="btn btn-sm btn-primary flex-grow-1">
+                                                <i class="fas fa-arrow-right me-1"></i>
+                                                Lanjut ke Desk Evaluation
+                                            </a>
+                                        @elseif(!$visitasiApproved)
+                                            <a href="{{ route('auditor.audit.visitasi', $auditee->id) }}"
+                                               class="btn btn-sm btn-primary flex-grow-1">
+                                                <i class="fas fa-arrow-right me-1"></i>
+                                                Lanjut ke Visitasi
+                                            </a>
                                         @else
                                             <a href="{{ route('auditor.audit.perjanjianKinerja', $auditee->id) }}"
-                                               class="btn btn-sm btn-{{ $auditee->overall_audit_status === 'new' ? 'primary' : 'light-primary' }} flex-grow-1">
-                                                <i class="fas fa-{{ $auditee->overall_audit_status === 'new' ? 'arrow-right' : 'file-alt' }} me-1"></i>
-                                                @if($auditee->overall_audit_status === 'new')
-                                                    Mulai Audit
-                                                @elseif($auditee->overall_audit_status === 'completed')
-                                                    Lihat Hasil
-                                                @else
-                                                    Lanjutkan
-                                                @endif
+                                               class="btn btn-sm btn-light-primary flex-grow-1">
+                                                <i class="fas fa-file-alt me-1"></i>
+                                                Lihat Hasil
                                             </a>
                                         @endif
                                     </div>

@@ -299,9 +299,9 @@
 @section('dashboardProfile')
     <!-- Back Button -->
     <div class="mb-5">
-        <a href="{{ route('auditor.audit.perjanjianKinerja', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
+        <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>
-            Kembali ke Perjanjian Kinerja
+            Kembali ke Penilaian Instrumen Prodi
         </a>
     </div>
 
@@ -354,8 +354,8 @@
                     <div class="ms-auto">
                         @if($allCompleted)
                             @if($setuju)
-                                <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
-                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Penilaian Instrumen Prodi
+                                <a href="{{ route('auditor.audit.visitasi', $pengajuan->id) }}" class="btn btn-sm px-4 btn-success">
+                                    <i class="fas fa-arrow-right me-2"></i> Lanjut ke Visitasi
                                 </a>
                             @else
                                 <button type="button" class="btn btn-sm px-4 btn-success" id="approve-desk-btn" data-id="{{ $pengajuan->id }}">

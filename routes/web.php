@@ -352,6 +352,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('indikator-rtm')->name('indikatorRtm.')->group(function () {
             Route::get('/', [IndikatorRtmController::class, 'index'])->name('index');
             Route::get('/fakultas/detail', [IndikatorRtmController::class, 'detailFakultas'])->name('detailFakultas');
+            Route::post('/fakultas/save-monitoring', [IndikatorRtmController::class, 'saveMonitoring'])->name('saveMonitoring');
+            Route::post('/fakultas/delete-monitoring', [IndikatorRtmController::class, 'deleteMonitoring'])->name('deleteMonitoring');
             Route::get('/lam/detail', [IndikatorRtmController::class, 'detailLam'])->name('detailLam');
             Route::get('/{pengajuan}/detail', [IndikatorRtmController::class, 'detail'])->whereNumber('pengajuan')->name('detail');
         });

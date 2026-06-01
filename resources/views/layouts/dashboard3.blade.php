@@ -530,12 +530,12 @@
                                                             <i class="fas fa-user-check me-2"></i> Perjanjian Kinerja
                                                         </a>
                                                     </li>
+                                                    @yield('menuPenilaianInstrumenProdi')
                                                     <li class="nav-item mt-2">
                                                         <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.deskEvaluation') ? 'active' : '' }}">
                                                             <i class="fas fa-clipboard-check me-2"></i> Desk Evaluation
                                                         </a>
                                                     </li>
-                                                    @yield('menuPenilaianInstrumenProdi')
                                                     <li class="nav-item mt-2">
                                                         <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.visitasi') ? 'active' : '' }}">
                                                             <i class="fas fa-map-marker-alt me-2"></i> Visitasi

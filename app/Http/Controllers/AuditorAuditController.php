@@ -258,6 +258,15 @@ class AuditorAuditController extends Controller
 
     public function deskEvaluation(PengajuanAmi $pengajuan)
     {
+        $penugasanAuditor = PenugasanAuditor::where('pengajuan_ami_id', $pengajuan->id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
+            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Desk Evaluation.');
+        }
+
         $dataIkss = IkssAuditee::with(['instrumen.indikatorKinerja'])
                         ->where('auditee_id', $pengajuan->auditee_id)
                         ->where('periode_id', $pengajuan->periode_id)
@@ -325,6 +334,17 @@ class AuditorAuditController extends Controller
                 'status' => 'error',
                 'errors' => $validator->errors()
             ], 422);
+        }
+
+        $penugasanAuditor = PenugasanAuditor::where('pengajuan_ami_id', $request->pengajuan_id)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Desk Evaluation.'
+            ], 403);
         }
 
         try {
@@ -419,6 +439,11 @@ class AuditorAuditController extends Controller
         // Cek apakah ada auditor yang sesuai dengan user yang sedang login
         $auditor = $penugasanAuditor->auditors->firstWhere('user_id', Auth::user()->id);
 
+        if (!$auditor || !(bool) $auditor->is_setuju_indikator_prodi) {
+            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum menyetujui Desk Evaluation.');
+        }
+
         if ($auditor) {
             // Update kolom 'is_setujui' menjadi true
             $auditor->update([
@@ -435,9 +460,9 @@ class AuditorAuditController extends Controller
             ->where('user_id', Auth::id())
             ->first();
 
-        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
-            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
-                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Visitasi.');
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju) {
+            return redirect()->route('auditor.audit.deskEvaluation', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Desk Evaluation terlebih dahulu sebelum Visitasi.');
         }
 
         // Check visitasi time validation
@@ -554,10 +579,10 @@ class AuditorAuditController extends Controller
             ->where('user_id', Auth::id())
             ->first();
 
-        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju_indikator_prodi) {
+        if (!$penugasanAuditor || !(bool) $penugasanAuditor->is_setuju) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum Visitasi.'
+                'message' => 'Selesaikan dan setujui Desk Evaluation terlebih dahulu sebelum Visitasi.'
             ], 403);
         }
 
@@ -652,9 +677,9 @@ class AuditorAuditController extends Controller
         // Cek apakah ada auditor yang sesuai dengan user yang sedang login
         $auditor = $penugasanAuditor->auditors->firstWhere('user_id', Auth::user()->id);
 
-        if (!$auditor || !(bool) $auditor->is_setuju_indikator_prodi) {
-            return redirect()->route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id)
-                ->with('error', 'Selesaikan dan setujui Penilaian Instrumen Prodi terlebih dahulu sebelum menyetujui Visitasi.');
+        if (!$auditor || !(bool) $auditor->is_setuju) {
+            return redirect()->route('auditor.audit.deskEvaluation', $pengajuan->id)
+                ->with('error', 'Selesaikan dan setujui Desk Evaluation terlebih dahulu sebelum menyetujui Visitasi.');
         }
 
         if ($auditor) {
