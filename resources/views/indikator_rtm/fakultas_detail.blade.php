@@ -405,7 +405,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             }
         });
-    }
+    });
 
     // Delete monitoring data via AJAX
     $('.btn-delete-monitoring').on('click', function() {
