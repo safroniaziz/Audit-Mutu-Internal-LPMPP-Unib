@@ -337,10 +337,10 @@
                                     @endphp
                                     @if($allCompleted)
                                         {{ $totalCompleted }} dari {{ $totalIkss }} instrumen telah dievaluasi dengan lengkap.
-                                        @if(!($isPenilaianProdiApproved ?? false))
-                                            <br>Silakan klik tombol <strong>Setujui</strong> untuk melanjutkan ke tahap <strong>Penilaian Instrumen Prodi</strong>.
+                                        @if(!$setuju)
+                                            <br>Silakan klik tombol <strong>Setujui</strong> untuk melanjutkan ke tahap <strong>Visitasi</strong>.
                                         @else
-                                            <br>Silakan lanjut ke tahap <strong>Penilaian Instrumen Prodi</strong>.
+                                            <br>Silakan lanjut ke tahap <strong>Visitasi</strong>.
                                         @endif
                                     @else
                                         {{ $totalCompleted }} dari {{ $totalIkss }} instrumen telah dievaluasi.
@@ -560,7 +560,7 @@
                                                 <div class="mt-3">
                                                     <h6>Deskripsi Penilaian Auditor <span class="text-danger">*</span></h6>
                                                     <textarea rows="2" class="form-control @error('deskripsi.'.$ikssAuditee->id) is-invalid @enderror"
-                                                              name="deskripsi[{{ $ikssAuditee->id }}]" {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                              name="deskripsi[{{ $ikssAuditee->id }}]" {{ $setuju ? 'disabled' : '' }}
                                                               required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->deskripsi) ? $deskEvaluation[$ikssAuditee->id]->deskripsi : old('deskripsi.'.$ikssAuditee->id) }}</textarea>
                                                     @error('deskripsi.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -569,7 +569,7 @@
                                                 <div class="mt-3">
                                                     <h6>Pertanyaan <span class="text-danger">*</span></h6>
                                                     <textarea rows="2" class="form-control @error('pertanyaan.'.$ikssAuditee->id) is-invalid @enderror"
-                                                              name="pertanyaan[{{ $ikssAuditee->id }}]" {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                              name="pertanyaan[{{ $ikssAuditee->id }}]" {{ $setuju ? 'disabled' : '' }}
                                                               required>{{ ($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->pertanyaan) ? $deskEvaluation[$ikssAuditee->id]->pertanyaan : old('pertanyaan.'.$ikssAuditee->id) }}</textarea>
                                                     @error('pertanyaan.'.$ikssAuditee->id)
                                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -578,7 +578,7 @@
                                                 <div class="mt-3">
                                                     <h6>Nilai <span class="text-danger">*</span></h6>
                                                     <select class="form-select @error('nilai.'.$ikssAuditee->id) is-invalid @enderror"
-                                                            name="nilai[{{ $ikssAuditee->id }}]" {{ ($isPenilaianProdiApproved ?? false) ? 'disabled' : '' }}
+                                                            name="nilai[{{ $ikssAuditee->id }}]" {{ $setuju ? 'disabled' : '' }}
                                                             required>
                                                         <option value="">Pilih Nilai</option>
                                                         <option value="4" {{ (($hasEvaluation || $hasPartialEvaluation) && isset($deskEvaluation[$ikssAuditee->id]->nilai) && $deskEvaluation[$ikssAuditee->id]->nilai == '4') || old('nilai.'.$ikssAuditee->id) == '4' ? 'selected' : '' }}>4</option>
@@ -605,7 +605,7 @@
                                         <div></div>
                                     @endif
 
-                                    @if(!($isPenilaianProdiApproved ?? false))
+                                    @if(!$setuju)
                                         @if(!$isLast)
                                             <button type="button" class="btn btn-primary next-step" data-next="{{ $loop->index + 1 }}">
                                                 Simpan & Lanjutkan <i class="bi bi-arrow-right ms-2"></i>
