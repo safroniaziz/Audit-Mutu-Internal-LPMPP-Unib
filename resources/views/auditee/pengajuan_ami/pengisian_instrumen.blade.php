@@ -723,7 +723,7 @@
 
                                     <div class="mb-4">
                                         <h6 class="fw-bold mb-3">Indikator Penilaian</h6>
-                                        <div class="bg-light-primary rounded p-4">
+                                        <div class="bg-light-primary rounded p-4" style="white-space: pre-line;">
                                             {!! $item['instrumen']->penilaian !!}
                                         </div>
                                     </div>

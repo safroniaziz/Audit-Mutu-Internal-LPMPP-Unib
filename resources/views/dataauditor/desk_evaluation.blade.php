@@ -551,7 +551,7 @@
 
                                             <div class="mb-4">
                                                 <h6>Indikator Penilaian</h6>
-                                                <div class="p-3 bg-light rounded">
+                                                <div class="p-3 bg-light rounded" style="white-space: pre-line;">
                                                     {!! $ikssAuditee->instrumen->penilaian !!}
                                                 </div>
                                             </div>

@@ -36,6 +36,6 @@ if (!function_exists('formatIndikatorPenilaian')) {
 
         $text = preg_replace('/(?<!^)(?<!\n)[ \t]+(?=(?:0|1|2|3|4):\s)/m', "\n", $text);
 
-        return nl2br(e($text), false);
+        return e($text);
     }
 }
