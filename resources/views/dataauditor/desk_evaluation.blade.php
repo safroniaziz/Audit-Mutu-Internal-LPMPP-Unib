@@ -298,7 +298,7 @@
 
 @section('dashboardProfile')
     <!-- Back Button -->
-    <div class="mb-5">
+    <div class="mb-5" id="scroll-top">
         <a href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuan->id) }}" class="btn btn-light-primary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>
             Kembali ke Penilaian Instrumen Prodi
@@ -477,7 +477,7 @@
                                                 <div>
                                                     <h6 class="text-muted mb-1">{{ $ikssAuditee->instrumen->indikatorKinerja->kode_ikss }}</h6>
                                                     <h4 class="mb-0">
-                                                        {{ $ikssAuditee->instrumen->indikator }}
+                                                        {!! $ikssAuditee->instrumen->indikator !!}
                                                     </h4>
                                                 </div>
                                                 @if($hasEvaluation)
@@ -500,7 +500,7 @@
                                                     <table class="table table-bordered">
                                                         <tr>
                                                             <td width="30%">Indikator Kinerja RSB</td>
-                                                            <td>{{ $ikssAuditee->instrumen->indikator }}</td>
+                                                            <td>{!! $ikssAuditee->instrumen->indikator !!}</td>
                                                         </tr>
                                                         <tr>
                                                             <td>Sumber data/bukti</td>
@@ -648,23 +648,25 @@
         let navMoved = false;
 
         // Unified wheel/trackpad scrolling handler
-        wizardNav.on('wheel', function(e) {
+        wizardNav.each(function() {
             const nav = this;
-            if (nav.scrollWidth <= nav.clientWidth) {
-                return;
-            }
+            nav.addEventListener('wheel', function(e) {
+                if (nav.scrollWidth <= nav.clientWidth) {
+                    return;
+                }
 
-            const deltaX = e.originalEvent.deltaX;
-            const deltaY = e.originalEvent.deltaY;
+                const deltaX = e.deltaX;
+                const deltaY = e.deltaY;
 
-            if (deltaX !== 0) {
-                e.preventDefault();
-                nav.scrollLeft += deltaX;
-            } else if (deltaY !== 0) {
-                e.preventDefault();
-                nav.scrollLeft += deltaY;
-            }
-        }, { passive: false });
+                if (deltaX !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaX;
+                } else if (deltaY !== 0) {
+                    e.preventDefault();
+                    nav.scrollLeft += deltaY;
+                }
+            }, { passive: false });
+        });
 
         // Add trackpad swipe support using pointer events
         let pointerStartX = 0;
@@ -727,8 +729,21 @@
             }
         });
 
-        // Auto scroll to form after reload
-        if ($('.wizard-content.active').length) {
+        const shouldScrollTop = window.location.hash === '#scroll-top';
+
+        if (shouldScrollTop) {
+            setTimeout(function() {
+                const scrollTarget = document.getElementById('scroll-top');
+
+                if (scrollTarget) {
+                    scrollTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                history.replaceState(null, document.title, window.location.pathname + window.location.search);
+            }, 100);
+        } else if ($('.wizard-content.active').length) {
             $('.wizard-nav')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 

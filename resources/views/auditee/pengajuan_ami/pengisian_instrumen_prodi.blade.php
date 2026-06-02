@@ -792,23 +792,25 @@ $(document).ready(function() {
     let navMoved = false;
 
     // Unified wheel/trackpad scrolling handler
-    wizardNav.on('wheel', function(e) {
+    wizardNav.each(function() {
         const nav = this;
-        if (nav.scrollWidth <= nav.clientWidth) {
-            return;
-        }
+        nav.addEventListener('wheel', function(e) {
+            if (nav.scrollWidth <= nav.clientWidth) {
+                return;
+            }
 
-        const deltaX = e.originalEvent.deltaX;
-        const deltaY = e.originalEvent.deltaY;
+            const deltaX = e.deltaX;
+            const deltaY = e.deltaY;
 
-        if (deltaX !== 0) {
-            e.preventDefault();
-            nav.scrollLeft += deltaX;
-        } else if (deltaY !== 0) {
-            e.preventDefault();
-            nav.scrollLeft += deltaY;
-        }
-    }, { passive: false });
+            if (deltaX !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaX;
+            } else if (deltaY !== 0) {
+                e.preventDefault();
+                nav.scrollLeft += deltaY;
+            }
+        }, { passive: false });
+    });
 
     // Add trackpad swipe support using pointer events
     let pointerStartX = 0;
