@@ -523,6 +523,21 @@
         white-space: nowrap;
     }
 
+    .indikator-penilaian-content {
+        line-height: 1.6;
+    }
+
+    .indikator-penilaian-content p:last-child,
+    .indikator-penilaian-content ul:last-child,
+    .indikator-penilaian-content ol:last-child {
+        margin-bottom: 0;
+    }
+
+    .indikator-penilaian-content ul,
+    .indikator-penilaian-content ol {
+        padding-left: 1.5rem;
+    }
+
     /* Responsive adjustments untuk alert button */
     @media (max-width: 768px) {
         .alert {
@@ -813,8 +828,8 @@
                                                     <div class="mb-8">
                                                         <h6 class="fw-bold mb-3">Indikator Penilaian</h6>
                                                         <div class="bg-light-warning rounded p-4">
-                                                            <div class="text-dark">
-                                                                {!! $instrumenProdi->indikator_penilaian !!}
+                                                            <div class="text-dark indikator-penilaian-content">
+                                                                {!! formatIndikatorPenilaian($instrumenProdi->indikator_penilaian) !!}
                                                             </div>
                                                         </div>
                                                     </div>

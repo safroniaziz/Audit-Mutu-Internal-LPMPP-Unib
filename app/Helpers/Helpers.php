@@ -18,3 +18,24 @@ if (!function_exists('formatSizeUnits')) {
         }
     }
 }
+
+if (!function_exists('formatIndikatorPenilaian')) {
+    function formatIndikatorPenilaian($value): string
+    {
+        $text = trim((string) ($value ?? ''));
+
+        if ($text === '') {
+            return '-';
+        }
+
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+        if (preg_match('/<[^>]+>/', $text)) {
+            return $text;
+        }
+
+        $text = preg_replace('/(?<!^)(?<!\n)[ \t]+(?=(?:0|1|2|3|4):\s)/m', "\n", $text);
+
+        return nl2br(e($text), false);
+    }
+}
