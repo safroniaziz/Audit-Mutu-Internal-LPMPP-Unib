@@ -102,4 +102,23 @@ class InstrumenProdi extends Model
                     ->where('pengajuan_ami_id', $pengajuanId)
                     ->where('auditor_id', Auth::id());
     }
+
+    public static function formatPenilaian($value): string
+    {
+        $text = trim((string) ($value ?? ''));
+
+        if ($text === '') {
+            return '-';
+        }
+
+        $text = str_replace(["\r\n", "\r"], "\n", $text);
+
+        if (preg_match('/<[^>]+>/', $text)) {
+            return $text;
+        }
+
+        $text = preg_replace('/(?<!^)(?<!\n)[ \t]+(?=(?:0|1|2|3|4):\s)/m', "\n", $text);
+
+        return e($text);
+    }
 }

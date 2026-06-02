@@ -829,7 +829,7 @@
                                                         <h6 class="fw-bold mb-3">Indikator Penilaian</h6>
                                                         <div class="bg-light-warning rounded p-4">
                                                             <div class="text-dark indikator-penilaian-content" style="white-space: pre-line;">
-                                                                {!! formatIndikatorPenilaian($instrumenProdi->indikator_penilaian) !!}
+                                                                {!! \App\Models\InstrumenProdi::formatPenilaian($instrumenProdi->indikator_penilaian) !!}
                                                             </div>
                                                         </div>
                                                     </div>
