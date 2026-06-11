@@ -1980,35 +1980,63 @@ class AuditeePengajuanAmiController extends Controller
             ->keyBy('instrumen_prodi_id');
 
         $previousSubmissionsByInstrumen = [];
+        $isStandardChanged = false;
         if ($allInstrumenProdiIds->isNotEmpty()) {
-            $previousSubmissions = InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
+            // Get currently assigned indicator IDs
+            $currentIndicatorIds = $indikatorInstrumens->pluck('id')->unique()->filter()->values()->toArray();
+
+            // Get indicator IDs from previous submissions
+            $previousSubmissionIndicatorIds = InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
                 ->where(function ($q) use ($candidatePreviousPeriodIds) {
-                    // Sertakan periode yang cocok ATAU NULL periode_id
-                    // (data lama mungkin tersimpan tanpa periode_id)
                     if (!empty($candidatePreviousPeriodIds)) {
                         $q->whereIn('periode_id', $candidatePreviousPeriodIds);
                     }
                     $q->orWhereNull('periode_id');
                 })
-                ->whereIn('instrumen_prodi_id', $allInstrumenProdiIds)
-                ->get();
+                ->join('instrumen_prodis', 'instrumen_prodis.id', '=', 'instrumen_prodi_submissions.instrumen_prodi_id')
+                ->pluck('instrumen_prodis.indikator_instrumen_id')
+                ->unique()
+                ->filter()
+                ->values()
+                ->toArray();
 
-            foreach ($previousSubmissions as $prev) {
-                $id = (int) $prev->instrumen_prodi_id;
-                $existing = $previousSubmissionsByInstrumen[$id] ?? null;
-                if (!$existing) {
-                    $previousSubmissionsByInstrumen[$id] = $prev;
-                    continue;
+            if (!empty($previousSubmissionIndicatorIds) && !empty($currentIndicatorIds)) {
+                $intersection = array_intersect($currentIndicatorIds, $previousSubmissionIndicatorIds);
+                if (empty($intersection)) {
+                    $isStandardChanged = true;
                 }
+            }
 
-                $existingRank = $periodRank[(int) $existing->periode_id] ?? PHP_INT_MAX;
-                $candidateRank = $periodRank[(int) $prev->periode_id] ?? PHP_INT_MAX;
-                if ($candidateRank < $existingRank) {
-                    $previousSubmissionsByInstrumen[$id] = $prev;
-                    continue;
-                }
-                if ($candidateRank === $existingRank && $score($prev) > $score($existing)) {
-                    $previousSubmissionsByInstrumen[$id] = $prev;
+            if (!$isStandardChanged) {
+                $previousSubmissions = InstrumenProdiSubmission::where('unit_kerja_id', $unitKerjaId)
+                    ->where(function ($q) use ($candidatePreviousPeriodIds) {
+                        // Sertakan periode yang cocok ATAU NULL periode_id
+                        // (data lama mungkin tersimpan tanpa periode_id)
+                        if (!empty($candidatePreviousPeriodIds)) {
+                            $q->whereIn('periode_id', $candidatePreviousPeriodIds);
+                        }
+                        $q->orWhereNull('periode_id');
+                    })
+                    ->whereIn('instrumen_prodi_id', $allInstrumenProdiIds)
+                    ->get();
+
+                foreach ($previousSubmissions as $prev) {
+                    $id = (int) $prev->instrumen_prodi_id;
+                    $existing = $previousSubmissionsByInstrumen[$id] ?? null;
+                    if (!$existing) {
+                        $previousSubmissionsByInstrumen[$id] = $prev;
+                        continue;
+                    }
+
+                    $existingRank = $periodRank[(int) $existing->periode_id] ?? PHP_INT_MAX;
+                    $candidateRank = $periodRank[(int) $prev->periode_id] ?? PHP_INT_MAX;
+                    if ($candidateRank < $existingRank) {
+                        $previousSubmissionsByInstrumen[$id] = $prev;
+                        continue;
+                    }
+                    if ($candidateRank === $existingRank && $score($prev) > $score($existing)) {
+                        $previousSubmissionsByInstrumen[$id] = $prev;
+                    }
                 }
             }
         }
@@ -2081,6 +2109,7 @@ class AuditeePengajuanAmiController extends Controller
             'defaultDariPeriodeSebelumnyaProdi' => $defaultDariPeriodeSebelumnyaProdi,
             'defaultFallbackCountProdi' => $defaultFallbackCountProdi,
             'previousPeriodeLabel' => $this->getPreviousPeriodeLabel($periodeAktif),
+            'isStandardChanged' => $isStandardChanged,
         ]);
     }
 

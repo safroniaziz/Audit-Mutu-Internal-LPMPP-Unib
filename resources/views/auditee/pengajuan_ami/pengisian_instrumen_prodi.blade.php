@@ -396,6 +396,21 @@
                 </div>
             @endif
 
+            @if(!empty($isStandardChanged))
+                <div class="alert alert-warning d-flex align-items-start p-5 mb-10">
+                    <div class="me-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-2 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="fw-bold text-dark mb-2">Perubahan Standar Instrumen (LAM)</h4>
+                        <div class="fs-6 text-gray-700">
+                            Standar instrumen (LAM) Anda pada periode ini berbeda dengan periode sebelumnya.
+                            Sistem secara profesional <strong>mengecualikan</strong> data pengisian dari periode sebelumnya agar tidak terjadi ketidaksesuaian data pada standar baru Anda.
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             @if(!empty($defaultDariPeriodeSebelumnyaProdi))
                 <div class="alert alert-info d-flex align-items-start p-5 mb-10">
                     <div class="me-4">

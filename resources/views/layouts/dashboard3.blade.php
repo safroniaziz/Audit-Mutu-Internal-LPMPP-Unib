@@ -516,6 +516,32 @@
                                                         </a>
                                                     </li>
                                                 @else
+                                                    @php
+                                                        $routePengajuan = request()->route('pengajuan') ?? $pengajuan ?? $auditess ?? null;
+                                                        $pengajuanId = is_object($routePengajuan) ? $routePengajuan->id : $routePengajuan;
+                                                        
+                                                        $isPerjanjianActive = false;
+                                                        $isProdiActive = false;
+                                                        $isDeskActive = false;
+                                                        $isVisitasiActive = false;
+                                                        $isUnduhActive = false;
+                                                        $isKetua = false;
+                                                        
+                                                        if ($pengajuanId) {
+                                                            $penugasan = \App\Models\PenugasanAuditor::where('pengajuan_ami_id', $pengajuanId)
+                                                                ->where('user_id', auth()->id())
+                                                                ->first();
+                                                                
+                                                            if ($penugasan) {
+                                                                $isPerjanjianActive = true;
+                                                                $isProdiActive = true;
+                                                                $isDeskActive = (bool)$penugasan->is_setuju_indikator_prodi;
+                                                                $isVisitasiActive = (bool)$penugasan->is_setuju;
+                                                                $isUnduhActive = (bool)$penugasan->is_setuju_visitasi;
+                                                                $isKetua = ($penugasan->role === 'ketua');
+                                                            }
+                                                        }
+                                                    @endphp
                                                     <li class="nav-item mt-2">
                                                         <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.daftarAuditee') ? 'active' : '' }}"
                                                         href="{{ route('auditor.audit.daftarAuditee') }}"
@@ -526,22 +552,67 @@
                                                         </a>
                                                     </li>
                                                     <li class="nav-item mt-2">
-                                                        <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.perjanjianKinerja') ? 'active' : '' }}">
-                                                            <i class="fas fa-user-check me-2"></i> Perjanjian Kinerja
-                                                        </a>
+                                                        @if($pengajuanId && $isPerjanjianActive)
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.perjanjianKinerja') ? 'active' : '' }}"
+                                                               href="{{ route('auditor.audit.perjanjianKinerja', $pengajuanId) }}">
+                                                                <i class="fas fa-user-check me-2"></i> Perjanjian Kinerja
+                                                            </a>
+                                                        @else
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.perjanjianKinerja') ? 'active' : '' }}">
+                                                                <i class="fas fa-user-check me-2"></i> Perjanjian Kinerja
+                                                            </a>
+                                                        @endif
                                                     </li>
-                                                    @yield('menuPenilaianInstrumenProdi')
                                                     <li class="nav-item mt-2">
-                                                        <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.deskEvaluation') ? 'active' : '' }}">
-                                                            <i class="fas fa-clipboard-check me-2"></i> Desk Evaluation
-                                                        </a>
+                                                        @if($pengajuanId && $isProdiActive)
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}"
+                                                               href="{{ route('auditor.audit.penilaianInstrumenProdi', $pengajuanId) }}">
+                                                                <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+                                                            </a>
+                                                        @else
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.penilaianInstrumenProdi') ? 'active' : '' }}">
+                                                                <i class="fas fa-file-alt me-2"></i> Penilaian Instrumen Prodi
+                                                            </a>
+                                                        @endif
                                                     </li>
                                                     <li class="nav-item mt-2">
-                                                        <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.visitasi') ? 'active' : '' }}">
-                                                            <i class="fas fa-map-marker-alt me-2"></i> Visitasi
-                                                        </a>
+                                                        @if($pengajuanId && $isDeskActive)
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.deskEvaluation') ? 'active' : '' }}"
+                                                               href="{{ route('auditor.audit.deskEvaluation', $pengajuanId) }}">
+                                                                <i class="fas fa-clipboard-check me-2"></i> Desk Evaluation
+                                                            </a>
+                                                        @else
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.deskEvaluation') ? 'active' : '' }}">
+                                                                <i class="fas fa-clipboard-check me-2"></i> Desk Evaluation
+                                                            </a>
+                                                        @endif
                                                     </li>
-                                                    @yield('menuUnduhDokumen')
+                                                    <li class="nav-item mt-2">
+                                                        @if($pengajuanId && $isVisitasiActive)
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.visitasi') ? 'active' : '' }}"
+                                                               href="{{ route('auditor.audit.visitasi', $pengajuanId) }}">
+                                                                <i class="fas fa-map-marker-alt me-2"></i> Visitasi
+                                                            </a>
+                                                        @else
+                                                            <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.visitasi') ? 'active' : '' }}">
+                                                                <i class="fas fa-map-marker-alt me-2"></i> Visitasi
+                                                            </a>
+                                                        @endif
+                                                    </li>
+                                                    @if($pengajuanId && $isKetua)
+                                                        <li class="nav-item mt-2">
+                                                            @if($isUnduhActive)
+                                                                <a class="nav-link text-active-primary ms-0 me-10 py-5 {{ Route::is('auditor.audit.unduhDokumen') ? 'active' : '' }}"
+                                                                   href="{{ route('auditor.audit.unduhDokumen', $pengajuanId) }}">
+                                                                    <i class="fas fa-download me-2"></i> Unduh Dokumen
+                                                                </a>
+                                                            @else
+                                                                <a class="nav-link text-active-primary ms-0 me-10 py-5 disabled {{ Route::is('auditor.audit.unduhDokumen') ? 'active' : '' }}">
+                                                                    <i class="fas fa-download me-2"></i> Unduh Dokumen
+                                                                </a>
+                                                            @endif
+                                                        </li>
+                                                    @endif
                                                 @endif
 
                                             </ul>
