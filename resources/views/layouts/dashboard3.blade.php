@@ -517,8 +517,29 @@
                                                     </li>
                                                 @else
                                                     @php
-                                                        $routePengajuan = request()->route('pengajuan') ?? $pengajuan ?? $auditess ?? null;
-                                                        $pengajuanId = is_object($routePengajuan) ? $routePengajuan->id : $routePengajuan;
+                                                        $resolvePengajuanId = function ($candidate) {
+                                                            if ($candidate instanceof \Illuminate\Support\Collection || is_array($candidate)) {
+                                                                return null;
+                                                            }
+
+                                                            if ($candidate instanceof \App\Models\PengajuanAmi) {
+                                                                return $candidate->id;
+                                                            }
+
+                                                            if (is_numeric($candidate)) {
+                                                                return (int) $candidate;
+                                                            }
+
+                                                            return is_object($candidate) && isset($candidate->id)
+                                                                ? $candidate->id
+                                                                : null;
+                                                        };
+
+                                                        $pengajuanId = $resolvePengajuanId(request()->route('pengajuan') ?? $pengajuan ?? null);
+
+                                                        if (!$pengajuanId && isset($auditess)) {
+                                                            $pengajuanId = $resolvePengajuanId($auditess);
+                                                        }
                                                         
                                                         $isPerjanjianActive = false;
                                                         $isProdiActive = false;
