@@ -1713,58 +1713,7 @@
         </script>
         @stack('scripts')
 
-        <!-- SweetAlert untuk Informasi IKSS Baru -->
-        @if(Auth::check() && Auth::user()->hasRole('Auditee') && request()->routeIs('auditee.dashboard'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('DOM loaded, showing IKSS alert...');
-                console.log('User has Auditee role:', {{ Auth::user()->hasRole('Auditee') ? 'true' : 'false' }});
-
-                // Show SweetAlert after a short delay (always show)
-                setTimeout(function() {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire({
-                            title: '<strong>📢 Informasi: Tambahan IKSS Terbaru</strong>',
-                                html: '<div class="text-start">' +
-                                    '<div class="alert alert-warning">' +
-                                    '<h6><i class="fas fa-exclamation-triangle me-2"></i>Perhatian!</h6>' +
-                                    '<p class="mb-0">Terdapat <strong>8 IKSS baru</strong> yang telah ditambahkan ke dalam sistem.</p>' +
-                                    '</div>' +
-                                    '<h6 class="mb-3"><i class="fas fa-list-alt me-2"></i>Daftar IKSS Baru:</h6>' +
-                                    '<ul class="list-unstyled mb-4">' +
-                                    '<li class="mb-2">• <strong>IKSS 1.4.3</strong> - Langganan Jurnal Online (1 instrumen)</li>' +
-                                    '<li class="mb-2">• <strong>IKSS 1.5.1</strong> - Tes TOEFL (1 instrumen)</li>' +
-                                    '<li class="mb-2">• <strong>IKSS 1.5.2</strong> - Mahasiswa Berprestasi (4 instrumen)</li>' +
-                                    '<li class="mb-2">• <strong>IKSS 1.5.5</strong> - Student Mobility Program (2 instrumen)</li>' +
-                                    '</ul>' +
-                                    '<div class="alert alert-info">' +
-                                    '<h6><i class="fas fa-info-circle me-2"></i>Untuk Auditee yang Sudah Menyelesaikan Audit:</h6>' +
-                                    '<p class="mb-2">Jika Anda sudah menyelesaikan semua tahapan audit namun belum memilih IKSS terbaru di atas, silakan hubungi:</p>' +
-                                    '<p class="mb-1"><i class="fas fa-user me-2"></i><strong>Ibu Tiara Eka Putri</strong></p>' +
-                                    '<p class="mb-2"><i class="fas fa-phone me-2"></i><strong>081373155834</strong></p>' +
-                                    '<small class="text-muted">Beliau akan membantu melakukan reset agar Anda dapat memilih IKSS kembali.</small>' +
-                                    '</div>' +
-                                    '</div>',
-                                icon: 'info',
-                                width: '600px',
-                                showCancelButton: true,
-                                confirmButtonText: '<i class="fas fa-arrow-right me-2"></i>Ke Pengisian Instrumen Prodi',
-                                cancelButtonText: '<i class="fas fa-times me-2"></i>Tutup',
-                                confirmButtonColor: '#3085d6',
-                                cancelButtonColor: '#6c757d'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    // Redirect to the first step before IKSS in the current flow.
-                                    window.location.href = '{{ route("auditee.pengajuanAmi.pengisianInstrumenProdi") }}';
-                                }
-                            });
-                        } else {
-                            console.error('SweetAlert2 is not loaded!');
-                        }
-                    }, 1000);
-            });
-        </script>
-        @endif		<!--end::Custom Javascript-->
+        		<!--end::Custom Javascript-->
 		<!--end::Javascript-->
 	</body>
 	<!--end::Body-->
