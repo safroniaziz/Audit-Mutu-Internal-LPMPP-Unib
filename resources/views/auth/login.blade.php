@@ -545,26 +545,39 @@
                 <!-- Content -->
                 <div class="relative z-10 flex flex-col h-full justify-between">
                     <div>
-                        <!-- Pengumuman AMI -->
-                        <div class="bg-white bg-opacity-15 backdrop-blur-sm border-l-4 border-orange-400 p-5 rounded-lg shadow-lg mb-6" data-aos="fade-left" data-aos-delay="200">
-                            <div class="flex items-start">
-                                <div class="bg-orange-400 rounded-full p-2 mr-4 text-white flex-shrink-0">
-                                    <i class="fas fa-bullhorn text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white mb-2 flex items-center">
-                                        <i class="fas fa-exclamation-circle mr-2"></i>
-                                        PENGUMUMAN PENTING
-                                    </h3>
-                                    <div class="space-y-2 text-blue-100">
-                                        <p class="font-semibold text-orange-200">📅 Perpanjangan Waktu Pengisian AMI:</p>
-                                        <p class="ml-4">• Pengisian AMI diperpanjang sampai dengan <strong class="text-white">21 September 2025</strong></p>
-                                        <p class="font-semibold mt-3 text-orange-200">🔍 Jadwal Desk Evaluasi:</p>
-                                        <p class="ml-4">• Desk Evaluasi dilaksanakan pada <strong class="text-white">18-26 September 2025</strong></p>
+                        <!-- Alur Pelaksanaan AMI -->
+                        <div class="bg-white bg-opacity-15 backdrop-blur-sm border-l-4 border-blue-400 p-5 rounded-xl shadow-lg mb-6" data-aos="fade-left" data-aos-delay="200">
+                            <h3 class="font-bold text-white mb-4 flex items-center text-lg">
+                                <i class="fas fa-project-diagram mr-2 text-blue-300"></i>
+                                Alur Pelaksanaan AMI
+                            </h3>
+                            <div class="grid grid-cols-1 gap-3 text-sm">
+                                <div class="flex items-center space-x-3 bg-white bg-opacity-5 p-3 rounded-lg hover:bg-opacity-10 transition">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-xs">1</span>
+                                    <div>
+                                        <p class="font-semibold text-white">Pengisian Instrumen</p>
+                                        <p class="text-xs text-blue-200">Oleh Program Studi / Auditee</p>
                                     </div>
-                                    <div class="mt-3 text-sm text-blue-100 bg-white bg-opacity-10 p-2 rounded border-l-2 border-orange-300">
-                                        <i class="fas fa-info-circle mr-1"></i>
-                                        Mohon segera melengkapi data AMI Anda sebelum batas waktu yang ditentukan.
+                                </div>
+                                <div class="flex items-center space-x-3 bg-white bg-opacity-5 p-3 rounded-lg hover:bg-opacity-10 transition">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-xs">2</span>
+                                    <div>
+                                        <p class="font-semibold text-white">Desk Evaluasi</p>
+                                        <p class="text-xs text-blue-200">Penilaian dokumen oleh Auditor</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3 bg-white bg-opacity-5 p-3 rounded-lg hover:bg-opacity-10 transition">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-xs">3</span>
+                                    <div>
+                                        <p class="font-semibold text-white">Visitasi Lapangan</p>
+                                        <p class="text-xs text-blue-200">Verifikasi lapangan oleh Auditor</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3 bg-white bg-opacity-5 p-3 rounded-lg hover:bg-opacity-10 transition">
+                                    <span class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 text-white font-bold text-xs">4</span>
+                                    <div>
+                                        <p class="font-semibold text-white">Rapat Tinjauan Manajemen (RTM)</p>
+                                        <p class="text-xs text-blue-200">Perumusan rencana tindak lanjut</p>
                                     </div>
                                 </div>
                             </div>

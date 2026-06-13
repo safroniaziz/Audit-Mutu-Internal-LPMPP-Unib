@@ -702,8 +702,8 @@ class AuditorAuditController extends Controller
             'kriterias.instrumenProdi' => function($query) use ($unitKerjaId, $pengajuan, $auditorId) {
                 $query->with([
                     'kriteriaInstrumen.indikatorInstrumen',
-                    'submission' => function ($submissionQuery) use ($pengajuan) {
-                        $submissionQuery->where('unit_kerja_id', $pengajuan->auditee->id)
+                    'submission' => function ($submissionQuery) use ($unitKerjaId, $pengajuan) {
+                        $submissionQuery->where('unit_kerja_id', $unitKerjaId)
                                         ->where('periode_id', $pengajuan->periode_id);
                     },
                     'nilaiAuditor' => function ($nilaiQuery) use ($pengajuan, $auditorId) {
@@ -851,7 +851,7 @@ class AuditorAuditController extends Controller
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
                 ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
-                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                    $query->where('unit_kerja_id', $pengajuan->auditee_id);
                 })->exists();
         }
 
@@ -878,7 +878,7 @@ class AuditorAuditController extends Controller
             }
         ])
         ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+            $query->where('unit_kerja_id', $pengajuan->auditee_id);
         })
         ->get();
 
@@ -1424,7 +1424,7 @@ class AuditorAuditController extends Controller
         foreach ($allSatuanStandar as $satuanStandar) {
             $satuanStandar->has_prodi_elements = $satuanStandar->indikatorKinerjas()
                 ->whereHas('unitKerjas', function ($query) use ($pengajuan) {
-                    $query->where('unit_kerja_id', $pengajuan->auditee->id);
+                    $query->where('unit_kerja_id', $pengajuan->auditee_id);
                 })->exists();
         }
 
@@ -1451,7 +1451,7 @@ class AuditorAuditController extends Controller
             }
         ])
         ->whereHas('indikatorInstrumen.prodis', function ($query) use ($pengajuan) {
-            $query->where('unit_kerja_id', $pengajuan->auditee->id);
+            $query->where('unit_kerja_id', $pengajuan->auditee_id);
         })
         ->get();
 

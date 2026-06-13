@@ -40,7 +40,8 @@ class PengajuanAmi extends Model
      */
     public function auditee(): BelongsTo
     {
-        return $this->belongsTo(UnitKerja::class, 'auditee_id', 'id');
+        return $this->belongsTo(UnitKerja::class, 'auditee_id', 'id')
+            ->withTrashed();
     }
 
     /**
