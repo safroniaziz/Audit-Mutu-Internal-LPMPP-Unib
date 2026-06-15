@@ -364,6 +364,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('auditee')->name('auditee.')->group(function () {
             Route::get('/dashboard', [AuditeeProfilController::class, 'index'])->name('dashboard');
             Route::get('/download', [AuditeeProfilController::class, 'downloadAllFiles'])->name('downloadAllFiles');
+            Route::post('/dashboard/ttd', [AuditeeProfilController::class, 'updateTtd'])->name('updateTtd');
+            Route::delete('/dashboard/ttd', [AuditeeProfilController::class, 'deleteTtd'])->name('deleteTtd');
 
             Route::prefix('perjanjian-kinerja')->name('perjanjian-kinerja.')->group(function () {
                 Route::delete('/{perjanjianKinerja}', [PerjanjianKinerjaController::class, 'destroy'])->name('destroy');
