@@ -63,12 +63,12 @@ class AuditeeProfilController extends Controller
     public function updateTtd(Request $request)
     {
         $request->validate([
-            'ttd' => 'required|image|mimes:jpeg,jpg,png|max:2048',
+            'ttd' => 'required|image|mimes:jpeg,jpg,png|max:350',
         ], [
             'ttd.required' => 'File tanda tangan wajib dipilih.',
             'ttd.image' => 'File harus berupa gambar.',
             'ttd.mimes' => 'Format tanda tangan harus JPG, JPEG, atau PNG.',
-            'ttd.max' => 'Ukuran tanda tangan maksimal 2MB.',
+            'ttd.max' => 'Ukuran tanda tangan maksimal 350KB.',
         ]);
 
         $user = Auth::user();

@@ -108,7 +108,7 @@
                     <form action="{{ route('auditee.updateTtd') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Upload TTD Baru (PNG/JPG, maks 2MB)</label>
+                            <label class="form-label fw-semibold">Upload TTD Baru (PNG/JPG, maks 350KB)</label>
                             
                             <div class="drag-drop-zone-ttd" id="dragDropZoneTtd" onclick="openFileDialogTtd()">
                                 <input type="file" name="ttd" id="ttdFileInput" accept=".png,.jpg,.jpeg" style="display: none;" onchange="handleFileChangeTtd(event)" required />
@@ -221,11 +221,11 @@
             return;
         }
 
-        if (file.size > 2048000) {
+        if (file.size > 358400) {
             Swal.fire({
                 icon: 'error',
                 title: 'File terlalu besar!',
-                text: 'Ukuran file maksimal 2MB',
+                text: 'Ukuran file maksimal 350KB',
             });
             resetFormTtd();
             return;
