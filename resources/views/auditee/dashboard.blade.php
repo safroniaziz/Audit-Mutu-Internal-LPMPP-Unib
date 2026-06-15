@@ -92,10 +92,10 @@
                         <div class="border rounded p-4 text-center bg-light position-relative">
                             @if (Auth::user()->ttd)
                                 <img src="{{ asset('storage/' . Auth::user()->ttd) }}" alt="TTD Auditee" style="max-height: 90px;">
-                                <form action="{{ route('auditee.deleteTtd') }}" method="POST" class="position-absolute top-0 end-0 m-2">
+                                <form action="{{ route('auditee.deleteTtd') }}" method="POST" class="position-absolute top-0 end-0 m-2" id="deleteTtdForm">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-icon btn-sm btn-light-danger" data-bs-toggle="tooltip" title="Hapus Tanda Tangan" onclick="return confirm('Apakah Anda yakin ingin menghapus tanda tangan saat ini?')">
+                                    <button type="button" class="btn btn-icon btn-sm btn-light-danger" data-bs-toggle="tooltip" title="Hapus Tanda Tangan" onclick="confirmDeleteTtd(event)">
                                         <i class="bi bi-trash fs-5"></i>
                                     </button>
                                 </form>
@@ -293,6 +293,38 @@
             processFile(file);
         }
     }, false);
+
+    function confirmDeleteTtd(event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Tanda tangan saat ini akan dihapus secara permanen!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('deleteTtdForm').submit();
+            }
+        });
+    }
+
+    @if (session('success'))
+        $(document).ready(function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+                timer: 2500,
+                timerProgressBar: true,
+            });
+        });
+    @endif
 </script>
 @endpush
 @endsection
